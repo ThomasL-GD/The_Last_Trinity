@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class Caca : MonoBehaviour
 {
+    
+    [SerializeField] private float 
+    
     // Start is called before the first frame update
     void Start()
     {
