@@ -49,7 +49,7 @@ public class PlayerControllerSubPuzzle : MonoBehaviour
         movementDirection.Normalize();
         
         //déplacement dans le sub puzzle
-        Vector3 subPuzzleDirection = new Vector3(verticalInput, 0, verticalInput);
+        Vector2 subPuzzleDirection = new Vector2(horizontalInput, verticalInput);
         
         //Utilisation du Quaternion pour permettre au player de toujours se déplacer dans l'angle où il regarde
         if (movementDirection != Vector3.zero && !m_isInSubPuzzle)
