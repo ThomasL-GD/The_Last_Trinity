@@ -10,6 +10,8 @@ public class PlayerController : MonoBehaviour
 {
     [Tooltip("Vitesse du joueur")] public float m_speed = 5f;
     [Tooltip("Vitesse de Rotation du Quaternion")] public float m_rotationSpeed = 700f;
+    [Tooltip("The input used to select this character")] public KeyCode m_selector = KeyCode.Space;
+    private bool m_isActive = false;
     
     void Update()
     {
@@ -27,6 +29,10 @@ public class PlayerController : MonoBehaviour
             Quaternion toRotation = Quaternion.LookRotation(movementDirection, Vector3.up);
                     
             transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, m_rotationSpeed * Time.deltaTime);
+        }
+
+        if (Input.GetKeyDown(m_selector)) {
+            m_isActive = true;
         }
     }
 }
