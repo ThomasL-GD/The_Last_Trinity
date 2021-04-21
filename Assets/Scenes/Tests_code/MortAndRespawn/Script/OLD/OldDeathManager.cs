@@ -26,6 +26,8 @@ public class OldDeathManager : MonoBehaviour {
         }
         
         StartCoroutine(AutoSaveTimer());
+        
+        Debug.LogWarning("THIS SCRIPT IS OLD AND MAY NOT WORK, PLEASE STOP USING IT WITHOUT PERMISSION OR I'LL COME TO YOUR HOUSE WITH MY HOLY CHAINSAW");
     }
     
     /// Do I really have to explain this ?

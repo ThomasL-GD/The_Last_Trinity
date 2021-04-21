@@ -10,17 +10,10 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
 
-    [Flags]
-    public enum Charas {
-        Human = 0,
-        Monster = 1,
-        Robot = 2
-    }
-
     [SerializeField] [Tooltip("Vitesse du joueur")] private float m_speed = 5f;
     [SerializeField] [Tooltip("Vitesse de Rotation du Quaternion")] private float m_rotationSpeed = 700f;
     [SerializeField] [Tooltip("The input used to select this character")] private SOInputMultiChara m_selector = null;
-    [SerializeField] [Tooltip("The character whom this script is on")] private Charas m_chara = 0;
+    [SerializeField] [Tooltip("The character whom this script is on, SELECT ONLY ONE !")] public Charas m_chara = 0;
     private KeyCode[] m_keyCodes = new[] {KeyCode.Joystick1Button0, KeyCode.Joystick1Button3, KeyCode.Joystick1Button1};
     private bool m_isActive = false;
     
@@ -83,7 +76,7 @@ public class PlayerController : MonoBehaviour
 
     /// <summary>
     /// Is called every frame as long as something is triggering the hitbox
-    /// It is detecting the trigger with every playable character to be able to kill him if he stays too long in there
+    /// It is detecting the trigger with every death zone to be able to kill itself if it stays too long in there
     /// </summary>
     /// <param name="p_other">The Collider of the object we're triggering with</param>
     private void OnTriggerStay(Collider p_other) {
@@ -99,7 +92,7 @@ public class PlayerController : MonoBehaviour
     }
 
     /// <summary>
-    /// Just to stop running the timer
+    /// Just to stop running the timer, if there's any weird behavior it may come from here (signed
     /// </summary>
     /// <param name="p_other">The Collider of the object we're exit-triggering with</param>
     private void OnTriggerExit(Collider p_other) {
