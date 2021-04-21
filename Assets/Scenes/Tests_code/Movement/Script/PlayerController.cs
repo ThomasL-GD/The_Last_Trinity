@@ -23,8 +23,14 @@ public class PlayerController : MonoBehaviour
     [SerializeField] [Tooltip("The character whom this script is on")] private Charas m_chara = 0;
     private KeyCode[] m_keyCodes = new[] {KeyCode.Joystick1Button0, KeyCode.Joystick1Button3, KeyCode.Joystick1Button1};
     private bool m_isActive = false;
+    
+    [SerializeField] [Tooltip("The time the player is allowed to stay in this death zone (unit : seconds)")] private float m_timeBeforeDying = 0.5f;
+    private float m_deathCounter = 0.0f;
+    private bool m_isDying = false;
 
     private void Start() {
+        DeathManager.DeathDelegator += ResetValues;
+        
         //We create an array (because it's easier to manipulate) of all the inputs of the characters
         m_keyCodes[0] = m_selector.inputHuman;
         m_keyCodes[1] = m_selector.inputMonster;
@@ -49,7 +55,7 @@ public class PlayerController : MonoBehaviour
             if (movementDirection != Vector3.zero)
             {
                 Quaternion toRotation = Quaternion.LookRotation(movementDirection, Vector3.up);
-                        
+                
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, m_rotationSpeed * Time.deltaTime);
             }
             
@@ -61,8 +67,52 @@ public class PlayerController : MonoBehaviour
         }
         //If any other input corresponding to a character is pressed, we inactive this chara
         else if (Input.GetKeyDown(m_keyCodes[0]) || Input.GetKeyDown(m_keyCodes[1]) || Input.GetKeyDown(m_keyCodes[2])){
-            Debug.Log("whatever");
             m_isActive = false;
         }
+        
+        
+        if (!m_isDying && m_deathCounter > 0f) {
+            m_deathCounter -= Time.deltaTime;
+        }
+        else if (m_isDying) {
+            m_deathCounter += Time.deltaTime;
+        }
+    }
+    
+    
+
+    /// <summary>
+    /// Is called every frame as long as something is triggering the hitbox
+    /// It is detecting the trigger with every playable character to be able to kill him if he stays too long in there
+    /// </summary>
+    /// <param name="p_other">The Collider of the object we're triggering with</param>
+    private void OnTriggerStay(Collider p_other) {
+        //We can detect if it is a player or not by checking if it has a PlayerController script
+        if (p_other.gameObject.TryGetComponent(out DeathZone pScript)) {
+            m_isDying = true;
+            if (m_deathCounter > m_timeBeforeDying) {
+                //The line below means that if the delegator is NOT empty, we invoke it.
+                DeathManager.DeathDelegator?.Invoke();
+            }
+        }
+        
+    }
+
+    /// <summary>
+    /// Just to stop running the timer
+    /// </summary>
+    /// <param name="p_other">The Collider of the object we're exit-triggering with</param>
+    private void OnTriggerExit(Collider p_other) {
+        if (p_other.gameObject.TryGetComponent(out DeathZone pScript)) {
+            m_isDying = false;
+        }
+    }
+    
+    /// <summary>
+    /// For safety, we reset a few values in case of death & respawn
+    /// </summary>
+    private void ResetValues() {
+        m_isDying = false;
+        m_deathCounter = 0.0f;
     }
 }
