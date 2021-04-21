@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cinemachine;
 
 /// <summary>
 /// Script du mouvement du player controller
@@ -21,9 +22,14 @@ public class PlayerController : MonoBehaviour
     private float m_deathCounter = 0.0f;
     private bool m_isDying = false;
 
-    private void Start() {
+    [SerializeField] private CinemachineVirtualCamera m_vCamH;
+    [SerializeField] private CinemachineVirtualCamera m_vCamM;
+    [SerializeField] private CinemachineVirtualCamera m_vCamR;
+
+    private void Start()
+    {
         DeathManager.DeathDelegator += ResetValues;
-        
+
         //We create an array (because it's easier to manipulate) of all the inputs of the characters
         m_keyCodes[0] = m_selector.inputHuman;
         m_keyCodes[1] = m_selector.inputMonster;
@@ -55,7 +61,27 @@ public class PlayerController : MonoBehaviour
         }
 
         //We activate this chara if its corresponding input is pressed
-        if (Input.GetKeyDown(m_keyCodes[(int)m_chara])) {
+        if (Input.GetKeyDown(m_keyCodes[(int)m_chara]))
+        {
+            switch (m_chara)
+            {
+                case Charas.Human:
+                    m_vCamH.Priority = 2;
+                    m_vCamM.Priority = 1;
+                    m_vCamR.Priority = 0;
+                    break;
+                case Charas.Monster:
+                    m_vCamH.Priority = 1;
+                    m_vCamM.Priority = 2;
+                    m_vCamR.Priority = 0;
+                    break;
+                case Charas.Robot:
+                    m_vCamH.Priority = 0;
+                    m_vCamM.Priority = 1;
+                    m_vCamR.Priority = 2;
+                    break;
+            }
+
             m_isActive = true;
         }
         //If any other input corresponding to a character is pressed, we inactive this chara
