@@ -17,6 +17,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] [Tooltip("The character whom this script is on, SELECT ONLY ONE !")] public Charas m_chara = 0;
     private KeyCode[] m_keyCodes = new[] {KeyCode.Joystick1Button0, KeyCode.Joystick1Button3, KeyCode.Joystick1Button1};
     private bool m_isActive = false;
+
+    [SerializeField]
+    [Tooltip("The prefab of what represents the soul, it will be driven from a character to another when a switch occurs")] private GameObject m_soul = null;
     
     [SerializeField] [Tooltip("The time the player is allowed to stay in this death zone (unit : seconds)")] private float m_timeBeforeDying = 0.5f;
     private float m_deathCounter = 0.0f;
@@ -36,6 +39,10 @@ public class PlayerController : MonoBehaviour
         m_keyCodes[2] = m_selector.inputRobot;
 
         if (m_chara == Charas.Human) m_isActive = true;
+
+        if (m_soul == null) {
+            Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT A PREFAB FOR THE SOUL ! WHERE DID HE GOT HIS FAKE DIPLOMA ?!");
+        }
     }
 
     void Update()
@@ -84,8 +91,19 @@ public class PlayerController : MonoBehaviour
 
             m_isActive = true;
         }
-        //If any other input corresponding to a character is pressed, we inactive this chara
+        //If any other input corresponding to another character is pressed, we inactive this chara
         else if (Input.GetKeyDown(m_keyCodes[0]) || Input.GetKeyDown(m_keyCodes[1]) || Input.GetKeyDown(m_keyCodes[2])){
+            //If this character was active, we create a soul and send it to the next selected character
+            if (m_isActive) {
+                GameObject soul = Instantiate(m_soul, transform.position, transform.rotation);
+                if (Input.GetKeyDown(m_keyCodes[(int) Charas.Human]))
+                    soul.GetComponent<AutoRotation>().m_target = m_vCamH.LookAt;
+                if (Input.GetKeyDown(m_keyCodes[(int) Charas.Monster]))
+                    soul.GetComponent<AutoRotation>().m_target = m_vCamM.LookAt;
+                if (Input.GetKeyDown(m_keyCodes[(int) Charas.Robot]))
+                    soul.GetComponent<AutoRotation>().m_target = m_vCamR.LookAt;
+            }
+            
             m_isActive = false;
         }
         
