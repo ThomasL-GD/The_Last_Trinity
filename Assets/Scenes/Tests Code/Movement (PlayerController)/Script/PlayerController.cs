@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] [Tooltip("The character whom this script is on, SELECT ONLY ONE !")] public Charas m_chara = 0;
     private KeyCode[] m_keyCodes = new[] {KeyCode.Joystick1Button0, KeyCode.Joystick1Button3, KeyCode.Joystick1Button1};
     private bool m_isActive = false;
+    public bool m_isForbiddenToMove = false;
     private bool m_isSwitchingChara = false;
 
     [SerializeField]
@@ -53,7 +54,7 @@ public class PlayerController : MonoBehaviour
         if (!m_isSwitchingChara) {
             
             //The character is not able to move if not selected
-            if (m_isActive) {
+            if (m_isActive && !m_isForbiddenToMove) {
                 float horizontalInput = Input.GetAxis("Horizontal");
                 float verticalInput = Input.GetAxis("Vertical");
                 
