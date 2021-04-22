@@ -47,6 +47,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        //1 - Movement
         //The character is not able to move if not selected
         if (m_isActive) {
             float horizontalInput = Input.GetAxis("Horizontal");
@@ -66,10 +67,12 @@ public class PlayerController : MonoBehaviour
             }
             
         }
-
+        
+        //2 - Change Chara
         //We activate this chara if its corresponding input is pressed
-        if (Input.GetKeyDown(m_keyCodes[(int)m_chara]))
+        if (Input.GetKeyDown(m_keyCodes[(int) m_chara]))
         {
+            //Change the camera by adjusting the priority
             switch (m_chara)
             {
                 case Charas.Human:
@@ -107,7 +110,10 @@ public class PlayerController : MonoBehaviour
             m_isActive = false;
         }
         
+        //3 - Competences
         
+        
+        //4 - Death Manager
         if (!m_isDying && m_deathCounter > 0f) {
             m_deathCounter -= Time.deltaTime;
         }
