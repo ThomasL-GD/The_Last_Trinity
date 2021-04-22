@@ -44,6 +44,10 @@ public class PlayerController : MonoBehaviour
         if (m_soul == null) {
             Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT A PREFAB FOR THE SOUL ! WHERE DID HE GOT HIS FAKE DIPLOMA ?!");
         }
+        
+        if (m_selector == null) {
+            Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE SCRIPTABLE OBJECT FOR THE INPUTS !");
+        }
     }
 
     void Update()
