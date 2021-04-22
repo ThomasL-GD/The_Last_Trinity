@@ -6,9 +6,9 @@ using UnityEngine;
 public class AutoRotation : MonoBehaviour {
 
     [SerializeField] [Tooltip("The speed at which the object will rotate")] private float m_rotationStrength = 10.0f;
-    [SerializeField] [Tooltip("The time taken for the object to go to its target (unit : seconds)")] private float m_duration = 2.0f;
+    [SerializeField] [Range(0.01f, 2f)] [Tooltip("The time taken for the object to go to its target (unit : seconds)")] private float m_duration = 2.0f;
     private float m_durationLeft = 2.0f;
-    [SerializeField] [Tooltip("The distance between this object and its target at which this object will auto-destroy (unit : meters)")] private float m_uncertainty = 0.2f;
+    [SerializeField] [Range(0.0f, 1.2f)] [Tooltip("The distance between this object and its target at which this object will auto-destroy (unit : meters)")] private float m_uncertainty = 0.2f;
     public Transform m_target = null;
     private bool m_targetNull = true;
 

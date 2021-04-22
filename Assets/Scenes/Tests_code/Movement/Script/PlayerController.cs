@@ -17,11 +17,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] [Tooltip("The character whom this script is on, SELECT ONLY ONE !")] public Charas m_chara = 0;
     private KeyCode[] m_keyCodes = new[] {KeyCode.Joystick1Button0, KeyCode.Joystick1Button3, KeyCode.Joystick1Button1};
     private bool m_isActive = false;
+    private bool m_isSwitchingChara = false;
 
     [SerializeField]
     [Tooltip("The prefab of what represents the soul, it will be driven from a character to another when a switch occurs")] private GameObject m_soul = null;
     
-    [SerializeField] [Tooltip("The time the player is allowed to stay in this death zone (unit : seconds)")] private float m_timeBeforeDying = 0.5f;
+    [SerializeField] [Range(0.2f, 5f)] [Tooltip("The time the player is allowed to stay in this death zone (unit : seconds)")] private float m_timeBeforeDying = 0.5f;
     private float m_deathCounter = 0.0f;
     private bool m_isDying = false;
 
@@ -47,67 +48,73 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        //The character is not able to move if not selected
-        if (m_isActive) {
-            float horizontalInput = Input.GetAxis("Horizontal");
-            float verticalInput = Input.GetAxis("Vertical");
-            
-            Vector3 movementDirection = new Vector3(horizontalInput,  0, verticalInput);
-            movementDirection.Normalize();
-                    
-            if(m_isActive) transform.Translate(movementDirection * m_speed * Time.deltaTime, Space.World);
-        
-            //Utilisation du Quaternion pour permettre au player de toujours se déplacer dans l'angle où il regarde
-            if (movementDirection != Vector3.zero)
-            {
-                Quaternion toRotation = Quaternion.LookRotation(movementDirection, Vector3.up);
-                
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, m_rotationSpeed * Time.deltaTime);
-            }
-            
-        }
 
-        //We activate this chara if its corresponding input is pressed
-        if (Input.GetKeyDown(m_keyCodes[(int)m_chara]))
-        {
-            switch (m_chara)
-            {
-                case Charas.Human:
-                    m_vCamH.Priority = 2;
-                    m_vCamM.Priority = 1;
-                    m_vCamR.Priority = 0;
-                    break;
-                case Charas.Monster:
-                    m_vCamH.Priority = 1;
-                    m_vCamM.Priority = 2;
-                    m_vCamR.Priority = 0;
-                    break;
-                case Charas.Robot:
-                    m_vCamH.Priority = 0;
-                    m_vCamM.Priority = 1;
-                    m_vCamR.Priority = 2;
-                    break;
-            }
-
-            m_isActive = true;
-        }
-        //If any other input corresponding to another character is pressed, we inactive this chara
-        else if (Input.GetKeyDown(m_keyCodes[0]) || Input.GetKeyDown(m_keyCodes[1]) || Input.GetKeyDown(m_keyCodes[2])){
-            //If this character was active, we create a soul and send it to the next selected character
+        //If the character is in a transition between two characters
+        if (!m_isSwitchingChara) {
+            
+            //The character is not able to move if not selected
             if (m_isActive) {
-                GameObject soul = Instantiate(m_soul, transform.position, transform.rotation);
-                if (Input.GetKeyDown(m_keyCodes[(int) Charas.Human]))
-                    soul.GetComponent<AutoRotation>().m_target = m_vCamH.LookAt;
-                if (Input.GetKeyDown(m_keyCodes[(int) Charas.Monster]))
-                    soul.GetComponent<AutoRotation>().m_target = m_vCamM.LookAt;
-                if (Input.GetKeyDown(m_keyCodes[(int) Charas.Robot]))
-                    soul.GetComponent<AutoRotation>().m_target = m_vCamR.LookAt;
+                float horizontalInput = Input.GetAxis("Horizontal");
+                float verticalInput = Input.GetAxis("Vertical");
+                
+                Vector3 movementDirection = new Vector3(horizontalInput,  0, verticalInput);
+                movementDirection.Normalize();
+                        
+                if(m_isActive) transform.Translate(movementDirection * m_speed * Time.deltaTime, Space.World);
+            
+                //Utilisation du Quaternion pour permettre au player de toujours se déplacer dans l'angle où il regarde
+                if (movementDirection != Vector3.zero)
+                {
+                    Quaternion toRotation = Quaternion.LookRotation(movementDirection, Vector3.up);
+                    
+                    transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, m_rotationSpeed * Time.deltaTime);
+                }
+                
+            }
+
+            //We activate this chara if its corresponding input is pressed
+            if (Input.GetKeyDown(m_keyCodes[(int)m_chara]))
+            {
+                switch (m_chara)
+                {
+                    case Charas.Human:
+                        m_vCamH.Priority = 2;
+                        m_vCamM.Priority = 1;
+                        m_vCamR.Priority = 0;
+                        break;
+                    case Charas.Monster:
+                        m_vCamH.Priority = 1;
+                        m_vCamM.Priority = 2;
+                        m_vCamR.Priority = 0;
+                        break;
+                    case Charas.Robot:
+                        m_vCamH.Priority = 0;
+                        m_vCamM.Priority = 1;
+                        m_vCamR.Priority = 2;
+                        break;
+                }
+
+                m_isActive = true;
+            }
+            //If any other input corresponding to another character is pressed, we inactive this chara
+            else if (Input.GetKeyDown(m_keyCodes[0]) || Input.GetKeyDown(m_keyCodes[1]) || Input.GetKeyDown(m_keyCodes[2])){
+                //If this character was active, we create a soul and send it to the next selected character
+                if (m_isActive) {
+                    GameObject soul = Instantiate(m_soul, transform.position, transform.rotation);
+                    if (Input.GetKeyDown(m_keyCodes[(int) Charas.Human]))
+                        soul.GetComponent<AutoRotation>().m_target = m_vCamH.LookAt;
+                    if (Input.GetKeyDown(m_keyCodes[(int) Charas.Monster]))
+                        soul.GetComponent<AutoRotation>().m_target = m_vCamM.LookAt;
+                    if (Input.GetKeyDown(m_keyCodes[(int) Charas.Robot]))
+                        soul.GetComponent<AutoRotation>().m_target = m_vCamR.LookAt;
+                }
+                
+                m_isActive = false;
             }
             
-            m_isActive = false;
         }
         
-        
+        //If this character is in a death zone, we increase his death timer, if not, we decrease it
         if (!m_isDying && m_deathCounter > 0f) {
             m_deathCounter -= Time.deltaTime;
         }
