@@ -93,7 +93,10 @@ public class PlayerController : MonoBehaviour
                         m_vCamR.Priority = 2;
                         break;
                 }
-
+                
+                m_isSwitchingChara = true;
+                StartCoroutine(SwitchTimer());
+                
                 m_isActive = true;
             }
             //If any other input corresponding to another character is pressed, we inactive this chara
@@ -122,7 +125,14 @@ public class PlayerController : MonoBehaviour
             m_deathCounter += Time.deltaTime;
         }
     }
-    
+
+    /// <summary>
+    /// Wait for a duration that depends on the switch duration, once it is done waiting it make m_isSwitchingChara in true, allowing the player to move and switch characters again
+    /// </summary>
+    IEnumerator SwitchTimer() {
+        yield return new WaitForSeconds(m_soul.GetComponent<AutoRotation>().m_duration / 1.2f);
+        m_isSwitchingChara = false;
+    }
     
 
     /// <summary>
