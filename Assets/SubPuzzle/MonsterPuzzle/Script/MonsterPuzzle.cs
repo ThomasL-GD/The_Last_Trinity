@@ -23,8 +23,8 @@ public class MonsterPuzzle : MonoBehaviour
 
 
     [Tooltip("Tableau à double entrée qui stocke les prefab")] public GameObject[,] m_prefabStock;
-    [SerializeField] [Tooltip("hauteur du tableau de prefab")] private int m_arrayHeight = 10;
-    [SerializeField] [Tooltip("largeur du tableau de prefab")] private int m_arrayWidth = 10;
+    [SerializeField] [Tooltip("hauteur du tableau de prefab")] public int m_arrayHeight = 10;
+    [SerializeField] [Tooltip("largeur du tableau de prefab")] public int m_arrayWidth = 10;
     
     //Use for Debug only
     //private GameObject m_prefabStockY=null;
