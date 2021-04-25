@@ -18,7 +18,7 @@ public class movePiece : MonoBehaviour
     private float m_realRotation;
     
     /// <summary>
-    /// Création d'un tableau de baleurs
+    /// Création d'un tableau de valeurs
     /// </summary>
     public int[] m_values;
 
@@ -33,6 +33,7 @@ public class movePiece : MonoBehaviour
 
     private void OnMouseDown()
     {
+        //Fonction de rotation d'une pièce lors d'une input
         RotatePiece();
     }
 
@@ -44,6 +45,7 @@ public class movePiece : MonoBehaviour
         
         transform.rotation = Quaternion.Euler(0, 0, m_realRotation);
 
+        //Change la valeur qui est attribuée à une face en fonction du symbole représenté
         RotateValue();
     }
     

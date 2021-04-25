@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -18,18 +19,17 @@ public class MonsterPuzzle : MonoBehaviour
     
     [SerializeField] [Tooltip("Décalage du prefab sur l'axe X")] public float m_offsetX = 4.0f;
     [SerializeField] [Tooltip("Décalage du prefab sur l'axe Y")] public float m_offsetY = 4.0f;
-    
-    [SerializeField] [Tooltip("Carré de selection qui se déplace entre les différentes instances de pièces présentes")] private Transform m_selector;
-
 
     [Tooltip("Tableau à double entrée qui stocke les prefab")] public GameObject[,] m_prefabStock;
-    [SerializeField] [Tooltip("hauteur du tableau de prefab")] public int m_arrayHeight = 10;
-    [SerializeField] [Tooltip("largeur du tableau de prefab")] public int m_arrayWidth = 10;
+    [Tooltip("hauteur du tableau de prefab")] public int m_arrayHeight = 10;
+    [Tooltip("largeur du tableau de prefab")] public int m_arrayWidth = 10;
+    
+    [Tooltip("Tableau à double entrée qui stocke les positions des prefab")] public List<Vector3> m_piecesTransform = new List<Vector3>();
+    
+    [SerializeField] [Tooltip("Carré de selection qui se déplace entre les différentes instances de pièces présentes")] private Transform m_selector;
     
     //Use for Debug only
     //private GameObject m_prefabStockY=null;
-    
-    [Tooltip("Tableau à double entrée qui stocke les positions des prefab")] public List<Vector3> m_piecesTransform = new List<Vector3>();
 
 
 
@@ -53,12 +53,25 @@ public class MonsterPuzzle : MonoBehaviour
             m_stockPieces.Add(m_piecePrefab[i]);
         }
         
+        //Fonction qui va instancier les pièces aléatoirement dans la scène
+        PuzzleStructure();
+
+        //Position des prefab à trouver
+        transform.position = new Vector3(transform.position.x + (((float)m_arrayWidth /2f) +0.5f)*m_offsetX, transform.position.y + (m_arrayHeight+1)*m_offsetY, transform.position.z);
+
+        //création du selecteur dans la scène
+        Instantiate(m_selector, new Vector3(m_piecesTransform[0].x, m_piecesTransform[0].y, transform.position.z), transform.rotation);
+        
+        //Fonction des pièces à trouver parmi les pièces présentes
+        CorrectPiecesInstantiate();
+        
+    }
+
+    private void PuzzleStructure()
+    {
         //tableau à deux dimensions qui place les pièces
         m_prefabStock = new GameObject[m_arrayHeight, m_arrayWidth];
 
-        //tableau qui regroupe les positions des pièces dans la scène
-        //m_piecesTransform = new Transform[Xposition,Yposition];
-        
         //double boucle for pour créer le tableau
         for (int x = 0; x < m_arrayHeight; x++)
         {
@@ -84,15 +97,11 @@ public class MonsterPuzzle : MonoBehaviour
             //Retour à la ligne
             transform.position = new Vector3(transform.position.x - m_offsetX * m_arrayWidth,transform.position.y - m_offsetY,0);
         }
-        
-        
-        
-        //Position des prefab à trouver
-        transform.position = new Vector3(transform.position.x + (((float)m_arrayWidth /2f) +0.5f)*m_offsetX, transform.position.y + (m_arrayHeight+1)*m_offsetY, transform.position.z);
-
-        //création du selecteur dans la scène
-        Instantiate(m_selector, new Vector3(m_piecesTransform[0].x, m_piecesTransform[0].y, transform.position.z), transform.rotation);
-        
+    }
+    
+    
+    private void CorrectPiecesInstantiate()
+    {
         //Instanciation des pièces à trouver parmi les pièces actives dans la scène
         //Si il y a plus de pièces à trouver que de pièces actives, erreur
         if (m_nbAmalgamePieces > m_potentialPieces.Count)
@@ -113,7 +122,5 @@ public class MonsterPuzzle : MonoBehaviour
             m_potentialPieces.RemoveAt(random);
         }
     }
-    
-    
     
 }
