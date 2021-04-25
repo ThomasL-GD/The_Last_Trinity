@@ -13,10 +13,11 @@ public class MonsterPuzzle : MonoBehaviour
     //Liste des pièces correctes
     [SerializeField] [Tooltip("Liste des pièces à trouver parmi les pièces de la scène")] private List<GameObject> m_correctPieces = new List<GameObject>();
 
+    
     [SerializeField] [Tooltip("nombre de pièces présentes dans l'amalgame")] private int m_nbAmalgamePieces = 3;
     
-    [SerializeField] [Tooltip("Décalage du prefab sur l'axe X")] private float m_offsetX = 4.0f;
-    [SerializeField] [Tooltip("Décalage du prefab sur l'axe Y")] private float m_offsetY = 4.0f;
+    [SerializeField] [Tooltip("Décalage du prefab sur l'axe X")] public float m_offsetX = 4.0f;
+    [SerializeField] [Tooltip("Décalage du prefab sur l'axe Y")] public float m_offsetY = 4.0f;
     
     [SerializeField] [Tooltip("Carré de selection qui se déplace entre les différentes instances de pièces présentes")] private Transform m_selector;
 
@@ -26,15 +27,12 @@ public class MonsterPuzzle : MonoBehaviour
     [SerializeField] [Tooltip("largeur du tableau de prefab")] private int m_arrayWidth = 10;
     
     //Use for Debug only
-    private GameObject m_prefabStockY=null;
-    
+    //private GameObject m_prefabStockY=null;
     
     [Tooltip("Tableau à double entrée qui stocke les positions des prefab")] public List<Vector3> m_piecesTransform = new List<Vector3>();
-    //[Tooltip("Tableau à double entrée qui stocke les positions des prefab")] public Transform[] m_piecesTransform;
-    
-    //Script sur chaque prefab instancié, les pièces de puzzle
-    private ChoosePiece m_choosePiece;
-    
+
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -79,6 +77,7 @@ public class MonsterPuzzle : MonoBehaviour
                 m_potentialPieces.Add(m_prefabStock[x,y]);
                 m_stockPieces.RemoveAt(random);
                 
+                //ajout des positions des pièces dans un nouveau tableau
                 m_piecesTransform.Add(transform.position);
                 
             }
@@ -87,20 +86,12 @@ public class MonsterPuzzle : MonoBehaviour
         }
         
         
-        //Ajout des positions des pièces dans la scène dans le tableau qui regroupe les positions
-        for(var i = 0; i < m_potentialPieces.Count; i++)
-        {
-            //m_piecesTransform[i] = m_potentialPieces[i].transform;
-            //m_piecesTransform[i] = m_choosePiece.m_piecePosition[i].transform;
-            //m_piecesTransform.AddRange(m_choosePiece.m_piecePosition);
-        }
-        
         
         //Position des prefab à trouver
         transform.position = new Vector3(transform.position.x + (((float)m_arrayWidth /2f) +0.5f)*m_offsetX, transform.position.y + (m_arrayHeight+1)*m_offsetY, transform.position.z);
 
         //création du selecteur dans la scène
-        Instantiate(m_selector, new Vector3(m_prefabStock[0,0].transform.position.x,0,0), transform.rotation);
+        Instantiate(m_selector, new Vector3(m_piecesTransform[0].x, m_piecesTransform[0].y, transform.position.z), transform.rotation);
         
         //Instanciation des pièces à trouver parmi les pièces actives dans la scène
         //Si il y a plus de pièces à trouver que de pièces actives, erreur
@@ -122,34 +113,7 @@ public class MonsterPuzzle : MonoBehaviour
             m_potentialPieces.RemoveAt(random);
         }
     }
-
-    private void Update()
-    {
-        //déplacement du sélecteur
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            //m_selector.transform.position = m_piecesTransform[4].transform.position;
-            
-            /*
-            if (m_selector.transform.position == m_piecePrefab[0].transform.position)
-            {
-                m_selector.transform.position = m_piecePrefab[m_piecePrefab.Length].transform.position;
-            }
-            */
-        }
-        else if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            //m_selector.transform.position = m_piecesTransform[3].transform.position;
-            
-            /*
-            if (m_selector.transform.position == m_piecePrefab[m_piecePrefab.Length].transform.position)
-            {
-                m_selector.transform.position = m_piecePrefab[0].transform.position;
-            }
-            */
-        }
-
-    }
+    
     
     
 }
