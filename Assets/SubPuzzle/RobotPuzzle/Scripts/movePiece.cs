@@ -10,7 +10,7 @@ public class movePiece : MonoBehaviour
     /// <summary>
     /// Vitesse de rotation d'une pièce
     /// </summary>
-    [SerializeField] private float m_speed = 200.0f;
+    [SerializeField] private float m_speed = 10.0f;
     
     /// <summary>
     /// angle de rotation d'un bloc
@@ -27,7 +27,7 @@ public class movePiece : MonoBehaviour
     {
         if (transform.root.eulerAngles.z != m_realRotation)
         {
-            transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(0,0,m_realRotation), m_speed);
+            transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(0,0,m_realRotation), m_speed * Time.deltaTime);
         }
     }
 
