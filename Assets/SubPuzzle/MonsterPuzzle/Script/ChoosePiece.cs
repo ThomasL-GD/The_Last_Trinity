@@ -1,9 +1,5 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
-
+using System.Collections.Generic;
 
 public class ChoosePiece : MonoBehaviour
 {
@@ -12,10 +8,15 @@ public class ChoosePiece : MonoBehaviour
     /// </summary>
     private MonsterPuzzle m_monsterPuzzle;
 
-    
+    public Transform[] m_piecePosition;
+
     private void Start()
     {
         m_monsterPuzzle = GameObject.Find("MonsterPuzzle").GetComponent<MonsterPuzzle>();
+        
+        //m_monsterPuzzle.m_piecesTransform.AddRange(m_piecePosition);
+        
+        //m_monsterPuzzle.m_piecesTransform.Add();
     }
 
     
@@ -33,6 +34,8 @@ public class ChoosePiece : MonoBehaviour
             Debug.Log("Perdu");
         }
     }
+
+    
     
     
 }
