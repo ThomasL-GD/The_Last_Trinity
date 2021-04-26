@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -29,15 +30,15 @@ public class MonsterPuzzle : MonoBehaviour
 
     [SerializeField] [Tooltip("Carré de selection qui se déplace entre les différentes instances de pièces présentes")] private GameObject m_prefabSelector = null;
     
-    //La position de la première case ;)
+    //La position de la première case
     private Vector3 m_initialPos = Vector3.zero;
     
-    //The transform of the selector
+    //transform du sélecteur
     private Transform m_selectorTransform = null;
 
-    //The coordinates of the selector
-    private int m_selectorX = 0;
-    private int m_selectorY = 0;
+    //Coordonnées du sélecteur
+    [SerializeField] private int m_selectorX = 0;
+    [SerializeField] private int m_selectorY = 0;
 
 
     // Start is called before the first frame update
@@ -67,7 +68,8 @@ public class MonsterPuzzle : MonoBehaviour
 
         //création du selecteur dans la scène
         GameObject instance = Instantiate(m_prefabSelector, m_initialPos, transform.rotation);
-
+        
+        //transform du sélecteur récupéré à l'instanciation
         m_selectorTransform = instance.transform;
         
         //Position des prefab à trouver
@@ -91,6 +93,7 @@ public class MonsterPuzzle : MonoBehaviour
                 //variable qui sort une position aléatoire dans la list de pièces du stock
                 int random = Random.Range(0, m_stockPieces.Count);
                 
+                //décalage de la position en x avant instance du prefab
                 transform.position = new Vector3(transform.position.x + m_offsetX,transform.position.y,0);
                 
                 //instantiation dans la scène d'une pièce tirée dans le stock de prefab 
@@ -101,8 +104,9 @@ public class MonsterPuzzle : MonoBehaviour
                 m_potentialPieces.Add(m_prefabStock[x,y]);
                 m_stockPieces.RemoveAt(random);
 
+                //récupération de la position de la première prefab instanciée
+                //position sert à placer le sélecteur qui reprend m_initialPos
                 if (x == 0 && y == 0) m_initialPos = transform.position;
-
             }
             //Retour à la ligne
             transform.position = new Vector3(transform.position.x - m_offsetX * m_arrayWidth,transform.position.y - m_offsetY,0);
@@ -130,6 +134,12 @@ public class MonsterPuzzle : MonoBehaviour
             //enlèvement de ce prefab de la liste des prefab à instancier dans la scène pour éviter de devoir trouver deux fois le même
             m_correctPieces.Add(m_potentialPieces[random]);
             m_potentialPieces.RemoveAt(random);
+        }
+
+        foreach (GameObject go in m_correctPieces)
+        {
+            go.GetComponent<SpriteRenderer>().color = Color.green;
+            m_prefabStock[m_selectorX, m_selectorY].GetComponent<SpriteRenderer>().color = Color.green;
         }
     }
     
@@ -160,8 +170,13 @@ public class MonsterPuzzle : MonoBehaviour
             m_selectorTransform.position = new Vector3(m_initialPos.x + m_selectorX * m_offsetX, m_initialPos.y - m_selectorY * m_offsetY, m_initialPos.z);
         }
 
-        //m_prefabStock[m_selectorX, m_selectorY];
-
+        //m_prefabStock[m_selectorX, m_selectorY]
+        if (m_prefabStock[m_selectorX, m_selectorY] == m_prefabStock[1,1])
+        {
+            Debug.Log("C'est la bonne pièce à trouver");
+        }
+        
+        
     }
     
 }
