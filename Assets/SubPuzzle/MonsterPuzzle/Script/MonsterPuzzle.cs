@@ -15,22 +15,29 @@ public class MonsterPuzzle : MonoBehaviour
     [SerializeField] [Tooltip("Liste des pièces à trouver parmi les pièces de la scène")] private List<GameObject> m_correctPieces = new List<GameObject>();
 
     
-    [SerializeField] [Tooltip("nombre de pièces présentes dans l'amalgame")] private int m_nbAmalgamePieces = 3;
+    [SerializeField] [Tooltip("nombre de pièces présentes dans l'amalgame")] [Range(2, 15)] public int m_nbAmalgamePieces = 3;
     
-    [SerializeField] [Tooltip("Décalage du prefab sur l'axe X")] public float m_offsetX = 4.0f;
-    [SerializeField] [Tooltip("Décalage du prefab sur l'axe Y")] public float m_offsetY = 4.0f;
+    [SerializeField] [Tooltip("Décalage du prefab sur l'axe X")] private float m_offsetX = 4.0f;
+    [SerializeField] [Tooltip("Décalage du prefab sur l'axe Y")] private float m_offsetY = 4.0f;
 
-    [Tooltip("Tableau à double entrée qui stocke les prefab")] public GameObject[,] m_prefabStock;
-    [Tooltip("hauteur du tableau de prefab")] public int m_arrayHeight = 10;
-    [Tooltip("largeur du tableau de prefab")] public int m_arrayWidth = 10;
-    
-    [Tooltip("Tableau à double entrée qui stocke les positions des prefab")] public List<Vector3> m_piecesTransform = new List<Vector3>();
-    
-    [SerializeField] [Tooltip("Carré de selection qui se déplace entre les différentes instances de pièces présentes")] private Transform m_selector;
-    
-    //Use for Debug only
-    //private GameObject m_prefabStockY=null;
+    [SerializeField] [Tooltip("The shift of height attributed to the jumble")] [Range(0.8f, 3f)] private float m_jumbleShift = 1f;
 
+    //Tableau à double entrée qui stocke les prefab
+    private GameObject[,] m_prefabStock;
+    [SerializeField] [Tooltip("hauteur du tableau de prefab")] public int m_arrayHeight = 10;
+    [SerializeField] [Tooltip("largeur du tableau de prefab")] public int m_arrayWidth = 10;
+
+    [SerializeField] [Tooltip("Carré de selection qui se déplace entre les différentes instances de pièces présentes")] private GameObject m_prefabSelector = null;
+    
+    //La position de la première case ;)
+    private Vector3 m_initialPos = Vector3.zero;
+    
+    //The transform of the selector
+    private Transform m_selectorTransform = null;
+
+    //The coordinates of the selector
+    private int m_selectorX = 0;
+    private int m_selectorY = 0;
 
 
     // Start is called before the first frame update
@@ -42,6 +49,8 @@ public class MonsterPuzzle : MonoBehaviour
             Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO MODIFY THE HEIGHT AND THE WIDTH OF THE ARRAY ACCORDING TO THE NUMBER OF DIFFERENT SYMBOLS !");
         }
         else PuzzlePiecesInstantiate();
+        
+        if(m_prefabSelector == null) Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE PREFAB OF THE SELECTOR !");
     }
     
 
@@ -56,11 +65,13 @@ public class MonsterPuzzle : MonoBehaviour
         //Fonction qui va instancier les pièces aléatoirement dans la scène
         PuzzleStructure();
 
-        //Position des prefab à trouver
-        transform.position = new Vector3(transform.position.x + (((float)m_arrayWidth /2f) +0.5f)*m_offsetX, transform.position.y + (m_arrayHeight+1)*m_offsetY, transform.position.z);
-
         //création du selecteur dans la scène
-        Instantiate(m_selector, new Vector3(m_piecesTransform[0].x, m_piecesTransform[0].y, transform.position.z), transform.rotation);
+        GameObject instance = Instantiate(m_prefabSelector, m_initialPos, transform.rotation);
+
+        m_selectorTransform = instance.transform;
+        
+        //Position des prefab à trouver
+        transform.position = new Vector3(transform.position.x + (((float)m_arrayWidth /2f) +0.5f)*m_offsetX, transform.position.y + m_offsetY*m_arrayHeight + (m_offsetY*m_jumbleShift), transform.position.z);
         
         //Fonction des pièces à trouver parmi les pièces présentes
         CorrectPiecesInstantiate();
@@ -89,10 +100,9 @@ public class MonsterPuzzle : MonoBehaviour
                 //enlèvement du prefab instancié des prefab du stock pour ne pas avoir de pièces en double
                 m_potentialPieces.Add(m_prefabStock[x,y]);
                 m_stockPieces.RemoveAt(random);
-                
-                //ajout des positions des pièces dans un nouveau tableau
-                m_piecesTransform.Add(transform.position);
-                
+
+                if (x == 0 && y == 0) m_initialPos = transform.position;
+
             }
             //Retour à la ligne
             transform.position = new Vector3(transform.position.x - m_offsetX * m_arrayWidth,transform.position.y - m_offsetY,0);
@@ -121,6 +131,37 @@ public class MonsterPuzzle : MonoBehaviour
             m_correctPieces.Add(m_potentialPieces[random]);
             m_potentialPieces.RemoveAt(random);
         }
+    }
+    
+    
+    void Update()
+    {
+
+        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow)) {
+            
+            //déplacement du sélecteur
+            if (Input.GetKeyDown(KeyCode.LeftArrow) && m_selectorX > 0)   //Déplacement a gauche si position X sélecteur > position  X  première prefab instanciée
+            {
+                m_selectorX--;
+            }
+            else if (Input.GetKeyDown(KeyCode.RightArrow) && m_selectorX < m_arrayWidth-1)  //Déplacement à droite si position  X sélecteur  < valeur largeur tableau prefab        // -1 parce que départ de 0
+            {
+                m_selectorX++;
+            }
+            else if (Input.GetKeyDown(KeyCode.UpArrow) && m_selectorY > 0)  //Déplacement en haut si position Y sélecteur < position Y première prefab
+            {
+                m_selectorY--;
+            }
+            else if (Input.GetKeyDown(KeyCode.DownArrow) && m_selectorY < m_arrayHeight-1) //Déplacement en bas si position Y sélecteur > valeur dernière prefab du tableau prefab       // -1 parce que départ de 0
+            {
+                m_selectorY++;
+            }
+
+            m_selectorTransform.position = new Vector3(m_initialPos.x + m_selectorX * m_offsetX, m_initialPos.y - m_selectorY * m_offsetY, m_initialPos.z);
+        }
+
+        //m_prefabStock[m_selectorX, m_selectorY];
+
     }
     
 }
