@@ -16,9 +16,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] [Tooltip("The input used to select this character")] private SOInputMultiChara m_selector = null;
     [SerializeField] [Tooltip("The character whom this script is on, SELECT ONLY ONE !")] public Charas m_chara = 0;
     private KeyCode[] m_keyCodes = new[] {KeyCode.Joystick1Button0, KeyCode.Joystick1Button3, KeyCode.Joystick1Button1};
-    private bool m_isActive = false;
+    public bool m_isActive = false;
+    private static bool m_inBetweenSwitching = false; //is Active when someone is switching character
     public bool m_isForbiddenToMove = false;
-    private bool m_isSwitchingChara = false;
+    [SerializeField] private bool m_isSwitchingChara = false;
+    
 
     [SerializeField]
     [Tooltip("The prefab of what represents the soul, it will be driven from a character to another when a switch occurs")] private GameObject m_soul = null;
@@ -78,7 +80,7 @@ public class PlayerController : MonoBehaviour
             }
 
             //We activate this chara if its corresponding input is pressed
-            if (Input.GetKeyDown(m_keyCodes[(int)m_chara]))
+            if (Input.GetKeyDown(m_keyCodes[(int)m_chara]) && !m_inBetweenSwitching)
             {
                 switch (m_chara)
                 {
@@ -100,12 +102,12 @@ public class PlayerController : MonoBehaviour
                 }
                 
                 m_isSwitchingChara = true;
+                m_inBetweenSwitching = true;
                 StartCoroutine(SwitchTimer());
-                
-                m_isActive = true;
             }
             //If any other input corresponding to another character is pressed, we inactive this chara
             else if (Input.GetKeyDown(m_keyCodes[0]) || Input.GetKeyDown(m_keyCodes[1]) || Input.GetKeyDown(m_keyCodes[2])){
+                //Debug.Log($"{m_chara}");
                 //If this character was active, we create a soul and send it to the next selected character
                 if (m_isActive) {
                     GameObject soul = Instantiate(m_soul, transform.position, transform.rotation);
@@ -116,10 +118,8 @@ public class PlayerController : MonoBehaviour
                     if (Input.GetKeyDown(m_keyCodes[(int) Charas.Robot]))
                         soul.GetComponent<AutoRotation>().m_target = m_vCamR.LookAt;
                 }
-                
                 m_isActive = false;
             }
-            
         }
         
         //If this character is in a death zone, we increase his death timer, if not, we decrease it
@@ -136,7 +136,10 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     IEnumerator SwitchTimer() {
         yield return new WaitForSeconds(m_soul.GetComponent<AutoRotation>().m_duration / 1.2f);
+        //Debug.Log($"{m_chara} : {m_isSwitchingChara}");
+        m_isActive = true;
         m_isSwitchingChara = false;
+        m_inBetweenSwitching = false;
     }
     
 
