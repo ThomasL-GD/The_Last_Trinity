@@ -42,8 +42,10 @@ public class MonsterPuzzle : MonoBehaviour
     
     [SerializeField] private int findPiece = 0;     //compte de pièce à trouver
     [SerializeField] private int errorAllowed = 3;  //nombre d'essais possibles avant echec de subpuzzle
-    
 
+
+    [SerializeField] [Tooltip("Pièces trouvées")] private List<GameObject> m_foundPieces = new List<GameObject>();
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -138,12 +140,6 @@ public class MonsterPuzzle : MonoBehaviour
             //enlèvement de ce prefab de la liste des prefab à instancier dans la scène pour éviter de devoir trouver deux fois le même
             m_correctPieces.Add(m_potentialPieces[random]);
             m_potentialPieces.RemoveAt(random);
-            
-        }
-
-        foreach (GameObject go in m_correctPieces)
-        {
-            go.GetComponent<SpriteRenderer>().color = Color.green;
         }
     }
     
@@ -179,39 +175,34 @@ public class MonsterPuzzle : MonoBehaviour
         {
             bool isCorrectPiece = false;    //variable booléènne qui indique si le joueur est sur une bonne pièce ou non
 
-            for (int i = 0; i < m_correctPieces.Count; i++) //pour chaque pièce dans les pièces correctes
+            for(int i = 0; i < m_correctPieces.Count; i++) //pour chaque pièce dans les pièces correctes
             {
-                if (m_prefabStock[m_selectorY, m_selectorX] == m_correctPieces[i]) //si le sélecteur est à la même position que la pièce actuelle de correct pieces
+                if(m_prefabStock[m_selectorY, m_selectorX] == m_correctPieces[i])  //si le sélecteur est à la même position que la pièce actuelle de correct pieces
                 {
-                    i = m_correctPieces.Count; //Arrête la boucle for dès trouvaille de pièce correcte
-                    
-                    Debug.Log("Vous avez trouvé une bonne pièce !");
+                    m_foundPieces.Add(m_correctPieces[i]); //ajout d'une pièce correcte à pièce trouvée
+                    m_correctPieces.RemoveAt(i);
 
-                    isCorrectPiece = true;   //indique qu'une pièce est bonne
-                    
-                    findPiece--;    //incrémentation du compteur d'objets à trouver
-                    
-                    if (findPiece == m_nbAmalgamePieces)
+                    //i = m_correctPieces.Count; //Arrête la boucle for dès trouvaille de pièce correcte
+                    Debug.Log("Vous avez trouvé une bonne pièce !");
+                    isCorrectPiece = true; //indique qu'une pièce est bonne
+                    findPiece++; //incrémentation du nombre de pièces bonnes à trouver
+
+                    if(findPiece == m_nbAmalgamePieces)
                     {
                         Debug.Log("Vous avez trouvé toutes les pièces !");
-                        this.gameObject.SetActive(false);
                     }
-                    
                     m_prefabStock[m_selectorY, m_selectorX].SetActive(false);
-                    
                 }
-            }
-
-            if (isCorrectPiece == false) //, compteur de défaite s'incrémente de 1
-            {
-                Debug.Log("Vous vous êtes trompé.");
-
-                errorAllowed--;
-
-                if (errorAllowed == 0)
+                
+                else if(isCorrectPiece == false) //compteur de défaite s'incrémente de 1
                 {
-                    Debug.Log("Vous avez perdu.");
-                    this.gameObject.SetActive(false);
+                    Debug.Log("Vous vous êtes trompé.");
+                    errorAllowed--;
+                    
+                    if (errorAllowed == 0)
+                    {
+                        Debug.Log("Vous avez perdu.");
+                    }
                 }
             }
         }
