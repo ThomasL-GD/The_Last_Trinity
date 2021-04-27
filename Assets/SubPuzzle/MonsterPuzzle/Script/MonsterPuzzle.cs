@@ -184,6 +184,7 @@ public class MonsterPuzzle : MonoBehaviour
                 if (m_prefabStock[m_selectorY, m_selectorX] == m_correctPieces[i]) //si le sélecteur est à la même position que la pièce actuelle de correct pieces
                 {
                     i = m_correctPieces.Count; //Arrête la boucle for dès trouvaille de pièce correcte
+                    
                     Debug.Log("Vous avez trouvé une bonne pièce !");
 
                     isCorrectPiece = true;   //indique qu'une pièce est bonne
@@ -196,10 +197,12 @@ public class MonsterPuzzle : MonoBehaviour
                         this.gameObject.SetActive(false);
                     }
                     
+                    m_prefabStock[m_selectorY, m_selectorX].SetActive(false);
+                    
                 }
             }
 
-            if (isCorrectPiece == false) //Si code ne trouve pas bonne pièce après recherche, compteur de défaite s'incrémente de 1
+            if (isCorrectPiece == false) //, compteur de défaite s'incrémente de 1
             {
                 Debug.Log("Vous vous êtes trompé.");
 
