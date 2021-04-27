@@ -48,12 +48,7 @@ public class MonsterPuzzle : MonoBehaviour
     void Start()
     {
         //Si nombre de pièces demandées à être affichées est inférieur au nombre de pièces possibles à afficher
-        if (m_nbAmalgamePieces > m_correctPieces.Count)
-        {
-            Debug.LogError("JEEZ ! THE GAME DESIGNER PUT TO MUCH AMALGAM PIECES TO FIND THAN THERE ARE IN THE CORRECT PIECES LIST ");
-        }
-        //Si nombre de pièces demandées à être affichées est inférieur au nombre de pièces possibles à afficher
-        else if (m_arrayHeight*m_arrayWidth > m_piecePrefab.Length)
+        if (m_arrayHeight*m_arrayWidth > m_piecePrefab.Length)
         {
             Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO MODIFY THE HEIGHT AND THE WIDTH OF THE ARRAY ACCORDING TO THE NUMBER OF DIFFERENT SYMBOLS !");
         }
@@ -192,23 +187,15 @@ public class MonsterPuzzle : MonoBehaviour
                     Debug.Log("Vous avez trouvé une bonne pièce !");
 
                     isCorrectPiece = true;   //indique qu'une pièce est bonne
-
                     
                     findPiece--;    //incrémentation du compteur d'objets à trouver
                     
-                    
-                    if (m_nbAmalgamePieces == 0)
-                    {
-                        Debug.Log("Vous avez trouvé toutes les pièces !");
-                        this.gameObject.SetActive(false);
-                    }
-                    /*
                     if (findPiece == m_nbAmalgamePieces)
                     {
                         Debug.Log("Vous avez trouvé toutes les pièces !");
                         this.gameObject.SetActive(false);
                     }
-                    */
+                    
                 }
             }
 
