@@ -39,19 +39,28 @@ public class MonsterPuzzle : MonoBehaviour
     //Coordonnées du sélecteur
     [SerializeField] private int m_selectorX = 0;
     [SerializeField] private int m_selectorY = 0;
-
+    
+    [SerializeField] private int findPiece = 0;     //compte de pièce à trouver
+    [SerializeField] private int errorAllowed = 3;  //nombre d'essais possibles avant echec de subpuzzle
+    
 
     // Start is called before the first frame update
     void Start()
     {
         //Si nombre de pièces demandées à être affichées est inférieur au nombre de pièces possibles à afficher
-        if (m_arrayHeight*m_arrayWidth > m_piecePrefab.Length)
+        if (m_nbAmalgamePieces > m_correctPieces.Count)
+        {
+            Debug.LogError("JEEZ ! THE GAME DESIGNER PUT TO MUCH AMALGAM PIECES TO FIND THAN THERE ARE IN THE CORRECT PIECES LIST ");
+        }
+        //Si nombre de pièces demandées à être affichées est inférieur au nombre de pièces possibles à afficher
+        else if (m_arrayHeight*m_arrayWidth > m_piecePrefab.Length)
         {
             Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO MODIFY THE HEIGHT AND THE WIDTH OF THE ARRAY ACCORDING TO THE NUMBER OF DIFFERENT SYMBOLS !");
         }
         else PuzzlePiecesInstantiate();
-        
+
         if(m_prefabSelector == null) Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE PREFAB OF THE SELECTOR !");
+        
     }
     
 
@@ -134,12 +143,12 @@ public class MonsterPuzzle : MonoBehaviour
             //enlèvement de ce prefab de la liste des prefab à instancier dans la scène pour éviter de devoir trouver deux fois le même
             m_correctPieces.Add(m_potentialPieces[random]);
             m_potentialPieces.RemoveAt(random);
+            
         }
 
         foreach (GameObject go in m_correctPieces)
         {
             go.GetComponent<SpriteRenderer>().color = Color.green;
-            m_prefabStock[m_selectorX, m_selectorY].GetComponent<SpriteRenderer>().color = Color.green;
         }
     }
     
@@ -170,13 +179,53 @@ public class MonsterPuzzle : MonoBehaviour
             m_selectorTransform.position = new Vector3(m_initialPos.x + m_selectorX * m_offsetX, m_initialPos.y - m_selectorY * m_offsetY, m_initialPos.z);
         }
 
-        //m_prefabStock[m_selectorX, m_selectorY]
-        if (m_prefabStock[m_selectorX, m_selectorY] == m_prefabStock[1,1])
+        
+        if (Input.GetKeyDown(KeyCode.T))
         {
-            Debug.Log("C'est la bonne pièce à trouver");
+            bool isCorrectPiece = false;    //variable booléènne qui indique si le joueur est sur une bonne pièce ou non
+
+            for (int i = 0; i < m_correctPieces.Count; i++) //pour chaque pièce dans les pièces correctes
+            {
+                if (m_prefabStock[m_selectorY, m_selectorX] == m_correctPieces[i]) //si le sélecteur est à la même position que la pièce actuelle de correct pieces
+                {
+                    i = m_correctPieces.Count; //Arrête la boucle for dès trouvaille de pièce correcte
+                    Debug.Log("Vous avez trouvé une bonne pièce !");
+
+                    isCorrectPiece = true;   //indique qu'une pièce est bonne
+
+                    
+                    findPiece--;    //incrémentation du compteur d'objets à trouver
+                    
+                    
+                    if (m_nbAmalgamePieces == 0)
+                    {
+                        Debug.Log("Vous avez trouvé toutes les pièces !");
+                        this.gameObject.SetActive(false);
+                    }
+                    /*
+                    if (findPiece == m_nbAmalgamePieces)
+                    {
+                        Debug.Log("Vous avez trouvé toutes les pièces !");
+                        this.gameObject.SetActive(false);
+                    }
+                    */
+                }
+            }
+
+            if (isCorrectPiece == false) //Si code ne trouve pas bonne pièce après recherche, compteur de défaite s'incrémente de 1
+            {
+                Debug.Log("Vous vous êtes trompé.");
+
+                errorAllowed--;
+
+                if (errorAllowed == 0)
+                {
+                    Debug.Log("Vous avez perdu.");
+                    this.gameObject.SetActive(false);
+                }
+            }
         }
-        
-        
+            
     }
     
 }
