@@ -54,7 +54,7 @@ public class RobotPuzzleManager : MonoBehaviour
 
             for (int i = 0; i < k; i++)
             {
-                m_movePiece.RotatePiece();
+                //m_movePiece.RotatePiece();
             }
         }
     }

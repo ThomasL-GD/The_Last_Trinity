@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class movePiece : MonoBehaviour
 {
-
+/*
     /// <summary>
     /// Vitesse de rotation d'une pièce
     /// </summary>
@@ -27,7 +27,7 @@ public class movePiece : MonoBehaviour
     {
         if (transform.root.eulerAngles.z != m_realRotation)
         {
-            transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(0,0,m_realRotation), m_speed * Time.deltaTime);
+            //transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(0,0,m_realRotation), m_speed * Time.deltaTime);
         }
     }
 
@@ -59,5 +59,5 @@ public class movePiece : MonoBehaviour
         }
         m_values[3] = aux;
     }
-    
+    */
 }

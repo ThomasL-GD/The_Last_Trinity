@@ -139,7 +139,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &161097816
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -179,9 +179,6 @@ MonoBehaviour:
   - {fileID: 3669308288289843618, guid: dc4640030f415d04b81b210c14a62c9e, type: 3}
   - {fileID: 5246518289208228632, guid: 50bda09718a514648bc3cccff95e4d0f, type: 3}
   - {fileID: 7164752123742796853, guid: 253a42a4de707224d866b62d54944c84, type: 3}
-  m_stockPieces: []
-  m_potentialPieces: []
-  m_correctPieces: []
   m_nbAmalgamePieces: 2
   m_offsetX: 2
   m_offsetY: 2
@@ -189,11 +186,7 @@ MonoBehaviour:
   m_arrayHeight: 3
   m_arrayWidth: 4
   m_prefabSelector: {fileID: 3457204076349033787, guid: 7ed14220dfe7f79428bf93938638153f, type: 3}
-  m_selectorX: 0
-  m_selectorY: 0
-  findPiece: 0
   errorAllowed: 3
-  m_foundPieces: []
 --- !u!4 &161097817
 Transform:
   m_ObjectHideFlags: 0
@@ -837,13 +830,13 @@ MonoBehaviour:
   - {fileID: 6803946066661369470, guid: 6f801b5231729a347b6ddb88b8d89027, type: 3}
   - {fileID: 1359248225425509418, guid: eb4bec95a9494894499d386449f638d4, type: 3}
   - {fileID: 5475869915929310563, guid: e88dc0d42b2376b4b95fde778f2b1e7f, type: 3}
+  m_stockPieces: []
+  m_scenePieces: []
   m_offsetX: 2
   m_offsetY: 2
   m_arrayHeight: 3
-  m_arrayWidth: 3
+  m_arrayWidth: 5
   m_prefabSelector: {fileID: 6125140419122790971, guid: 8fa3cf46b5a0be04b9e5fcb8f0600daf, type: 3}
-  m_selectorX: 0
-  m_selectorY: 0
 --- !u!4 &403035251
 Transform:
   m_ObjectHideFlags: 0

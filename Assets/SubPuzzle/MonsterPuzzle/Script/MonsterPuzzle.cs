@@ -9,12 +9,11 @@ public class MonsterPuzzle : MonoBehaviour
     [SerializeField] [Tooltip("Liste des pièces qui vont spawn")] private GameObject[] m_piecePrefab;
     
     //liste des pièces qui peuvent apparaitre
-    [SerializeField] [Tooltip("Liste des pièces dans le stock")] private List<GameObject> m_stockPieces = new List<GameObject>();
+    private List<GameObject> m_stockPieces = new List<GameObject>();
     //liste des pièces dans la scène
-    [SerializeField] [Tooltip("liste des pièces présentes dans la pièce")] private List<GameObject> m_potentialPieces = new List<GameObject>();
+    private List<GameObject> m_potentialPieces = new List<GameObject>();
     //Liste des pièces correctes
-    [SerializeField] [Tooltip("Liste des pièces à trouver parmi les pièces de la scène")] private List<GameObject> m_correctPieces = new List<GameObject>();
-
+    private List<GameObject> m_correctPieces = new List<GameObject>();
     
     [SerializeField] [Tooltip("nombre de pièces présentes dans l'amalgame")] [Range(2, 15)] public int m_nbAmalgamePieces = 3;
     
@@ -37,14 +36,13 @@ public class MonsterPuzzle : MonoBehaviour
     private Transform m_selectorTransform = null;
 
     //Coordonnées du sélecteur
-    [SerializeField] private int m_selectorX = 0;
-    [SerializeField] private int m_selectorY = 0;
+    private int m_selectorX = 0;
+    private int m_selectorY = 0;
     
-    [SerializeField] private int findPiece = 0;     //compte de pièce à trouver
+    private int findPiece = 0;     //compte de pièce à trouver
     [SerializeField] private int errorAllowed = 3;  //nombre d'essais possibles avant echec de subpuzzle
-
-
-    [SerializeField] [Tooltip("Pièces trouvées")] private List<GameObject> m_foundPieces = new List<GameObject>();
+    
+    private List<GameObject> m_foundPieces = new List<GameObject>();
     
     // Start is called before the first frame update
     void Start()
