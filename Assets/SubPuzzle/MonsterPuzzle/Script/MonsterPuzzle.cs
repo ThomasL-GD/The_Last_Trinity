@@ -61,6 +61,13 @@ public class MonsterPuzzle : MonoBehaviour
     }
     
 
+    /// <summary>
+    /// Fonction de création du puzzle dans la scène
+    /// 1 - ajout de tous les préfab du tableau de base dans une liste
+    /// 2 - création du tableau à deux dimensions dans la scène avec les prefab de la liste
+    /// 3 - création du sélecteur dans la scène et positionnnement de celle-ci
+    /// 4 - ajout des pièces correctes à dénicher parmi les pièces présentes dans la scène à une nouvelle liste de pièces correctes
+    /// </summary>
     private void PuzzlePiecesInstantiate()
     {
         //déplace toutes les prefab du tableau dans une liste (list stockPieces)
@@ -86,6 +93,12 @@ public class MonsterPuzzle : MonoBehaviour
         
     }
 
+    /// <summary>
+    /// Fonction de création des dimensions du tableau dans la scène et des places des prefab de pièce
+    /// On ajoute une pièce de la liste des pièces du stock à la liste des pièces dans la scène
+    /// On l'enlève ensuite du stock pour ne pas avoir deux fois la même pièce dans la scène
+    /// On récupère la position de la première pièce instanciée pour positionner ensuite notre sélecteur
+    /// </summary>
     private void PuzzleStructure()
     {
         //tableau à deux dimensions qui place les pièces
@@ -119,7 +132,10 @@ public class MonsterPuzzle : MonoBehaviour
         }
     }
     
-    
+    /// <summary>
+    /// Ajout d'une pièce aléatoire dans la scène à la liste des pièces à trouver
+    /// On enlève ensuite cette pièce des pièces de la scène pour ne pas à avoir trouver deux fois la même
+    /// </summary>
     private void CorrectPiecesInstantiate()
     {
         //Instanciation des pièces à trouver parmi les pièces actives dans la scène
@@ -144,6 +160,15 @@ public class MonsterPuzzle : MonoBehaviour
     }
     
     
+    /// <summary>
+    /// Déplacement du sélecteur avec différents inputs
+    /// Input de sélection de pièce :
+    ///  1 - vérification si la pièce sur laquelle le sélecteur se situe est correcte
+    ///  2 - Si elle est correcte, on vérifie qu'elle n'a pas déjà été ajouté
+    ///  3 - Si elle n'a pas été ajouté, on l'ajoute
+    ///  4 - Si elle a été ajouté, rien ne se passe
+    ///  5 - Si elle n'est pas correcte, le nombre d'erreurs possibles à faire diminue
+    /// </summary>
     void Update()
     {
 
@@ -174,37 +199,54 @@ public class MonsterPuzzle : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.T))
         {
             bool isCorrectPiece = false;    //variable booléènne qui indique si le joueur est sur une bonne pièce ou non
-
-            for(int i = 0; i < m_correctPieces.Count; i++) //pour chaque pièce dans les pièces correctes
+            bool isAlreadyFound = false;    //Variable booléènne qui indique si la pièce a déjà été trouvée
+            
+            for (int i = 0; i < m_correctPieces.Count; i++) //pour chaque pièce dans les pièces correctes
             {
-                if(m_prefabStock[m_selectorY, m_selectorX] == m_correctPieces[i])  //si le sélecteur est à la même position que la pièce actuelle de correct pieces
+                if (m_prefabStock[m_selectorY, m_selectorX] == m_correctPieces[i]) //si le sélecteur est à la même position que la pièce actuelle de correct pieces
                 {
-                    m_foundPieces.Add(m_correctPieces[i]); //ajout d'une pièce correcte à pièce trouvée
-                    m_correctPieces.RemoveAt(i);
-
-                    //i = m_correctPieces.Count; //Arrête la boucle for dès trouvaille de pièce correcte
-                    Debug.Log("Vous avez trouvé une bonne pièce !");
-                    isCorrectPiece = true; //indique qu'une pièce est bonne
-                    findPiece++; //incrémentation du nombre de pièces bonnes à trouver
-
-                    if(findPiece == m_nbAmalgamePieces)
+                    for (int j = 0; j < m_foundPieces.Count; j++)   //Pour chaque pièces dans les pièces trouvées
                     {
-                        Debug.Log("Vous avez trouvé toutes les pièces !");
+                        if (m_prefabStock[m_selectorY, m_selectorX] == m_foundPieces[j])    //Si le sélecteur est à la même position que la pièce actuelle dans foundPiece
+                        {
+                            isAlreadyFound = true;  //la pièce en question a déjà été trouvé
+                            Debug.Log("Vous avez déjà trouvé sur cette pièce");
+                            j = m_foundPieces.Count;
+                        }
                     }
-                    m_prefabStock[m_selectorY, m_selectorX].SetActive(false);
+
+                    if (!isAlreadyFound)    //Si la pièce n'a pas encore été trouvée
+                    {
+                        m_foundPieces.Add(m_correctPieces[i]); //ajout d'une pièce correcte à pièce trouvée
+
+                        Debug.Log("Vous avez trouvé une bonne pièce !");
+                        isCorrectPiece = true; //indique qu'une pièce est bonne
+                        findPiece++; //incrémentation des bonnes pièces trouvées
+
+                        if (findPiece == m_nbAmalgamePieces) //Si le nombre de pièces trouvées = nombre de pièces à trouver
+                        {
+                            Debug.Log("Vous avez trouvé toutes les pièces !");
+                        }
+
+                        m_prefabStock[m_selectorY, m_selectorX].SetActive(false);   //feedback
+
+                        i = m_correctPieces.Count; //Arrête la boucle for dès trouvaille de pièce correcte
+                    }
+                }
+
+            }
+
+            if(isCorrectPiece == false && isAlreadyFound == false) //compteur de défaite s'incrémente de 1
+            {
+                Debug.Log("Vous vous êtes trompé.");
+                errorAllowed--;   //nombre d'erreurs possibles avant défaite diminue
+                if (errorAllowed == 0)
+                {
+                    Debug.Log("Vous avez perdu.");
                 }
                 
-                else if(isCorrectPiece == false) //compteur de défaite s'incrémente de 1
-                {
-                    Debug.Log("Vous vous êtes trompé.");
-                    errorAllowed--;
-                    
-                    if (errorAllowed == 0)
-                    {
-                        Debug.Log("Vous avez perdu.");
-                    }
-                }
             }
+            
         }
             
     }
