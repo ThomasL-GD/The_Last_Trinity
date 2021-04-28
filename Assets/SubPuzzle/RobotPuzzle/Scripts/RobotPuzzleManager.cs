@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class RobotPuzzleManager : MonoBehaviour
 {
@@ -13,6 +15,8 @@ public class RobotPuzzleManager : MonoBehaviour
     }
 
     public MyRobotPuzzle m_myRobotPuzzle;
+
+    public movePiece m_movePiece;
     
     // Start is called before the first frame update
     void Start()
@@ -26,16 +30,31 @@ public class RobotPuzzleManager : MonoBehaviour
 
         foreach (var piece in GameObject.FindGameObjectsWithTag("Piece"))
         {
-            m_myRobotPuzzle.m_robotPieces[(int) piece.transform.position.x, (int) piece.transform.position.y]
-                = piece.GetComponent<GameObject>();
+            m_myRobotPuzzle.m_robotPieces[(int) piece.transform.position.x, (int) piece.transform.position.y] = piece.GetComponent<GameObject>();
         }
 
         foreach (var item in m_myRobotPuzzle.m_robotPieces)
         {
             Debug.Log(item.gameObject.name);
         }
+
+        Shuffle();
     }
 
+
+    public void Shuffle()
+    {
+        foreach (var piece in m_myRobotPuzzle.m_robotPieces)
+        {
+            int k = Random.Range(0, 4);
+
+            for (int i = 0; i < k; i++)
+            {
+                m_movePiece.RotatePiece();
+            }
+        }
+    }
+    
     
     Vector2 CheckDimension()
     {
@@ -49,6 +68,7 @@ public class RobotPuzzleManager : MonoBehaviour
             if (go.transform.position.y > aux.y) aux.y = go.transform.position.y;
         }
 
+        //offset par rapport à position de base
         aux.x++;
         aux.y++;
 
@@ -56,9 +76,5 @@ public class RobotPuzzleManager : MonoBehaviour
     }
     
     
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+   
 }
