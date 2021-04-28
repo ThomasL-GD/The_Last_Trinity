@@ -174,37 +174,54 @@ public class MonsterPuzzle : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.T))
         {
             bool isCorrectPiece = false;    //variable booléènne qui indique si le joueur est sur une bonne pièce ou non
-
-            for(int i = 0; i < m_correctPieces.Count; i++) //pour chaque pièce dans les pièces correctes
+            bool isAlreadyFound = false;    //Variable booléènne qui indique si la pièce a déjà été trouvée
+            
+            for (int i = 0; i < m_correctPieces.Count; i++) //pour chaque pièce dans les pièces correctes
             {
-                if(m_prefabStock[m_selectorY, m_selectorX] == m_correctPieces[i])  //si le sélecteur est à la même position que la pièce actuelle de correct pieces
+                if (m_prefabStock[m_selectorY, m_selectorX] == m_correctPieces[i]) //si le sélecteur est à la même position que la pièce actuelle de correct pieces
                 {
-                    m_foundPieces.Add(m_correctPieces[i]); //ajout d'une pièce correcte à pièce trouvée
-                    m_correctPieces.RemoveAt(i);
-
-                    //i = m_correctPieces.Count; //Arrête la boucle for dès trouvaille de pièce correcte
-                    Debug.Log("Vous avez trouvé une bonne pièce !");
-                    isCorrectPiece = true; //indique qu'une pièce est bonne
-                    findPiece++; //incrémentation du nombre de pièces bonnes à trouver
-
-                    if(findPiece == m_nbAmalgamePieces)
+                    for (int j = 0; j < m_foundPieces.Count; j++)   //Pour chaque pièces dans les pièces trouvées
                     {
-                        Debug.Log("Vous avez trouvé toutes les pièces !");
+                        if (m_prefabStock[m_selectorY, m_selectorX] == m_foundPieces[j])    //Si le sélecteur est à la même position que la pièce actuelle dans foundPiece
+                        {
+                            isAlreadyFound = true;  //la pièce en question a déjà été trouvé
+                            Debug.Log("Vous avez déjà trouvé sur cette pièce");
+                            j = m_foundPieces.Count;
+                        }
                     }
-                    m_prefabStock[m_selectorY, m_selectorX].SetActive(false);
+
+                    if (!isAlreadyFound)    //Si la pièce n'a pas encore été trouvée
+                    {
+                        m_foundPieces.Add(m_correctPieces[i]); //ajout d'une pièce correcte à pièce trouvée
+
+                        Debug.Log("Vous avez trouvé une bonne pièce !");
+                        isCorrectPiece = true; //indique qu'une pièce est bonne
+                        findPiece++; //incrémentation des bonnes pièces trouvées
+
+                        if (findPiece == m_nbAmalgamePieces) //Si le nombre de pièces trouvées = nombre de pièces à trouver
+                        {
+                            Debug.Log("Vous avez trouvé toutes les pièces !");
+                        }
+
+                        m_prefabStock[m_selectorY, m_selectorX].SetActive(false);   //feedback
+
+                        i = m_correctPieces.Count; //Arrête la boucle for dès trouvaille de pièce correcte
+                    }
+                }
+
+            }
+
+            if(isCorrectPiece == false && isAlreadyFound == false) //compteur de défaite s'incrémente de 1
+            {
+                Debug.Log("Vous vous êtes trompé.");
+                errorAllowed--;   //nombre d'erreurs possibles avant défaite diminue
+                if (errorAllowed == 0)
+                {
+                    Debug.Log("Vous avez perdu.");
                 }
                 
-                else if(isCorrectPiece == false) //compteur de défaite s'incrémente de 1
-                {
-                    Debug.Log("Vous vous êtes trompé.");
-                    errorAllowed--;
-                    
-                    if (errorAllowed == 0)
-                    {
-                        Debug.Log("Vous avez perdu.");
-                    }
-                }
             }
+            
         }
             
     }
