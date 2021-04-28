@@ -61,6 +61,13 @@ public class MonsterPuzzle : MonoBehaviour
     }
     
 
+    /// <summary>
+    /// Fonction de création du puzzle dans la scène
+    /// 1 - ajout de tous les préfab du tableau de base dans une liste
+    /// 2 - création du tableau à deux dimensions dans la scène avec les prefab de la liste
+    /// 3 - création du sélecteur dans la scène et positionnnement de celle-ci
+    /// 4 - ajout des pièces correctes à dénicher parmi les pièces présentes dans la scène à une nouvelle liste de pièces correctes
+    /// </summary>
     private void PuzzlePiecesInstantiate()
     {
         //déplace toutes les prefab du tableau dans une liste (list stockPieces)
@@ -86,6 +93,12 @@ public class MonsterPuzzle : MonoBehaviour
         
     }
 
+    /// <summary>
+    /// Fonction de création des dimensions du tableau dans la scène et des places des prefab de pièce
+    /// On ajoute une pièce de la liste des pièces du stock à la liste des pièces dans la scène
+    /// On l'enlève ensuite du stock pour ne pas avoir deux fois la même pièce dans la scène
+    /// On récupère la position de la première pièce instanciée pour positionner ensuite notre sélecteur
+    /// </summary>
     private void PuzzleStructure()
     {
         //tableau à deux dimensions qui place les pièces
@@ -119,7 +132,10 @@ public class MonsterPuzzle : MonoBehaviour
         }
     }
     
-    
+    /// <summary>
+    /// Ajout d'une pièce aléatoire dans la scène à la liste des pièces à trouver
+    /// On enlève ensuite cette pièce des pièces de la scène pour ne pas à avoir trouver deux fois la même
+    /// </summary>
     private void CorrectPiecesInstantiate()
     {
         //Instanciation des pièces à trouver parmi les pièces actives dans la scène
@@ -144,6 +160,15 @@ public class MonsterPuzzle : MonoBehaviour
     }
     
     
+    /// <summary>
+    /// Déplacement du sélecteur avec différents inputs
+    /// Input de sélection de pièce :
+    ///  1 - vérification si la pièce sur laquelle le sélecteur se situe est correcte
+    ///  2 - Si elle est correcte, on vérifie qu'elle n'a pas déjà été ajouté
+    ///  3 - Si elle n'a pas été ajouté, on l'ajoute
+    ///  4 - Si elle a été ajouté, rien ne se passe
+    ///  5 - Si elle n'est pas correcte, le nombre d'erreurs possibles à faire diminue
+    /// </summary>
     void Update()
     {
 

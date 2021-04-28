@@ -139,7 +139,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &161097816
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -801,6 +801,63 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: eb4bec95a9494894499d386449f638d4, type: 3}
+--- !u!1 &403035249
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 403035251}
+  - component: {fileID: 403035250}
+  m_Layer: 0
+  m_Name: SubPuzzleRobot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &403035250
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 403035249}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d514eced98d300e469c6b1bdc44f9ce6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_piecePrefab:
+  - {fileID: 2441802556659083684, guid: 7e276a35f6fce4146b773129a8fe00f5, type: 3}
+  - {fileID: 7710828181753326196, guid: 00af6257542cad244876a8ab399518a4, type: 3}
+  - {fileID: 4581239909967446119, guid: 665706228a4fcb74e8aee216d0f92f47, type: 3}
+  - {fileID: 6803946066661369470, guid: 6f801b5231729a347b6ddb88b8d89027, type: 3}
+  - {fileID: 1359248225425509418, guid: eb4bec95a9494894499d386449f638d4, type: 3}
+  - {fileID: 5475869915929310563, guid: e88dc0d42b2376b4b95fde778f2b1e7f, type: 3}
+  m_offsetX: 2
+  m_offsetY: 2
+  m_arrayHeight: 3
+  m_arrayWidth: 3
+  m_prefabSelector: {fileID: 6125140419122790971, guid: 8fa3cf46b5a0be04b9e5fcb8f0600daf, type: 3}
+  m_selectorX: 0
+  m_selectorY: 0
+--- !u!4 &403035251
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 403035249}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &448446267
 GameObject:
   m_ObjectHideFlags: 0
@@ -1545,8 +1602,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1031546551}
-  m_LocalRotation: {x: 0.0060005076, y: -0.010499574, z: 0.00006300598, w: 0.99992687}
-  m_LocalPosition: {x: 0.95289475, y: 1.0133842, z: -13.982414}
+  m_LocalRotation: {x: 0.011998695, y: 0.0044976277, z: -0.00005398083, w: 0.9999179}
+  m_LocalPosition: {x: 1.195898, y: 0.8658098, z: -14.301774}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -2726,7 +2783,7 @@ GameObject:
   - component: {fileID: 2041638790}
   - component: {fileID: 2041638789}
   m_Layer: 0
-  m_Name: RobotPuzzle
+  m_Name: RobotPuzzle (Test)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
