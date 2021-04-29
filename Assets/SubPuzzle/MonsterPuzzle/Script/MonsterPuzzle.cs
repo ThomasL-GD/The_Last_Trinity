@@ -104,6 +104,9 @@ public class MonsterPuzzle : MonoBehaviour
         //tableau à deux dimensions qui place les pièces
         m_prefabStock = new GameObject[m_arrayHeight, m_arrayWidth];
 
+        GameObject emptyContainer = new GameObject("PiecesContainer");
+        GameObject container = Instantiate(emptyContainer);
+
         //double boucle for pour créer le tableau
         for (int x = 0; x < m_arrayHeight; x++)
         {
@@ -116,7 +119,7 @@ public class MonsterPuzzle : MonoBehaviour
                 transform.position = new Vector3(transform.position.x + m_offsetX,transform.position.y,0);
                 
                 //instantiation dans la scène d'une pièce tirée dans le stock de prefab 
-                m_prefabStock[x,y] = Instantiate(m_stockPieces[random], transform.position, transform.rotation);
+                m_prefabStock[x,y] = Instantiate(m_stockPieces[random], transform.position, transform.rotation,container.transform);
                 
                 //ajout du prefab instancié dans une nouvelle liste regroupant les pièces actives
                 //enlèvement du prefab instancié des prefab du stock pour ne pas avoir de pièces en double

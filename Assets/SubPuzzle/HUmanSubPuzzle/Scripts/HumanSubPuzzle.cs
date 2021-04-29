@@ -32,20 +32,20 @@ public class HumanSubPuzzle : MonoBehaviour {
         for (int i = 0; i < m_maze.GetLength(0); i++) {
             for (int j = 0; j < m_maze.GetLength(1); j++) {
                 //Here, we add a wall in a random direction to the cell we're currently on
-                m_maze[i, j] = m_maze[i, j] | AssignDirections();
+                m_maze[i, j] |= AssignDirections();
 
                 //Once a cell have a wall, we update the cell(s) who touch the wall(s) we just added to make sure they know it exist
                 if (m_maze[i, j] == Directions.Up) {
-                    if (i > 0) m_maze[i - 1, j] = m_maze[i - 1, j] | Directions.Down;
+                    if (i > 0) m_maze[i - 1, j] |= Directions.Down;
                 }
                 if (m_maze[i, j] == Directions.Down) {
-                    if (i < m_maze.GetLength(0) - 1) m_maze[i + 1, j] = m_maze[i + 1, j] | Directions.Up;
+                    if (i < m_maze.GetLength(0) - 1) m_maze[i + 1, j] |= Directions.Up;
                 }
                 if (m_maze[i, j] == Directions.Left) {
-                    if (j > 0) m_maze[i, j - 1] = m_maze[i, j - 1] | Directions.Right;
+                    if (j > 0) m_maze[i, j - 1] |= Directions.Right;
                 }
                 if (m_maze[i, j] == Directions.Right) {
-                    if (j < m_maze.GetLength(1) - 1) m_maze[i, j + 1] = m_maze[i, j + 1] | Directions.Left;
+                    if (j < m_maze.GetLength(1) - 1) m_maze[i, j + 1] |= Directions.Left;
                 }
             }
         }
@@ -54,16 +54,16 @@ public class HumanSubPuzzle : MonoBehaviour {
         for (int i = 0; i < m_maze.GetLength(0); i++) {
             for (int j = 0; j < m_maze.GetLength(1); j++) {
                 //Up Border
-                if (i == 0) m_maze[i, j] = m_maze[i, j] | Directions.Up;
+                if (i == 0) m_maze[i, j] |= Directions.Up;
                 
                 //Down Border
-                if (i == m_maze.GetLength(0) - 1) m_maze[i, j] = m_maze[i, j] | Directions.Down;
+                if (i == m_maze.GetLength(0) - 1) m_maze[i, j] |= Directions.Down;
                 
                 //Left Border
-                if (j == 0) m_maze[i, j] = m_maze[i, j] | Directions.Left;
+                if (j == 0) m_maze[i, j] |= Directions.Left;
                 
                 //Right Border
-                if (j == m_maze.GetLength(1) - 1) m_maze[i, j] = m_maze[i, j] | Directions.Right;
+                if (j == m_maze.GetLength(1) - 1) m_maze[i, j] |= Directions.Right;
             }
         }
     }
@@ -74,7 +74,7 @@ public class HumanSubPuzzle : MonoBehaviour {
     /// <returns>Returns a random direction</returns>
     private Directions AssignDirections() {
         Directions directions = 0b0000_0000;
-        int rand = Random.Range(0, 4/*Enum.GetNames(typeof(Directions)).Length*/);
+        int rand = Random.Range(0, 4/*Enum.GetNames(typeof(Directions)).Length Ne marche pas puisqu'il y a le None*/);
         directions = (Directions)Mathf.Pow(2, rand);
         return directions;
     }
