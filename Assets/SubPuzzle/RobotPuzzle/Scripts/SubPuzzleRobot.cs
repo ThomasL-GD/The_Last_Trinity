@@ -13,14 +13,18 @@ public class SubPuzzleRobot : MonoBehaviour
         public int y = 0;
     }
 
+    
     private Selector m_selector = new Selector();
+
+    private movePiece m_movePiece;
+    
     
     [SerializeField] [Tooltip("Liste des pièces de notre bibliothèque")] private GameObject[] m_piecePrefab;
 
     //liste des pièces qui peuvent apparaitre dans le jeu
-    [SerializeField] [Tooltip("Liste des pièces dans le stock")] private List<GameObject> m_stockPieces = new List<GameObject>();
+    private List<GameObject> m_stockPieces = new List<GameObject>();
     //liste des pièces dans la scène
-    [SerializeField] [Tooltip("liste des pièces présentes dans la scène")] private List<GameObject> m_scenePieces = new List<GameObject>();
+    private List<GameObject> m_scenePieces = new List<GameObject>();
     
     [SerializeField] [Tooltip("Décalage du prefab sur l'axe X")] private float m_offsetX = 4.0f;
     [SerializeField] [Tooltip("Décalage du prefab sur l'axe Y")] private float m_offsetY = 4.0f;
@@ -38,12 +42,15 @@ public class SubPuzzleRobot : MonoBehaviour
 
     //transform du sélecteur
     private Transform m_selectorTransform = null;
-    
 
     //valeur de rotation d'une pièce
     private float m_pieceRotation = 90;
 
-    private movePiece m_movePiece;
+    //Valeur de victoire en fonction des connexions présents dans la scène
+    [SerializeField] private int m_winValue;
+    
+    //valeur de connexions actuelles en haut
+    [SerializeField] private int m_currentValue;
     
     // Start is called before the first frame update
     void Start()
@@ -52,9 +59,12 @@ public class SubPuzzleRobot : MonoBehaviour
 
         if (m_prefabSelector == null)
             Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE PREFAB OF THE SELECTOR !");
+        
+        m_winValue = GetWinValue();
 
+        m_currentValue = Sweep();
     }
-
+    
     void PuzzlePiecesInstantiate()
     {
         //déplace toutes les prefab du tableau dans une liste (list stockPieces)
@@ -103,7 +113,63 @@ public class SubPuzzleRobot : MonoBehaviour
             transform.position = new Vector3(transform.position.x - m_offsetX * m_arrayWidth, transform.position.y - m_offsetY, 0);
         }
     }
+    
+    
+    int GetWinValue()
+    {
+        int winValue = 0;
 
+        for (int i = 0; i < m_scenePieces.Count; i++)   //Pour chaque pièces dans la scène
+        {
+            if (m_scenePieces[i].TryGetComponent(out m_movePiece))  //Si la pièce a le script movepiece
+            {
+                for (int j = 0; j < m_movePiece.m_values.Length; j++) //Pour chaque valeur dans le tableau m_values
+                {
+                    if (m_movePiece.m_values[j] == true)    //si la variable de la pièce au rang i est vraie
+                    {
+                        winValue++;
+                    }
+                }
+            }
+
+        }
+
+        winValue /= 2;    //on divise par 2 le nombre total de sorties pour avoir une "connexion", il faut 2 sorties vraies pour avoir une connexion
+
+        return winValue;
+    }
+
+    public int Sweep()
+    {
+        int value = 0;
+
+        //bool piece1 = false;
+        //bool piece2 = false;
+        
+        for (int i = 0; i < m_scenePieces.Count; i++)   //pour chaque pièce dans la scène
+        {
+            //Compare avec le haut
+            if (m_scenePieces[i].TryGetComponent(out m_movePiece))  //recherche du script movepiece sur la pièce
+            {
+                if (m_movePiece.m_values[0] == true)    //Si la première valeur, qui est la face vers le haut, est vraie
+                {
+                    if(m_scenePieces[i + m_arrayWidth].TryGetComponent(out m_movePiece))    //recherche du script movepiece sur la pièce au-dessus de l'actuelle pièce
+                    {
+                        if (m_movePiece.m_values[2] == true)    //Si la 3ème valeur, qui est la face vers le bas, est vraie
+                        {
+                            value++;    //une connexion est effectuée !
+                        }
+                    }
+                }
+            }
+            
+        }
+
+        
+        return value;
+    }
+
+    
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow) ||

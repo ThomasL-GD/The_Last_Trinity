@@ -6,12 +6,7 @@ using UnityEngine;
 
 public class movePiece : MonoBehaviour
 {
-/*
-    /// <summary>
-    /// Vitesse de rotation d'une pièce
-    /// </summary>
-    [SerializeField] private float m_speed = 10.0f;
-    
+
     /// <summary>
     /// angle de rotation d'un bloc
     /// </summary>
@@ -20,22 +15,9 @@ public class movePiece : MonoBehaviour
     /// <summary>
     /// Création d'un tableau de valeurs
     /// </summary>
-    public int[] m_values;
+    public bool[] m_values;
 
     
-    private void Update()
-    {
-        if (transform.root.eulerAngles.z != m_realRotation)
-        {
-            //transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(0,0,m_realRotation), m_speed * Time.deltaTime);
-        }
-    }
-
-    private void OnMouseDown()
-    {
-        //Fonction de rotation d'une pièce lors d'une input
-        RotatePiece();
-    }
 
     public void RotatePiece()
     {
@@ -49,9 +31,10 @@ public class movePiece : MonoBehaviour
         RotateValue();
     }
     
+    
     public void RotateValue()
     {
-        int aux = m_values[0];
+        bool aux = m_values[0];
         
         for (int i = 0; i < m_values.Length-1; i++)
         {
@@ -59,5 +42,7 @@ public class movePiece : MonoBehaviour
         }
         m_values[3] = aux;
     }
-    */
+
+    
+    
 }
