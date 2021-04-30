@@ -42,9 +42,29 @@ public class RobotPuzzleManager : MonoBehaviour
             Debug.Log(item.gameObject.name);
         }
 
+        //m_myRobotPuzzle.m_winValue = GetWinValue();
+        
         Shuffle();
     }
 
+/*
+    int GetWinValue()
+    {
+        int winValue = 0;
+        
+        foreach (var piece in m_myRobotPuzzle.m_robotPieces)
+        {
+            foreach (var j in m_movePiece.m_values)
+            {
+                winValue += j;
+            }
+        }
+
+        winValue /= 2;
+
+        return winValue;
+    }  
+  */
 
     void Shuffle()
     {
