@@ -14,4 +14,5 @@ public enum Directions {
     Right = 0b0000_1000,
     
     None = 0b0000_0000,
+    All = 0b0000_1111,
 }
