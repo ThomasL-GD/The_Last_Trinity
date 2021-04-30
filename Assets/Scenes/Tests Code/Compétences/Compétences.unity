@@ -140,7 +140,7 @@ GameObject:
   - component: {fileID: 205744752}
   m_Layer: 0
   m_Name: "Cam\xE9ra Robot"
-  m_TagString: Untagged
+  m_TagString: Camera Robot
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -187,7 +187,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 205744751}
-  m_LocalRotation: {x: 0.50872713, y: -0.0020776703, z: 0.0012277119, w: 0.8609244}
+  m_LocalRotation: {x: 0.50872725, y: -0.0020776703, z: 0.0012277123, w: 0.8609244}
   m_LocalPosition: {x: 2.6381083, y: 15.41, z: -9.469243}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -690,7 +690,7 @@ GameObject:
   - component: {fileID: 780364264}
   m_Layer: 0
   m_Name: "Cam\xE9ra Monstre"
-  m_TagString: Untagged
+  m_TagString: Camera Monstre
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -887,7 +887,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1031546551}
-  m_LocalRotation: {x: 0.503255, y: -0.077567615, z: 0.045420073, w: 0.8594502}
+  m_LocalRotation: {x: 0.5032551, y: -0.07756761, z: 0.045420073, w: 0.8594502}
   m_LocalPosition: {x: -1.6, y: 15.41, z: -9.49}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -1066,7 +1066,7 @@ GameObject:
   - component: {fileID: 1631136597}
   m_Layer: 0
   m_Name: "Cam\xE9ra Humain"
-  m_TagString: Untagged
+  m_TagString: Camera Humain
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1113,7 +1113,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1631136596}
-  m_LocalRotation: {x: 0.503255, y: -0.077567615, z: 0.045420073, w: 0.8594502}
+  m_LocalRotation: {x: 0.5032551, y: -0.07756761, z: 0.045420073, w: 0.8594502}
   m_LocalPosition: {x: -1.6, y: 15.41, z: -9.49}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -1466,15 +1466,15 @@ PrefabInstance:
     - target: {fileID: 6590652175406110486, guid: 5a04c930a68b0694982f7b37b5504c75, type: 3}
       propertyPath: m_vCamH
       value: 
-      objectReference: {fileID: 1631136597}
+      objectReference: {fileID: 0}
     - target: {fileID: 6590652175406110486, guid: 5a04c930a68b0694982f7b37b5504c75, type: 3}
       propertyPath: m_vCamM
       value: 
-      objectReference: {fileID: 780364264}
+      objectReference: {fileID: 0}
     - target: {fileID: 6590652175406110486, guid: 5a04c930a68b0694982f7b37b5504c75, type: 3}
       propertyPath: m_vCamR
       value: 
-      objectReference: {fileID: 205744752}
+      objectReference: {fileID: 0}
     - target: {fileID: 6590652175406110486, guid: 5a04c930a68b0694982f7b37b5504c75, type: 3}
       propertyPath: m_cineCam
       value: 
@@ -1490,15 +1490,15 @@ PrefabInstance:
     - target: {fileID: 6590652175594776881, guid: 5a04c930a68b0694982f7b37b5504c75, type: 3}
       propertyPath: m_vCamH
       value: 
-      objectReference: {fileID: 1631136597}
+      objectReference: {fileID: 0}
     - target: {fileID: 6590652175594776881, guid: 5a04c930a68b0694982f7b37b5504c75, type: 3}
       propertyPath: m_vCamM
       value: 
-      objectReference: {fileID: 780364264}
+      objectReference: {fileID: 0}
     - target: {fileID: 6590652175594776881, guid: 5a04c930a68b0694982f7b37b5504c75, type: 3}
       propertyPath: m_vCamR
       value: 
-      objectReference: {fileID: 205744752}
+      objectReference: {fileID: 0}
     - target: {fileID: 6590652175594776881, guid: 5a04c930a68b0694982f7b37b5504c75, type: 3}
       propertyPath: m_cineCam
       value: 
@@ -1510,18 +1510,22 @@ PrefabInstance:
     - target: {fileID: 6590652176170718736, guid: 5a04c930a68b0694982f7b37b5504c75, type: 3}
       propertyPath: m_vCamH
       value: 
-      objectReference: {fileID: 1631136597}
+      objectReference: {fileID: 0}
     - target: {fileID: 6590652176170718736, guid: 5a04c930a68b0694982f7b37b5504c75, type: 3}
       propertyPath: m_vCamM
       value: 
-      objectReference: {fileID: 780364264}
+      objectReference: {fileID: 0}
     - target: {fileID: 6590652176170718736, guid: 5a04c930a68b0694982f7b37b5504c75, type: 3}
       propertyPath: m_vCamR
       value: 
-      objectReference: {fileID: 205744752}
+      objectReference: {fileID: 0}
     - target: {fileID: 6590652176170718736, guid: 5a04c930a68b0694982f7b37b5504c75, type: 3}
       propertyPath: m_cineCam
       value: 
       objectReference: {fileID: 1631136596}
+    - target: {fileID: 6590652176170718736, guid: 5a04c930a68b0694982f7b37b5504c75, type: 3}
+      propertyPath: m_soulPrefab
+      value: 
+      objectReference: {fileID: 3936441117308932647, guid: 9f560081b1cc7cc45b449b1649a4dab0, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5a04c930a68b0694982f7b37b5504c75, type: 3}
