@@ -22,6 +22,8 @@ public class HumanSubPuzzle : MonoBehaviour {
     [SerializeField] [Tooltip("The height of the maze (unit : cells)")] public int m_mazeHeight = 5;
     [SerializeField] [Tooltip("The width of the maze (unit : cells)")] public int m_mazeWidth = 5;
     [SerializeField] [Tooltip("The number of random removed walls (Warning ! This function can remove walls that are already removed by the base algorithm) ")] public int m_wallsToRemove = 5;
+
+    [SerializeField] [Tooltip("If on, Every cell that is closed by all four directions will open itself (warning ! does not prevent a group of cells to be closed from the rest of the maze)")] private bool m_isBreakingClosedCells = true;
     /*Contains every cell of the maze and if each cell have a wall above, under, on the right or on the left of itself*/private Directions[,] m_maze = null;
     [SerializeField] [Tooltip("Décalage du prefab sur l'axe X")] private float m_offsetX = 4.0f;
     [SerializeField] [Tooltip("Décalage du prefab sur l'axe Y")] private float m_offsetY = 4.0f;
@@ -32,6 +34,7 @@ public class HumanSubPuzzle : MonoBehaviour {
     [SerializeField] [Tooltip("For debug only")] private GameObject m_prefabLeft = null;
     [SerializeField] [Tooltip("For debug only")] private GameObject m_prefabRight = null;
     [SerializeField] [Tooltip("For debug only")] private GameObject m_prefabDown = null;
+    [SerializeField] [Tooltip("The visual representation of the player")] private GameObject m_prefabPlayer = null;
     
     
     /// <summary>
@@ -71,24 +74,20 @@ public class HumanSubPuzzle : MonoBehaviour {
         //Now it's time to break random walls in order to have new paths emerging
         for (int i = 0; i < m_wallsToRemove; i++) {
             
-            //We select a random direction and a random tile to break a wall
-            Directions removedDirection = RandomDirectionBetween(Directions.All);
+            //The selector has its x and y reversed becaus eof the EraseRandomWall function
             Selector select = new Selector(Random.Range(0, m_maze.GetLength(1)), Random.Range(0, m_maze.GetLength(0)));
+            EraseRandomWall(select);
             
-            m_maze[select.y, select.x] &= ~removedDirection;
-            
-            //Once we removed a wall, we make sure the adjacent cell (if it exists) will have its opposite wall removed as well
-            if (removedDirection == Directions.Up && select.y != 0) {
-                m_maze[select.y-1, select.x] &= ~Directions.Down;
-            }
-            else if (removedDirection == Directions.Down && select.y != m_mazeHeight - 1) {
-                m_maze[select.y+1, select.x] &= ~Directions.Up;
-            }
-            else if (removedDirection == Directions.Left && select.x != 0) {
-                m_maze[select.y, select.x-1] &= ~Directions.Right;
-            }
-            else if (removedDirection == Directions.Right && select.x != m_mazeWidth - 1) {
-                m_maze[select.y, select.x+1] &= ~Directions.Left;
+        }
+        
+        if (m_isBreakingClosedCells) {
+            for (int i = 0; i < m_maze.GetLength(0); i++) {
+                for (int j = 0; j < m_maze.GetLength(1); j++) {
+                    //If any cell is full of walls, we break one randomly
+                    if (m_maze[i, j] == Directions.All) {
+                        EraseRandomWall(new Selector(j, i));
+                    }
+                }
             }
         }
         
@@ -135,6 +134,35 @@ public class HumanSubPuzzle : MonoBehaviour {
                 }
                 
             }
+        }
+    }
+
+    /// <summary>
+    /// Will erase a random wall and make sure its opposite wall gets destroyed as well
+    /// </summary>
+    /// <param name="p_select">
+    /// The coordinates in m_maze of the cell to which erase a wall
+    /// WARNING ! WE USE "m_maze[p_select.y, p_select.x]" TO NAVIGATE IN THE MAZE
+    /// </param>
+    private void EraseRandomWall(Selector p_select) {
+        
+        //We select a random direction and a random tile to break a wall
+        Directions removedDirection = RandomDirectionBetween(Directions.All);
+            
+        m_maze[p_select.y, p_select.x] &= ~removedDirection;
+            
+        //Once we removed a wall, we make sure the adjacent cell (if it exists) will have its opposite wall removed as well
+        if (removedDirection == Directions.Up && p_select.y != 0) {
+            m_maze[p_select.y-1, p_select.x] &= ~Directions.Down;
+        }
+        else if (removedDirection == Directions.Down && p_select.y != m_mazeHeight - 1) {
+            m_maze[p_select.y+1, p_select.x] &= ~Directions.Up;
+        }
+        else if (removedDirection == Directions.Left && p_select.x != 0) {
+            m_maze[p_select.y, p_select.x-1] &= ~Directions.Right;
+        }
+        else if (removedDirection == Directions.Right && p_select.x != m_mazeWidth - 1) {
+            m_maze[p_select.y, p_select.x+1] &= ~Directions.Left;
         }
     }
 
@@ -317,6 +345,8 @@ public class HumanSubPuzzle : MonoBehaviour {
             else if (Input.GetKeyDown(KeyCode.DownArrow) && m_selector.y < m_maze.GetLength(0) - 1) {
                 m_selector.y++;
             }
+            
+            
         }
     }
 }
