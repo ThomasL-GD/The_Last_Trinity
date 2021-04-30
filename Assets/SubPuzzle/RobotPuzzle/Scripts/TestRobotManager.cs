@@ -42,7 +42,6 @@ public class TestRobotManager : MonoBehaviour
 
 		m_puzzle.m_curValue=Sweep ();
 
-
 	}
 
 
@@ -186,24 +185,5 @@ public class TestRobotManager : MonoBehaviour
 		}
 	}
 
-
-	Vector2 CheckDimensions()
-	{
-		Vector2 aux = Vector2.zero;
-
-		GameObject[] pieces = GameObject.FindGameObjectsWithTag ("Piece");
-
-		foreach (var p in pieces) {
-			if (p.transform.position.x > aux.x)
-				aux.x = p.transform.position.x;
-
-			if (p.transform.position.y > aux.y)
-				aux.y= p.transform.position.y;
-		}
-
-		aux.x++;
-		aux.y++;
-
-		return aux;
-	}
+	
 }
