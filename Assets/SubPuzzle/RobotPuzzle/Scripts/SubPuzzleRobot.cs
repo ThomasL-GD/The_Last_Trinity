@@ -26,8 +26,9 @@ public class SubPuzzleRobot : MonoBehaviour
     //liste des pièces dans la scène
     private List<GameObject> m_scenePieces = new List<GameObject>();
     
-    [SerializeField] [Tooltip("Décalage du prefab sur l'axe X")] private float m_offsetX = 4.0f;
-    [SerializeField] [Tooltip("Décalage du prefab sur l'axe Y")] private float m_offsetY = 4.0f;
+    //décalage du préfab à chaque instanciation
+    private float m_offsetX = 2.0f;
+    private float m_offsetY = 2.0f;
 
     //Tableau à double entrée qui stocke les prefab
     private GameObject[,] m_prefabStock;
@@ -51,6 +52,8 @@ public class SubPuzzleRobot : MonoBehaviour
     
     //valeur de connexions actuelles en haut
     [SerializeField] private int m_currentValue;
+    
+    
     
     // Start is called before the first frame update
     void Start()
@@ -143,26 +146,104 @@ public class SubPuzzleRobot : MonoBehaviour
     {
         int value = 0;
 
-        //bool piece1 = false;
-        //bool piece2 = false;
+        bool piece1 = false;
+        bool piece2 = false;
         
-        for (int i = 0; i < m_scenePieces.Count; i++)   //pour chaque pièce dans la scène
+        for (int i = 4; i < m_scenePieces.Count; i++)   //pour chaque pièce dans la scène
         {
-            //Compare avec le haut
-            if (m_scenePieces[i].TryGetComponent(out m_movePiece))  //recherche du script movepiece sur la pièce
+            //Compare avec le bas
+            if (m_scenePieces[i].transform.position.y > m_scenePieces[m_arrayHeight*m_arrayWidth-1].transform.position.y && m_scenePieces[i].TryGetComponent(out m_movePiece))  //Si la pièce actuelle ne se situe pas tout en bas du tableau et qu'on recherche le script movepiece sur la pièce
             {
-                if (m_movePiece.m_values[0] == true)    //Si la première valeur, qui est la face vers le haut, est vraie
+                if (m_movePiece.m_values[2] == true) //Si la 2ème valeur, qui est la face vers le bas, est vraie
                 {
-                    if(m_scenePieces[i + m_arrayWidth].TryGetComponent(out m_movePiece))    //recherche du script movepiece sur la pièce au-dessus de l'actuelle pièce
-                    {
-                        if (m_movePiece.m_values[2] == true)    //Si la 3ème valeur, qui est la face vers le bas, est vraie
-                        {
-                            value++;    //une connexion est effectuée !
-                        }
-                    }
+                    piece1 = true;
                 }
+                else piece1 = false;
             }
             
+            if(piece1 == true && m_scenePieces[i + m_arrayWidth].TryGetComponent(out m_movePiece))    //recherche du script movepiece sur la pièce située au-dessus de l'actuelle pièce
+            {
+                if (m_movePiece.m_values[0] == true) //Si la 1ère valeur, qui est la face vers le haut, est vraie
+                {
+                    piece2 = true;
+                }
+                else piece2 = false;
+            }
+
+            if (piece1 && piece2) value++; //Debug.Log("Connexion effecuée avec le bas");
+            
+            
+            
+            //Compare avec le haut
+            if (m_scenePieces[i].transform.position.y < m_scenePieces[0].transform.position.y && m_scenePieces[i].TryGetComponent(out m_movePiece)) //Si la pière actuelle ne se situe pas tout en haut du tableau et qu'on recherche le script movepiece sur la pièce
+            {
+                if (m_movePiece.m_values[0] == true) //Si la première valeur, qui est la face vers le haut, est vraie
+                {
+                    piece1 = true;
+                }
+                else piece1 = false;
+
+                if (piece1 == true && m_scenePieces[i - m_arrayWidth].TryGetComponent(out m_movePiece)) //recherche du script movepiece sur la pièce au-dessus de l'actuelle pièce
+                {
+                    if (m_movePiece.m_values[2] == true) //Si la 3ème valeur, qui est la face vers le bas, est vraie
+                    {
+                        piece2 = true;
+                    }
+                    else piece2 = false;
+                }
+
+                if (piece1 && piece2) value++; //Debug.Log("Connexion effecuée avec le haut");
+            }
+            
+            
+            //Compare avec la droite
+            if (m_scenePieces[i].transform.position.x < m_scenePieces[m_arrayWidth - 1].transform.position.x && m_scenePieces[i].TryGetComponent(out m_movePiece)) //recherche du script movepiece sur la pièce
+            {
+                if (m_movePiece.m_values[1] == true) //Si la 2ème valeur, qui est la face vers la droite, est vraie
+                {
+                    piece1 = true;
+                }
+                else piece1 = false;
+
+                if (piece1 == true && m_scenePieces[i + 1].TryGetComponent(out m_movePiece)) //recherche du script movepiece sur la pièce à droite de l'actuelle pièce
+                {
+                    if (m_movePiece.m_values[3] == true) //Si la 4ème valeur, qui est la face vers la gauche, est vraie
+                    {
+                        piece2 = true;
+                    }
+                    else piece2 = false;
+                }
+
+                if (piece1 && piece2) value++; //Debug.Log("Connexion effecuée avec la droite");
+            }
+            
+            
+            //Compare avec la gauche
+            if (m_scenePieces[i].transform.position.x > m_scenePieces[0].transform.position.x && m_scenePieces[i].TryGetComponent(out m_movePiece)) //recherche du script movepiece sur la pièce
+            {
+                if (m_movePiece.m_values[3] == true) //Si la 4ème valeur, qui est la face vers le haut, est vraie
+                {
+                    piece1 = true;
+                }
+                else piece1 = false;
+                
+                if (piece1 == true && m_scenePieces[i - 1].TryGetComponent(out m_movePiece)) //recherche du script movepiece sur la pièce au-dessus de l'actuelle pièce
+                {
+                    if (m_movePiece.m_values[1] == true) //Si la 2ème valeur, qui est la face vers le bas, est vraie
+                    {
+                        piece2 = true;
+                    }
+                    else piece2 = false;
+                }
+
+                if (piece1 && piece2) value++; //Debug.Log("Connexion effecuée avec la gauche");
+            }
+            
+            
+            
+            //Debug.Log($"{m_scenePieces[i]}");
+
+            i = m_scenePieces.Count;
         }
 
         
@@ -172,8 +253,7 @@ public class SubPuzzleRobot : MonoBehaviour
     
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow) ||
-            Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow))
+        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow))
         {
 
             //déplacement du sélecteur
@@ -208,12 +288,14 @@ public class SubPuzzleRobot : MonoBehaviour
 
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            Sweep();
+        }
         
     }
-
-
-
-
+    
 
 
 }

@@ -18,7 +18,7 @@ public class movePiece : MonoBehaviour
     public bool[] m_values;
 
     
-
+/*
     public void RotatePiece()
     {
         m_realRotation -= 90;
@@ -42,7 +42,7 @@ public class movePiece : MonoBehaviour
         }
         m_values[3] = aux;
     }
-
+*/
     
     
 }
