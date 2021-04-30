@@ -227,7 +227,7 @@ public class SubPuzzleRobot : MonoBehaviour
                 }
                 else piece1 = false;
                 
-                if (piece1 == true && m_scenePieces[i + m_arrayWidth].TryGetComponent(out m_movePiece)) //recherche du script movepiece sur la pièce au-dessus de l'actuelle pièce
+                if (piece1 == true && m_scenePieces[i - 1].TryGetComponent(out m_movePiece)) //recherche du script movepiece sur la pièce au-dessus de l'actuelle pièce
                 {
                     if (m_movePiece.m_values[1] == true) //Si la 2ème valeur, qui est la face vers le bas, est vraie
                     {
