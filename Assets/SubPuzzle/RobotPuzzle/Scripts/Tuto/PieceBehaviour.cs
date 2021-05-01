@@ -2,20 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class piece : MonoBehaviour
+public class PieceBehaviour : MonoBehaviour
 {
-    public int[] m_values;    //tableau de valeur pour chaque face de chaque pièce à instancier
+    [Tooltip("tableau des valeurs vraies ou fausses")] public bool[] m_values = null;    //tableau de valeur pour chaque face de chaque pièce à instancier
     
-    [SerializeField] [Tooltip("Vitesse de rotation des pièces")] private float m_speed;
+    [SerializeField] [Tooltip("Vitesse de rotation des pièces")] private float m_speed = 10.0f;
     
-    private float m_realRotation; //Angle de rotation d'une pièce
+    private float m_realRotation = 0.0f; //Angle à partir de laquelle la pièce va se caler pour rotate dynamiquement
     
-    public TestRobotManager m_testRobotManager;
+    [HideInInspector] public RobotPuzzleManager m_RobotPuzzleManager = null;
     
-    // Use this for initialization
-    void Start () {
-        m_testRobotManager = GameObject.FindGameObjectWithTag ("GameController").GetComponent<TestRobotManager> ();
-    }
 	
     // Update is called once per frame
     void Update () {
@@ -29,18 +25,18 @@ public class piece : MonoBehaviour
 
     void OnMouseDown()
     {
-
-        int difference = -m_testRobotManager.QuickSweep((int)transform.position.x,(int)transform.position.y);   //valeur de position au départ
+        int difference = -m_RobotPuzzleManager.QuickSweep((int)transform.position.x,(int)transform.position.y);   //valeur de position au départ
 
         RotatePiece (); //Fonction qui tourne la pièce ainsi que les valeurs qui lui sont attribbués
 
-        difference += m_testRobotManager.QuickSweep((int)transform.position.x,(int)transform.position.y);   //valeur de position après rotation de la pièce
+        difference += m_RobotPuzzleManager.QuickSweep((int)transform.position.x,(int)transform.position.y);   //valeur de position après rotation de la pièce
         
-        m_testRobotManager.m_puzzle.m_curValue += difference;
+        m_RobotPuzzleManager.m_puzzle.m_curValue += difference; //calcul la différence après rotation et add to curValue
 
-        if (m_testRobotManager.m_puzzle.m_curValue == m_testRobotManager.m_puzzle.m_winValue)  m_testRobotManager.Win ();
+        if (m_RobotPuzzleManager.m_puzzle.m_curValue == m_RobotPuzzleManager.m_puzzle.m_winValue)  m_RobotPuzzleManager.Win ();
     }
 
+    
     /// <summary>
     /// Fonction qui sert à tourner la pièce d'un certain angle
     /// fonction mise en publique parce qu'on l'appelle dans testRobotManager
@@ -52,7 +48,7 @@ public class piece : MonoBehaviour
         if (m_realRotation == 360)
             m_realRotation = 0;
 
-        RotateValues ();    //rotation des valeurs
+        RotateValues();    //rotation des valeurs
     }
 
     /// <summary>
@@ -60,7 +56,7 @@ public class piece : MonoBehaviour
     /// </summary>
     private void RotateValues()
     {
-        int firstValue = m_values [0]; //première valeur de la pièce
+        bool firstValue = m_values [0]; //première valeur de la pièce
 
         //la valeur actuelle sur chaque face prends la valeur suivante, c'est ce qui lie la rotation de la pièce à la valeur de la face de chaque pièce 
         for (int i = 0; i < m_values.Length-1; i++) {

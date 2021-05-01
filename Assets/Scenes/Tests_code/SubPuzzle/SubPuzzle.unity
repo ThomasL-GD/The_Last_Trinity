@@ -983,7 +983,7 @@ GameObject:
   - component: {fileID: 573528084}
   - component: {fileID: 573528083}
   m_Layer: 0
-  m_Name: TestTutoRobot
+  m_Name: RobotPuzzle
   m_TagString: GameController
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1002,6 +1002,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_canvas: {fileID: 330045595}
+  m_piecesPrefabClass:
+    prefabEmpty: {fileID: 5475869915929310563, guid: b270918c076458642b9bf1be2e465cb6, type: 3}
+    prefabOneDirection: {fileID: 1359248225425509418, guid: a2e7a69d7ab395047be3246134af8bec, type: 3}
+    prefabStraightLine: {fileID: 2441802556659083684, guid: 16157b59620448d4f8c85d474f5940e9, type: 3}
+    prefabCorner: {fileID: 7710828181753326196, guid: dc7ff2d73c7e71d4e9903c997c854a14, type: 3}
+    prefabTForm: {fileID: 6803946066661369470, guid: e1ad6250d5bfd7140991bcc80ffe8861, type: 3}
+    prefabCross: {fileID: 4581239909967446119, guid: b1246151c5d50ff4c934f075c279df72, type: 3}
   m_piecePrefabs:
   - {fileID: 5475869915929310563, guid: b270918c076458642b9bf1be2e465cb6, type: 3}
   - {fileID: 1359248225425509418, guid: a2e7a69d7ab395047be3246134af8bec, type: 3}
@@ -1012,7 +1019,7 @@ MonoBehaviour:
   m_puzzle:
     m_winValue: 0
     m_curValue: 0
-    m_width: 3
+    m_width: 4
     m_height: 3
 --- !u!4 &573528084
 Transform:
@@ -1411,7 +1418,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1031546551}
   m_LocalRotation: {x: 0.010499376, y: -0.011995335, z: 0.00012595265, w: 0.999873}
-  m_LocalPosition: {x: 0.73861885, y: 1.8388271, z: -5.7820983}
+  m_LocalPosition: {x: 1.4227378, y: 2.4077086, z: -8.067268}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -2283,7 +2290,6 @@ GameObject:
   - component: {fileID: 1957986677}
   - component: {fileID: 1957986679}
   - component: {fileID: 1957986678}
-  - component: {fileID: 1957986680}
   - component: {fileID: 1957986681}
   m_Layer: 5
   m_Name: Panel
@@ -2351,18 +2357,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1957986676}
   m_CullTransparentMesh: 0
---- !u!114 &1957986680
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1957986676}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 98e1dce539ee1c0478a475a18a882e22, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!95 &1957986681
 Animator:
   serializedVersion: 3
