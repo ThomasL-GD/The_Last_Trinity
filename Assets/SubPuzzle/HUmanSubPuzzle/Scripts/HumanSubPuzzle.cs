@@ -18,6 +18,7 @@ public class HumanSubPuzzle : MonoBehaviour {
     }
     
     private Selector m_selector = new Selector(0,0); //Contains the coordinates of our selector aka the position of th player
+    private GameObject m_player = null; //Contains the coordinates of our selector aka the position of th player
 
     [Header("Balancing")]
     [SerializeField] [Tooltip("The height of the maze (unit : cells)")] [Range(2,50)] public int m_mazeHeight = 5;
@@ -33,12 +34,15 @@ public class HumanSubPuzzle : MonoBehaviour {
     [SerializeField] [Tooltip("Décalage du prefab sur l'axe Y")] private float m_offsetY = 4.0f;
 
     [Header("Prefabs for visual representation")]
-    [SerializeField] [Tooltip("For debug only")] private GameObject m_prefabBG = null;
+    [SerializeField] [Tooltip("The visual representation of the player")] private GameObject m_prefabPlayer = null;
+    [SerializeField] [Tooltip("The prefab of the background")] private GameObject m_prefabBG = null;
+    
+    [Header("Debug")]
+    [SerializeField] [Tooltip("If on, the walls will be displayed for debug")] private bool m_debugMode = false;
     [SerializeField] [Tooltip("For debug only")] private GameObject m_prefabUp = null;
     [SerializeField] [Tooltip("For debug only")] private GameObject m_prefabLeft = null;
     [SerializeField] [Tooltip("For debug only")] private GameObject m_prefabRight = null;
     [SerializeField] [Tooltip("For debug only")] private GameObject m_prefabDown = null;
-    [SerializeField] [Tooltip("The visual representation of the player")] private GameObject m_prefabPlayer = null;
     
     
     /// <summary>
@@ -125,30 +129,50 @@ public class HumanSubPuzzle : MonoBehaviour {
 
 
         //Visual representation
-        GameObject emptyContainer = new GameObject("PiecesContainer");
-        GameObject container = Instantiate(emptyContainer);
+        if (m_debugMode) {
+            
+            GameObject emptyContainer = new GameObject("PiecesContainer");
+            GameObject container = Instantiate(emptyContainer);
         
-        for (int i = 0; i < m_maze.GetLength(0); i++) {
-            for (int j = 0; j < m_maze.GetLength(1); j++) {
+            for (int i = 0; i < m_maze.GetLength(0); i++) {
+                for (int j = 0; j < m_maze.GetLength(1); j++) {
 
-                transform.position = new Vector3(0 + j * m_offsetX, 0 - i * m_offsetY, 0);
-                Instantiate(m_prefabBG, new Vector3(transform.position.x, transform.position.y, transform.position.z + 0.5f), transform.rotation, container.transform);
+                    transform.position = new Vector3(0 + j * m_offsetX, 0 - i * m_offsetY, 0);
+                    Instantiate(m_prefabBG, new Vector3(transform.position.x, transform.position.y, transform.position.z + 0.5f), transform.rotation, container.transform);
 
-                if (m_maze[i, j].HasFlag(Directions.Up)) {
-                    Instantiate(m_prefabUp, transform.position, transform.rotation, container.transform);
-                }
-                if (m_maze[i, j].HasFlag(Directions.Down)) {
-                    Instantiate(m_prefabDown, transform.position, transform.rotation, container.transform);
-                }
-                if (m_maze[i, j].HasFlag(Directions.Left)) {
-                    Instantiate(m_prefabLeft, transform.position, transform.rotation, container.transform);
-                }
-                if (m_maze[i, j].HasFlag(Directions.Right)) {
-                    Instantiate(m_prefabRight, transform.position, transform.rotation, container.transform);
-                }
+                    if (m_maze[i, j].HasFlag(Directions.Up)) {
+                        Instantiate(m_prefabUp, transform.position, transform.rotation, container.transform);
+                    }
+                    if (m_maze[i, j].HasFlag(Directions.Down)) {
+                        Instantiate(m_prefabDown, transform.position, transform.rotation, container.transform);
+                    }
+                    if (m_maze[i, j].HasFlag(Directions.Left)) {
+                        Instantiate(m_prefabLeft, transform.position, transform.rotation, container.transform);
+                    }
+                    if (m_maze[i, j].HasFlag(Directions.Right)) {
+                        Instantiate(m_prefabRight, transform.position, transform.rotation, container.transform);
+                    }
                 
+                }
             }
         }
+        else { // If we're not in debug mode, we just display the background
+            GameObject emptyContainer = new GameObject("PiecesContainer");
+            GameObject container = Instantiate(emptyContainer);
+        
+            for (int i = 0; i < m_maze.GetLength(0); i++) {
+                for (int j = 0; j < m_maze.GetLength(1); j++) {
+
+                    transform.position = new Vector3(0 + j * m_offsetX, 0 - i * m_offsetY, 0);
+                    Instantiate(m_prefabBG, new Vector3(transform.position.x, transform.position.y, transform.position.z + 0.5f), transform.rotation, container.transform);
+
+                }
+            }
+        }
+        
+        //Player sprite instantiate
+        if(m_prefabPlayer!=null) m_player = Instantiate(m_prefabPlayer, new Vector3(0, 0, 0), transform.rotation);
+
     }
 
     /// <summary>
@@ -342,26 +366,53 @@ public class HumanSubPuzzle : MonoBehaviour {
     void Update() {
 
         if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow)) {
-
-            //déplacement du sélecteur
-            //Déplacement a gauche si position X sélecteur > position  X  première prefab instanciée
+            
+            Directions attemptedMovement = Directions.None;
+            
+            //We first stocks the way the player wants to go if he's not blocked by the limits of the maze
             if (Input.GetKeyDown(KeyCode.LeftArrow) && m_selector.x > 0) {
-                m_selector.x--;
+                attemptedMovement = Directions.Left;
             }
-            //Déplacement à droite si position  X sélecteur  < valeur largeur tableau prefab        // -1 parce que départ de 0
             else if (Input.GetKeyDown(KeyCode.RightArrow) && m_selector.x < m_maze.GetLength(1) - 1) {
-                m_selector.x++;
+                attemptedMovement = Directions.Right;
             }
-            //Déplacement en haut si position Y sélecteur < position Y première prefab
             else if (Input.GetKeyDown(KeyCode.UpArrow) && m_selector.y > 0) {
-                m_selector.y--;
+                attemptedMovement = Directions.Up;
             }
-            //Déplacement en bas si position Y sélecteur > valeur dernière prefab du tableau prefab       // -1 parce que départ de 0
             else if (Input.GetKeyDown(KeyCode.DownArrow) && m_selector.y < m_maze.GetLength(0) - 1) {
-                m_selector.y++;
+                attemptedMovement = Directions.Down;
             }
-            
-            
+
+            //First we verify the player has no wall blocking the way he wants to go;
+            if (attemptedMovement == Directions.None || m_maze[m_selector.y, m_selector.x].HasFlag(attemptedMovement)) {
+                Debug.Log("Nah bro, you cannot go this way");
+                Handheld.Vibrate();
+            }
+            else {
+                //If the movement is not blocked by a wall, we update the selector coordinates according to the wanted direction
+                switch (attemptedMovement) {
+                    case Directions.Left:
+                        m_selector.x--;
+                        break;
+                    case Directions.Right:
+                        m_selector.x++;
+                        break;
+                    case Directions.Up:
+                        m_selector.y--;
+                        break;
+                    case Directions.Down:
+                        m_selector.y++;
+                        break;
+                }
+
+                //Then, we update the visual representation for the player
+                m_player.transform.position = new Vector3(m_offsetX * m_selector.x, -m_offsetY * m_selector.y, 0);
+                
+                //Win verification
+                if (m_selector.x == m_mazeWidth - 1 && m_selector.y == m_mazeHeight - 1) {
+                    Debug.Log("IT'S A WIN !");
+                }
+            }
         }
     }
 }

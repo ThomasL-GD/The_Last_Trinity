@@ -361,18 +361,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 633781c0e2efedf49a6902dfb4e57202, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_mazeHeight: 6
-  m_mazeWidth: 14
-  m_wallsToRemove: 48
+  m_mazeHeight: 8
+  m_mazeWidth: 8
+  m_wallsToRemove: 6
   m_isBreakingClosedCells: 1
+  m_wallsToRemoveAfterBreaking: 13
   m_offsetX: 10
   m_offsetY: 10
+  m_debugMode: 1
   m_prefabBG: {fileID: 5419854575767258787, guid: 8f0d2bfcce7368d44b7c7417a0ce171c, type: 3}
   m_prefabUp: {fileID: 245841817513572696, guid: 0adcab1867652404889a4ffa9d6c7e35, type: 3}
   m_prefabLeft: {fileID: 1758551592486317599, guid: 659b8253e1ad37c43bc01b6ee9de91a3, type: 3}
   m_prefabRight: {fileID: 2900311240990152336, guid: 14b5daa7864d96a45ad3989d98d141a9, type: 3}
   m_prefabDown: {fileID: 7307003934862178985, guid: fea1e3e8f007f9149b391e8cb06daee5, type: 3}
-  m_prefabPlayer: {fileID: 0}
+  m_prefabPlayer: {fileID: 6918469997813173856, guid: 705cf9d200c03cf4cbf0607b1ee1c029, type: 3}
 --- !u!4 &997209038
 Transform:
   m_ObjectHideFlags: 0
