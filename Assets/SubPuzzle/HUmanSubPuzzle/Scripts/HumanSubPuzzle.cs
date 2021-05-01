@@ -34,13 +34,15 @@ public class HumanSubPuzzle : MonoBehaviour {
     [SerializeField] [Tooltip("Décalage du prefab sur l'axe Y")] private float m_offsetY = 4.0f;
 
     [Header("Prefabs for visual representation")]
+    [SerializeField] [Tooltip("The visual representation of the player")] private GameObject m_prefabPlayer = null;
+    [SerializeField] [Tooltip("The prefab of the background")] private GameObject m_prefabBG = null;
+    
+    [Header("Debug")]
     [SerializeField] [Tooltip("If on, the walls will be displayed for debug")] private bool m_debugMode = false;
-    [SerializeField] [Tooltip("For debug only")] private GameObject m_prefabBG = null;
     [SerializeField] [Tooltip("For debug only")] private GameObject m_prefabUp = null;
     [SerializeField] [Tooltip("For debug only")] private GameObject m_prefabLeft = null;
     [SerializeField] [Tooltip("For debug only")] private GameObject m_prefabRight = null;
     [SerializeField] [Tooltip("For debug only")] private GameObject m_prefabDown = null;
-    [SerializeField] [Tooltip("The visual representation of the player")] private GameObject m_prefabPlayer = null;
     
     
     /// <summary>
@@ -151,6 +153,19 @@ public class HumanSubPuzzle : MonoBehaviour {
                         Instantiate(m_prefabRight, transform.position, transform.rotation, container.transform);
                     }
                 
+                }
+            }
+        }
+        else { // If we're not in debug mode, we just display the background
+            GameObject emptyContainer = new GameObject("PiecesContainer");
+            GameObject container = Instantiate(emptyContainer);
+        
+            for (int i = 0; i < m_maze.GetLength(0); i++) {
+                for (int j = 0; j < m_maze.GetLength(1); j++) {
+
+                    transform.position = new Vector3(0 + j * m_offsetX, 0 - i * m_offsetY, 0);
+                    Instantiate(m_prefabBG, new Vector3(transform.position.x, transform.position.y, transform.position.z + 0.5f), transform.rotation, container.transform);
+
                 }
             }
         }
