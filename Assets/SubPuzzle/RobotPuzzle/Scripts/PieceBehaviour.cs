@@ -10,7 +10,7 @@ public class PieceBehaviour : MonoBehaviour
     
     private float m_realRotation = 0.0f; //Angle à partir de laquelle la pièce va se caler pour rotate dynamiquement
     
-    [HideInInspector] public RobotPuzzleManager m_RobotPuzzleManager = null;
+    [HideInInspector] public RobotPuzzleManager m_RobotPuzzleManager = null;    //script du gestionnaire de puzzle
     
 	
     // Update is called once per frame
@@ -20,6 +20,7 @@ public class PieceBehaviour : MonoBehaviour
         if (transform.root.eulerAngles.z != m_realRotation) {
             transform.rotation = Quaternion.Lerp (transform.rotation, Quaternion.Euler (0, 0, m_realRotation), m_speed);
         }
+        
     }
     
 
@@ -36,6 +37,23 @@ public class PieceBehaviour : MonoBehaviour
         if (m_RobotPuzzleManager.m_puzzle.m_curValue == m_RobotPuzzleManager.m_puzzle.m_winValue)  m_RobotPuzzleManager.Win ();
     }
 
+    /// <summary>
+    /// Fonction qui implique la rotation de pièce et indique le changement de valeurs de la pièce sur chaque face
+    /// </summary>
+    public void SweepPiece()
+    {
+        int difference = -m_RobotPuzzleManager.QuickSweep((int)transform.position.x,(int)transform.position.y);   //valeur de position au départ
+
+        RotatePiece (); //Fonction qui tourne la pièce ainsi que les valeurs qui lui sont attribbués
+
+        difference += m_RobotPuzzleManager.QuickSweep((int)transform.position.x,(int)transform.position.y);   //valeur de position après rotation de la pièce
+        
+        m_RobotPuzzleManager.m_puzzle.m_curValue += difference; //calcul la différence après rotation et add to curValue
+
+        if (m_RobotPuzzleManager.m_puzzle.m_curValue == m_RobotPuzzleManager.m_puzzle.m_winValue)  m_RobotPuzzleManager.Win ();
+        
+    }
+    
     
     /// <summary>
     /// Fonction qui sert à tourner la pièce d'un certain angle
