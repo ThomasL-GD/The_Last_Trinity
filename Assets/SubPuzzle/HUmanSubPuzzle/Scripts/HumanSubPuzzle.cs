@@ -16,15 +16,19 @@ public class HumanSubPuzzle : MonoBehaviour {
             y = p_y;
         }
     }
+    
+    private Selector m_selector = new Selector(0,0); //Contains the coordinates of our selector aka the position of th player
 
-    private Selector m_selector = new Selector(0,0);
-
-    [SerializeField] [Tooltip("The height of the maze (unit : cells)")] public int m_mazeHeight = 5;
-    [SerializeField] [Tooltip("The width of the maze (unit : cells)")] public int m_mazeWidth = 5;
-    [SerializeField] [Tooltip("The number of random removed walls (Warning ! This function can remove walls that are already removed by the base algorithm) ")] public int m_wallsToRemove = 5;
-
+    [Header("Balancing")]
+    [SerializeField] [Tooltip("The height of the maze (unit : cells)")] [Range(2,50)] public int m_mazeHeight = 5;
+    [SerializeField] [Tooltip("The width of the maze (unit : cells)")] [Range(2,50)] public int m_mazeWidth = 5;
+    [SerializeField] [Tooltip("The number of random removed walls\n(Warning ! This function can remove walls that are already removed by the base algorithm) ")] [Range(0,500)] public int m_wallsToRemove = 5;
     [SerializeField] [Tooltip("If on, Every cell that is closed by all four directions will open itself (warning ! does not prevent a group of cells to be closed from the rest of the maze)")] private bool m_isBreakingClosedCells = true;
+    [SerializeField] [Tooltip("The number of random removed walls AFTER the breaking of closed cells\n(Warning ! If isBreakingClosedCells is false, this parameter won't be used !)\n(Warning ! This function can remove walls that are already removed by the base algorithm) ")] [Range(0,500)] public int m_wallsToRemoveAfterBreaking = 5;
+    
     /*Contains every cell of the maze and if each cell have a wall above, under, on the right or on the left of itself*/private Directions[,] m_maze = null;
+    
+    [Header("Offsets")]
     [SerializeField] [Tooltip("Décalage du prefab sur l'axe X")] private float m_offsetX = 4.0f;
     [SerializeField] [Tooltip("Décalage du prefab sur l'axe Y")] private float m_offsetY = 4.0f;
 
@@ -46,7 +50,7 @@ public class HumanSubPuzzle : MonoBehaviour {
         if (m_mazeHeight < 2 || m_mazeWidth < 2) {
             Debug.LogError("Invalid size of the maze ! each dimension must be 2 or more cell long");
         }
-        if (m_wallsToRemove >= m_mazeHeight * m_mazeWidth * 4) {
+        if (m_wallsToRemove + m_wallsToRemoveAfterBreaking >= m_mazeHeight * m_mazeWidth * 4) {
             Debug.LogWarning("Warning ! You want to remove to many random walls from the maze, it's gonna be either way too easy or completely fucked up");
         }
         
@@ -80,6 +84,7 @@ public class HumanSubPuzzle : MonoBehaviour {
             
         }
         
+        //If m_isBreakingClosedCells is true, we're gonna look into the entire  maze and break closed cells
         if (m_isBreakingClosedCells) {
             for (int i = 0; i < m_maze.GetLength(0); i++) {
                 for (int j = 0; j < m_maze.GetLength(1); j++) {
@@ -88,6 +93,15 @@ public class HumanSubPuzzle : MonoBehaviour {
                         EraseRandomWall(new Selector(j, i));
                     }
                 }
+            }
+            
+            //Now it's time to break random walls again
+            for (int i = 0; i < m_wallsToRemoveAfterBreaking; i++) {
+            
+                //The selector has its x and y reversed becaus eof the EraseRandomWall function
+                Selector select = new Selector(Random.Range(0, m_maze.GetLength(1)), Random.Range(0, m_maze.GetLength(0)));
+                EraseRandomWall(select);
+            
             }
         }
         
@@ -174,6 +188,7 @@ public class HumanSubPuzzle : MonoBehaviour {
         // We create a path from the beginning to the end that will create holes in the maze in order to make sure there's at least one possible solution for the player;
         //We create a path head that will move in the maze and initialize it in 0,0
         Selector pathHead = new Selector(0, 0);
+        //We create a path variable that will stock every position the pathhead have taken
         List<Vector2> path = new List<Vector2>();
         
         while (!(pathHead.x == m_mazeWidth - 1 && pathHead.y == m_mazeHeight - 1)) {
