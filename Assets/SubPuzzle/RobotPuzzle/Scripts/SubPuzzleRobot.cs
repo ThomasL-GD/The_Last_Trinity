@@ -240,7 +240,6 @@ public class SubPuzzleRobot : MonoBehaviour
             }
             
             
-            
             //Debug.Log($"{m_scenePieces[i]}");
 
             i = m_scenePieces.Count;
@@ -285,7 +284,6 @@ public class SubPuzzleRobot : MonoBehaviour
                 {
                     m_scenePieces[i].transform.Rotate(Vector3.back, m_pieceRotation);   //rotation de la pièce sur laquelle le sélecteur se situe
                 }
-
             }
         }
 
@@ -296,6 +294,4 @@ public class SubPuzzleRobot : MonoBehaviour
         
     }
     
-
-
 }
