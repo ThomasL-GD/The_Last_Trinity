@@ -33,7 +33,7 @@ public class SnapToMainCam : MonoBehaviour {
 		thisCam.depth = mainCam.depth + 1;
         thisCam.renderingPath = RenderingPath.Forward;
         thisCam.useOcclusionCulling = mainCam.useOcclusionCulling;
-        thisCam.hdr = mainCam.hdr;
+        thisCam.allowHDR = mainCam.allowHDR;
 		transform.localPosition = Vector3.zero;
 		transform.localRotation = Quaternion.identity;
 		transform.localScale = Vector3.one;
