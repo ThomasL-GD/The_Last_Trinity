@@ -6,6 +6,17 @@
     <e p="C:\Users\Niels Ferreira\OneDrive\Bureau\PROJET_FIN_D_ANNEE\The_Last_Trinity" t="IncludeRecursive">
       <e p="Assembly-CSharp.csproj" t="IncludeRecursive" />
       <e p="Assets" t="Include">
+        <e p="OLD_SubPuzzle" t="Include">
+          <e p="Intéraction" t="Include">
+            <e p="PlayerControllerSubPuzzle.cs" t="Include" />
+          </e>
+          <e p="RobotPuzzle" t="Include">
+            <e p="OLD" t="Include">
+              <e p="movePiece.cs" t="Include" />
+              <e p="SubPuzzleRobot.cs" t="Include" />
+            </e>
+          </e>
+        </e>
         <e p="openSub.cs" t="Include" />
         <e p="Scenes" t="Include">
           <e p="Tests Code" t="Include">
@@ -44,31 +55,48 @@
                 <e p="Vision.cs" t="Include" />
               </e>
             </e>
-          </e>
-        </e>
-        <e p="SubPuzzle" t="Include">
-          <e p="HUmanSubPuzzle" t="Include">
-            <e p="Scripts" t="Include">
-              <e p="EnumDirections.cs" t="Include" />
-              <e p="HumanSubPuzzle.cs" t="Include" />
+            <e p="SubPuzzles" t="Include">
+              <e p="Human" t="Include">
+                <e p="Scripts" t="Include">
+                  <e p="EnumDirections.cs" t="Include" />
+                  <e p="HumanSubPuzzle.cs" t="Include" />
+                </e>
+              </e>
+              <e p="Monster" t="Include">
+                <e p="Scripts" t="Include">
+                  <e p="MonsterPuzzle.cs" t="Include" />
+                </e>
+              </e>
+              <e p="Robot" t="Include">
+                <e p="Scripts" t="Include">
+                  <e p="PieceBehaviour.cs" t="Include" />
+                  <e p="RobotPuzzleManager.cs" t="Include" />
+                </e>
+              </e>
             </e>
           </e>
-          <e p="Intéraction" t="Include">
-            <e p="PlayerControllerSubPuzzle.cs" t="Include" />
-          </e>
-          <e p="MonsterPuzzle" t="Include">
-            <e p="Script" t="Include">
-              <e p="MonsterPuzzle.cs" t="Include" />
-            </e>
-          </e>
-          <e p="RobotPuzzle" t="Include">
-            <e p="OLD" t="Include">
-              <e p="movePiece.cs" t="Include" />
-              <e p="SubPuzzleRobot.cs" t="Include" />
-            </e>
-            <e p="Scripts" t="Include">
-              <e p="PieceBehaviour.cs" t="Include" />
-              <e p="RobotPuzzleManager.cs" t="Include" />
+          <e p="Tests Graphiques" t="Include">
+            <e p="Shaders" t="Include">
+              <e p="Pixelation" t="Include">
+                <e p="Core" t="Include">
+                  <e p="GrabBeforePixelation.shader" t="Include" />
+                  <e p="PixelationPost.cs" t="Include" />
+                  <e p="PixelationPost.shader" t="Include" />
+                  <e p="SnapToMainCam.cs" t="Include" />
+                </e>
+                <e p="Examples" t="Include">
+                  <e p="PixelSize" t="Include">
+                    <e p="PixelSizeOscillator.cs" t="Include" />
+                  </e>
+                  <e p="PixelTentacle" t="Include">
+                    <e p="Rotate.cs" t="Include" />
+                  </e>
+                  <e p="SimpleOscillator.cs" t="Include" />
+                </e>
+                <e p="Readme.cs" t="Include" />
+                <e p="README.txt" t="Include" />
+                <e p="ReadmeEditor.cs" t="Include" />
+              </e>
             </e>
           </e>
         </e>

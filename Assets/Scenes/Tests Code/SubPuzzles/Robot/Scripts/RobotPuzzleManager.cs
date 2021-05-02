@@ -3,11 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.Rendering;
 using Random = UnityEngine.Random;
 
 public class RobotPuzzleManager : MonoBehaviour
 {
-	[Tooltip("Image de réussite de subPuzzle")] public GameObject m_canvas;
+	[Tooltip("Image de réussite de subPuzzle")] public GameObject m_victoryCanvas;
 
 	[Serializable]
 	public class PiecePrefabs
@@ -56,6 +57,8 @@ public class RobotPuzzleManager : MonoBehaviour
 	[Tooltip("For debug only")] private List<GameObject> m_scenePieces = new List<GameObject>();
 
 	[SerializeField] [Tooltip("autorisation de bouger sur des cases vides")] private bool m_canMoveOnEmpty = false;
+
+	private DebugUI.Panel m_panel = null;
 	
 	private void Awake()
 	{
@@ -81,11 +84,21 @@ public class RobotPuzzleManager : MonoBehaviour
 				gameObject.SetActive(false);
 			}
 		}
+
+		if (Screen.width >= Screen.height)
+		{
+			m_panel 
+		}
+		else
+		{
+			
+		}
+		
 	}
 	
 	void OnEnable(){
 
-		m_canvas.SetActive (false);		//encadrement de réussite de subpuzzle cachée
+		m_victoryCanvas.SetActive (false);		//encadrement de réussite de subpuzzle cachée
 		
 		if (m_puzzle.m_width == 0 || m_puzzle.m_height == 0) {
 			Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE DIMENSIONS OF THE ARRAY !");
@@ -105,7 +118,7 @@ public class RobotPuzzleManager : MonoBehaviour
 		m_puzzle.m_curValue=Sweep ();
 		
 		//création du selecteur dans la scène
-		GameObject instance = Instantiate(m_prefabSelector, m_initialPos, transform.rotation);
+		GameObject instance = Instantiate(m_prefabSelector, m_initialPos, transform.rotation, gameObject.transform);
 
 		//le sélecteur se positionne  à la position
 		m_selectorTransform = instance.transform;
@@ -162,7 +175,7 @@ public class RobotPuzzleManager : MonoBehaviour
 				if (valueSum == 2 && auxValues[0] != auxValues[2]) valueSum = 5;	//Si la pièce à instancier possède deux connexions et que la valeur de la face du haut est différente de la face en bas, instancier la pièce corner
 
 				//instanciation du prefab en fonction de la valeur de valueSum
-				GameObject go = (GameObject) Instantiate (m_piecePrefabs[valueSum], new Vector3 (j, i, 0), Quaternion.identity);
+				GameObject go = (GameObject) Instantiate (m_piecePrefabs[valueSum], new Vector3 (j, i, 0), Quaternion.identity, gameObject.transform);		//4ème paramètre met en enfant du gameobject principal
 				
 				m_scenePieces.Add(go);
 				
@@ -223,7 +236,7 @@ public class RobotPuzzleManager : MonoBehaviour
 	/// </summary>
 	public void Win()
 	{
-		m_canvas.SetActive (true);
+		m_victoryCanvas.SetActive (true);
 	}
 
 	
