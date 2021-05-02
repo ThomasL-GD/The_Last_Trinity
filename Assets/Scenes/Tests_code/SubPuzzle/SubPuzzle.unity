@@ -794,7 +794,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &448446268
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -895,7 +895,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!65 &561956084
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -928,7 +928,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 5dac2b31dd45bb441b7b402f29b963fb, type: 2}
+  - {fileID: 2100000, guid: 6b871e6afd9bfaa42b9e5cf03885413b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1019,10 +1019,10 @@ MonoBehaviour:
   m_puzzle:
     m_winValue: 0
     m_curValue: 0
-    m_width: 4
+    m_width: 3
     m_height: 3
   m_prefabSelector: {fileID: 1814738444315178597, guid: 71d5659d1354c064384ee80c6c292686, type: 3}
-  m_scenePieces: []
+  m_canMoveOnEmpty: 0
 --- !u!4 &573528084
 Transform:
   m_ObjectHideFlags: 0
@@ -2087,12 +2087,12 @@ GameObject:
   m_Component:
   - component: {fileID: 1668405390}
   m_Layer: 0
-  m_Name: "Int\xE9raction"
+  m_Name: Interaction
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1668405390
 Transform:
   m_ObjectHideFlags: 0
@@ -2126,7 +2126,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1855959310
 Transform:
   m_ObjectHideFlags: 0
@@ -2164,7 +2164,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1924588507
 MonoBehaviour:
   m_ObjectHideFlags: 0

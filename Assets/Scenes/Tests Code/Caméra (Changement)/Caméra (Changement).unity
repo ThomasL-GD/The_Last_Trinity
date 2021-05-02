@@ -187,7 +187,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 205744751}
-  m_LocalRotation: {x: 0.50872713, y: -0.0020776703, z: 0.0012277119, w: 0.8609244}
+  m_LocalRotation: {x: 0.4876374, y: -0.002106916, z: 0.0011768161, w: 0.87304294}
   m_LocalPosition: {x: 2.6381083, y: 15.41, z: -9.469243}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -737,7 +737,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 780364263}
-  m_LocalRotation: {x: 0.50845754, y: -0.002108618, z: 0.0012451088, w: 0.86108357}
+  m_LocalRotation: {x: 0.4873485, y: -0.0021382987, z: 0.001193417, w: 0.8732042}
   m_LocalPosition: {x: 0.07876992, y: 15.41, z: -9.481777}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -887,7 +887,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1031546551}
-  m_LocalRotation: {x: 0.5032551, y: -0.07756761, z: 0.045420073, w: 0.8594502}
+  m_LocalRotation: {x: 0.48200914, y: -0.07865904, z: 0.043502577, w: 0.8715432}
   m_LocalPosition: {x: -1.6, y: 15.41, z: -9.49}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -1113,7 +1113,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1631136596}
-  m_LocalRotation: {x: 0.5032551, y: -0.07756761, z: 0.045420073, w: 0.8594502}
+  m_LocalRotation: {x: 0.48200914, y: -0.07865904, z: 0.043502577, w: 0.8715432}
   m_LocalPosition: {x: -1.6, y: 15.41, z: -9.49}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -1398,6 +1398,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Playable_Characters
       objectReference: {fileID: 0}
+    - target: {fileID: 6590652175406109931, guid: 5a04c930a68b0694982f7b37b5504c75, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.68
+      objectReference: {fileID: 0}
     - target: {fileID: 6590652175406110486, guid: 5a04c930a68b0694982f7b37b5504c75, type: 3}
       propertyPath: m_vCamH
       value: 
@@ -1434,6 +1438,10 @@ PrefabInstance:
       propertyPath: m_cineCam
       value: 
       objectReference: {fileID: 1631136596}
+    - target: {fileID: 6590652175594776885, guid: 5a04c930a68b0694982f7b37b5504c75, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.68
+      objectReference: {fileID: 0}
     - target: {fileID: 6590652176170718736, guid: 5a04c930a68b0694982f7b37b5504c75, type: 3}
       propertyPath: m_vCamH
       value: 
@@ -1450,5 +1458,9 @@ PrefabInstance:
       propertyPath: m_cineCam
       value: 
       objectReference: {fileID: 1631136596}
+    - target: {fileID: 6590652176170718741, guid: 5a04c930a68b0694982f7b37b5504c75, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.68
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5a04c930a68b0694982f7b37b5504c75, type: 3}

@@ -26,8 +26,8 @@ public class RobotPuzzleManager : MonoBehaviour
 	[System.Serializable]
 	public class Puzzle
 	{
-		public int m_winValue;	//variable qui indique le nombre de connexions à atteindre pour réussir le puzzle
-		public int m_curValue;	//variable qui indique la valeur actuelle du nombre de connexions dans le subpuzzle
+		[HideInInspector] public int m_winValue;	//variable qui indique le nombre de connexions à atteindre pour réussir le puzzle
+		[HideInInspector] public int m_curValue;	//variable qui indique la valeur actuelle du nombre de connexions dans le subpuzzle
 
 		public int m_width;		//variable qui indique la largeur du tableau
 		public int m_height;	//variable qui indique la hauteur du tableau
@@ -53,8 +53,9 @@ public class RobotPuzzleManager : MonoBehaviour
 	private Transform m_selectorTransform = null;
 	
 	//liste des pièces dans la scène
-	[SerializeField] private List<GameObject> m_scenePieces = new List<GameObject>();
-	
+	[Tooltip("For debug only")] private List<GameObject> m_scenePieces = new List<GameObject>();
+
+	[SerializeField] [Tooltip("autorisation de bouger sur des cases vides")] private bool m_canMoveOnEmpty = false;
 	
 	private void Awake()
 	{
@@ -316,28 +317,28 @@ public class RobotPuzzleManager : MonoBehaviour
 						PieceBehaviour pieceScript = m_scenePieces[i-1].GetComponent<PieceBehaviour>();
 						
 						//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
-						if(pieceScript.m_isEmptyPiece == false) m_selector.x--;
+						if(pieceScript.m_isEmptyPiece == false || m_canMoveOnEmpty) m_selector.x--;
 					}
 					else if (Input.GetKeyDown(KeyCode.RightArrow) && m_selector.x < m_puzzle.m_width - 1) //Déplacement à droite si position  X sélecteur < valeur largeur tableau prefab
 					{
 						//Récupération du script sur la pièce de puzzle
 						PieceBehaviour pieceScript = m_scenePieces[i+1].GetComponent<PieceBehaviour>();
 						
-						if(pieceScript.m_isEmptyPiece == false) m_selector.x++;		//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
+						if(pieceScript.m_isEmptyPiece == false || m_canMoveOnEmpty) m_selector.x++;		//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
 					}
 					else if (Input.GetKeyDown(KeyCode.UpArrow) && m_selector.y > -m_puzzle.m_height + 1) //Déplacement en haut si position Y sélecteur > position Y dernière prefab
 					{
 						//Récupération du script sur la pièce de puzzle
 						PieceBehaviour pieceScript = m_scenePieces[i+m_puzzle.m_width].GetComponent<PieceBehaviour>();
 						
-						if(pieceScript.m_isEmptyPiece == false) m_selector.y--;		//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
+						if(pieceScript.m_isEmptyPiece == false || m_canMoveOnEmpty) m_selector.y--;		//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
 					}
 					else if (Input.GetKeyDown(KeyCode.DownArrow) && m_selector.y < m_puzzle.m_height - m_puzzle.m_height) //Déplacement en bas si position Y sélecteur < 0
 					{
 						//Récupération du script sur la pièce de puzzle
 						PieceBehaviour pieceScript = m_scenePieces[i-m_puzzle.m_width].GetComponent<PieceBehaviour>();
 						
-						if(pieceScript.m_isEmptyPiece == false) m_selector.y++;		//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
+						if(pieceScript.m_isEmptyPiece == false || m_canMoveOnEmpty) m_selector.y++;		//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
 					}
 				}
 			}

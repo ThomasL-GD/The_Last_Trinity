@@ -15,7 +15,7 @@ public class PieceBehaviour : MonoBehaviour
     //Angle à partir de laquelle la pièce va se caler pour rotate dynamiquement
     private float m_realRotation = 0.0f;
     
-    [Tooltip("vérifie si la pièce a au moins une connexion")] public bool m_isEmptyPiece = true;
+    [HideInInspector] [Tooltip("vérifie si la pièce a au moins une connexion")] public bool m_isEmptyPiece = true;
     
     private void Start()
     {
