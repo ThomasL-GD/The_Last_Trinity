@@ -305,22 +305,41 @@ public class RobotPuzzleManager : MonoBehaviour
 	{
 		if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow))
 		{
-			//déplacement du sélecteur
-			if (Input.GetKeyDown(KeyCode.LeftArrow) && m_selector.x > m_puzzle.m_width-m_puzzle.m_width) //Déplacement a gauche si position X sélecteur > position  X  première prefab instanciée
+			for (int i = 0; i < m_scenePieces.Count; i++) //pour chaque pièce présente dans la scène
 			{
-				m_selector.x--;
-			}
-			else if (Input.GetKeyDown(KeyCode.RightArrow) && m_selector.x < m_puzzle.m_width - 1) //Déplacement à droite si position  X sélecteur < valeur largeur tableau prefab        // -1 parce que départ de 0
-			{
-				m_selector.x++;
-			}
-			else if (Input.GetKeyDown(KeyCode.UpArrow) && m_selector.y > -m_puzzle.m_height+1) //Déplacement en haut si position Y sélecteur > position Y dernière prefab
-			{
-				m_selector.y--;
-			}
-			else if (Input.GetKeyDown(KeyCode.DownArrow) && m_selector.y < m_puzzle.m_height-m_puzzle.m_height) //Déplacement en bas si position Y sélecteur < 0
-			{
-				m_selector.y++;
+				if (m_selectorTransform.position == m_scenePieces[i].transform.position) //si le sélecteur est à la même position que la pièce actuelle de scenePieces
+				{
+					//déplacement du sélecteur
+					if (Input.GetKeyDown(KeyCode.LeftArrow) && m_selector.x > m_puzzle.m_width - m_puzzle.m_width) //Déplacement a gauche si position X sélecteur > position  X  première prefab instanciée
+					{
+						//Récupération du script sur la pièce de puzzle
+						PieceBehaviour pieceScript = m_scenePieces[i-1].GetComponent<PieceBehaviour>();
+						
+						//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
+						if(pieceScript.m_isEmptyPiece == false) m_selector.x--;
+					}
+					else if (Input.GetKeyDown(KeyCode.RightArrow) && m_selector.x < m_puzzle.m_width - 1) //Déplacement à droite si position  X sélecteur < valeur largeur tableau prefab
+					{
+						//Récupération du script sur la pièce de puzzle
+						PieceBehaviour pieceScript = m_scenePieces[i+1].GetComponent<PieceBehaviour>();
+						
+						if(pieceScript.m_isEmptyPiece == false) m_selector.x++;		//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
+					}
+					else if (Input.GetKeyDown(KeyCode.UpArrow) && m_selector.y > -m_puzzle.m_height + 1) //Déplacement en haut si position Y sélecteur > position Y dernière prefab
+					{
+						//Récupération du script sur la pièce de puzzle
+						PieceBehaviour pieceScript = m_scenePieces[i+m_puzzle.m_width].GetComponent<PieceBehaviour>();
+						
+						if(pieceScript.m_isEmptyPiece == false) m_selector.y--;		//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
+					}
+					else if (Input.GetKeyDown(KeyCode.DownArrow) && m_selector.y < m_puzzle.m_height - m_puzzle.m_height) //Déplacement en bas si position Y sélecteur < 0
+					{
+						//Récupération du script sur la pièce de puzzle
+						PieceBehaviour pieceScript = m_scenePieces[i-m_puzzle.m_width].GetComponent<PieceBehaviour>();
+						
+						if(pieceScript.m_isEmptyPiece == false) m_selector.y++;		//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
+					}
+				}
 			}
 
 			m_selectorTransform.position = new Vector3(m_initialPos.x + m_selector.x, m_initialPos.y - m_selector.y, m_initialPos.z);	//nouvelle position du sélecteur
@@ -331,9 +350,13 @@ public class RobotPuzzleManager : MonoBehaviour
 		{
 			for (int i = 0; i < m_scenePieces.Count; i++) //pour chaque pièce présente dans la scène
 			{
-				if (m_puzzle.m_pieces[m_selector.y, m_selector.x] == m_scenePieces[i]) //si le sélecteur est à la même position que la pièce actuelle de scenePieces
+				if (m_selectorTransform.position == m_scenePieces[i].transform.position) //si le sélecteur est à la même position que la pièce actuelle de scenePieces
 				{
-					//pieceScript.Sweep();	//rotation de la pièce
+					//Récupération du script sur la pièce de puzzle
+					PieceBehaviour pieceScript = m_scenePieces[i].GetComponent<PieceBehaviour>();
+
+					//rotation de la pièce
+					pieceScript.SweepPiece();
 				}
 			}
 		}
