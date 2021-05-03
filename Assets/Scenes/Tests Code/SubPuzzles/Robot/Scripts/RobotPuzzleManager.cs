@@ -21,7 +21,7 @@ public class RobotPuzzleManager : MonoBehaviour
 		public GameObject prefabCross = null;
 	}
 
-	[SerializeField] [Tooltip("Tableau des pièces à instancier avec leur nom")] private PiecePrefabs m_piecesPrefabClass=null;
+	[SerializeField] [Tooltip("Tableau des pièces à instancier avec leur nom\n(Ne pas mettre ceux qui se terminent par 'GO')")] private PiecePrefabs m_piecesPrefabClass=null;
 	[HideInInspector] [Tooltip("Tableau des pièces à instancier")] public GameObject[] m_piecePrefabs;
 
 	[System.Serializable]
@@ -51,14 +51,14 @@ public class RobotPuzzleManager : MonoBehaviour
 	private Vector3 m_initialPos = Vector3.zero;
 
 	//transform du sélecteur
-	private Transform m_selectorTransform = null;
+	private RectTransform m_selectorTransform = null;
 	
 	//liste des pièces dans la scène
 	[Tooltip("For debug only")] private List<GameObject> m_scenePieces = new List<GameObject>();
 
 	[SerializeField] [Tooltip("autorisation de bouger sur des cases vides")] private bool m_canMoveOnEmpty = false;
 
-	private DebugUI.Panel m_panel = null;
+	private RectTransform m_rect = null;
 	
 	private void Awake()
 	{
@@ -85,12 +85,16 @@ public class RobotPuzzleManager : MonoBehaviour
 			}
 		}
 
-		if (Screen.width >= Screen.height)
-		{
+		m_rect = gameObject.GetComponent<RectTransform>();
+		m_rect.anchorMin = new Vector2(0.5f, 0.5f);
+		m_rect.anchorMax = m_rect.anchorMin;
+		if (Screen.width >= Screen.height) {
+			m_rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Screen.height);
+			m_rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Screen.height);
 		}
-		else
-		{
-			
+		else {
+			m_rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Screen.width);
+			m_rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Screen.width);
 		}
 		
 	}
@@ -120,7 +124,7 @@ public class RobotPuzzleManager : MonoBehaviour
 		GameObject instance = Instantiate(m_prefabSelector, m_initialPos, transform.rotation, gameObject.transform);
 
 		//le sélecteur se positionne  à la position
-		m_selectorTransform = instance.transform;
+		m_selectorTransform = (RectTransform)instance.transform;
 	}
 
 
@@ -175,7 +179,7 @@ public class RobotPuzzleManager : MonoBehaviour
 
 				//instanciation du prefab en fonction de la valeur de valueSum
 				GameObject go = (GameObject) Instantiate (m_piecePrefabs[valueSum], new Vector3 (j, i, 0), Quaternion.identity, gameObject.transform);		//4ème paramètre met en enfant du gameobject principal
-				
+
 				m_scenePieces.Add(go);
 				
 				//récupération de la position de la première prefab instanciée
