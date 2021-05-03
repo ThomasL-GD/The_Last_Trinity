@@ -87,7 +87,6 @@ public class RobotPuzzleManager : MonoBehaviour
 
 		if (Screen.width >= Screen.height)
 		{
-			m_panel 
 		}
 		else
 		{
