@@ -86,7 +86,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 		//We resize the panel in order for it to be a square
 		SquarePanelToScreen();
 
-		m_victoryCanvas.SetActive (false);		//encadrement de réussite de subpuzzle cachée
+		m_victoryCanvas.SetActive (false);	//encadrement de réussite de subpuzzle cachée
 		
 		if (m_puzzle.m_width == 0 || m_puzzle.m_height == 0) {
 			Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE DIMENSIONS OF THE ARRAY !");
@@ -134,30 +134,30 @@ public class RobotPuzzleManager : MonoBehaviour {
 			for (int j = 0; j < m_puzzle.m_width; j++) {
 
 				//restrictions sur la largeur
-				if (j == 0) //Si la pièce actuelle se situe à la position minimum à gauche (donc il n'y a rien à gauche)
+				if (j == 0) //Si la pièce actuelle se situe à la position minimum sur la largeur
 					auxValues[3] = false; //la valeur de la connexion à gauche est fausse;
 				else
 					auxValues[3] = m_puzzle.m_pieces[j - 1, i].m_values[1];	//Sinon la valeur de la connexion à gauche de la pièce actuelle est égale à la valeur de la connexion à droite de la pièce à gauche
 
-				if (j == m_puzzle.m_width - 1)	//Si la pièce se situe à la position maximum à droite (donc il n'y a pas de pièce encore à droite)
+				if (j == m_puzzle.m_width - 1)	//Si la pièce se situe à la position maximum sur la largeur
 					auxValues [1] = false;	//la valeur de la connexion à droite est fausse
 				else
 					auxValues [1] = (Random.Range(0, 2) == 1);	//Sinon la valeur de la connexion à droite est soit vraie, soit fausse
 
 
 				//restrictions sur la hauteur
-				if (i == 0)	//Si la pièce actuelle se situe à la position minimum en hauteur (donc il n'y a pas de pièce en-dessous)
+				if (i == 0)	//Si la pièce actuelle se situe à la position minimum sur la hauteur
 					auxValues [2] = false;	//la valeur de la connexion en bas est fausse
 				else
 					auxValues [2] = m_puzzle.m_pieces [j, i - 1].m_values [0];	//Sinon la valeur de la connexion en bas de la pièce actuelle = la valeur de la connexion en haut de la pièce juste en-dessous	
 
-				if (i == m_puzzle.m_height - 1)	//Si la pièce actuelle se situe à la position maximum en hauteur (donc il n'y a pas de pièces au-dessus)
+				if (i == m_puzzle.m_height - 1)	//Si la pièce actuelle se situe à la position maximum sur la hauteur
 					auxValues [0] = false;	//la valeur de la connexion en haut est fausse
 				else
 					auxValues [0] = (Random.Range (0, 2)== 1);	//Sinon la valeur de la connexion en haut de la pièce actuelle est soit vraie soit fausse
 
 				
-				//indique le type pièce à instancier
+				//indique le nombre de connexions que la pièce possède
 				int valueSum = 0;
 
 				//check de chaque valeur de chaque face dans auxValues afin de choisir quel type de pièce instancier
@@ -169,6 +169,8 @@ public class RobotPuzzleManager : MonoBehaviour {
 				
 				if (valueSum == 2 && auxValues[0] != auxValues[2]) valueSum = 5;	//Si la pièce à instancier possède deux connexions et que la valeur de la face du haut est différente de la face en bas, instancier la pièce corner
 
+				Debug.Log($"{valueSum}");
+				
 				//instanciation du prefab en fonction de la valeur de valueSum
 				GameObject go = (GameObject) Instantiate (m_piecePrefabs[valueSum], new Vector3 (j, i, 0), Quaternion.identity, gameObject.transform);		//4ème paramètre met en enfant du gameobject principal
 				if (go.TryGetComponent(out RectTransform goRect)) {
@@ -197,6 +199,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 					}
 					else{pieceScript.RotatePiece ();}
 				}
+				
 				// while (pieceScript.m_values [0] != auxValues [0] || pieceScript.m_values [1] != auxValues [1] || pieceScript.m_values [2] != auxValues [2] || pieceScript.m_values [3] != auxValues [3])
 				// {
 				// 	pieceScript.RotatePiece ();

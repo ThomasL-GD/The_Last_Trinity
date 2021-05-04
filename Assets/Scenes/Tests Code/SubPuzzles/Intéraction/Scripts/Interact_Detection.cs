@@ -21,6 +21,19 @@ public class Interact_Detection : MonoBehaviour
     [SerializeField] [Tooltip("subpuzzle du monstre")] private GameObject m_puzzle;
 
 
+    private void OnEnable()
+    {
+        m_isInSubPuzzle = true;
+        //GameObject instantiatedPuzzle = Instantiate(m_puzzle,m_camera.transform.position, Quaternion.identity);
+        m_puzzle.SetActive(true);
+    }
+
+    private void OnDisable()
+    {
+        m_isInSubPuzzle = false;
+        m_puzzle.SetActive(false);
+    }
+
     private void Update()
     {
         bool inputHuman = Input.GetKeyDown(m_inputs.inputHuman);
@@ -42,8 +55,7 @@ public class Interact_Detection : MonoBehaviour
         else //Input du robot et bouton visible ==> entrée dans subpuzzle
         if (inputRobot && m_buttonActivate)
         {
-            m_isInSubPuzzle = true;
-            GameObject instantiatedPuzzle = Instantiate(m_puzzle,m_camera.transform.position, Quaternion.identity);
+            OnEnable();
         }
         
         //Le bouton d'activation regarde toujours en direction de la caméra de jeu
@@ -74,6 +86,6 @@ public class Interact_Detection : MonoBehaviour
         m_activationButton.SetActive(false);
         m_buttonActivate = false;
         
-        if(m_isInSubPuzzle) Destroy(m_puzzle);  //destruction du puzzle si le joueur quitte la zone d'activation
+        if(m_isInSubPuzzle) OnDisable();  //destruction du puzzle si le joueur quitte la zone d'activation
     }
 }
