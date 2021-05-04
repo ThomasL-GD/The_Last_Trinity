@@ -8,12 +8,10 @@ public class MonsterPuzzle : MonoBehaviour
 {
     [SerializeField] [Tooltip("Liste des pièces qui vont spawn")] private GameObject[] m_piecePrefab;
     
-    //liste des pièces qui peuvent apparaitre
-    private List<GameObject> m_stockPieces = new List<GameObject>();
-    //liste des pièces dans la scène
-    private List<GameObject> m_potentialPieces = new List<GameObject>();
-    //Liste des pièces correctes
-    private List<GameObject> m_correctPieces = new List<GameObject>();
+    [Tooltip("liste des pièces qui peuvent apparaitre")]private List<GameObject> m_stockPieces = new List<GameObject>();
+    [Tooltip("liste des pièces dans la scène")] private List<GameObject> m_potentialPieces = new List<GameObject>();
+    [Tooltip("liste des pièces correctes")] private List<GameObject> m_correctPieces = new List<GameObject>();
+    [Tooltip("List des pièces trouvées")] private List<GameObject> m_foundPieces = new List<GameObject>();
     
     [SerializeField] [Tooltip("nombre de pièces présentes dans l'amalgame")] [Range(2, 15)] public int m_nbAmalgamePieces = 3;
     
@@ -39,10 +37,13 @@ public class MonsterPuzzle : MonoBehaviour
     private int m_selectorX = 0;
     private int m_selectorY = 0;
     
-    private int findPiece = 0;     //compte de pièce à trouver
+    [Tooltip("compte de pièce à trouver")] private int findPiece = 0;
     [SerializeField] private int errorAllowed = 3;  //nombre d'essais possibles avant echec de subpuzzle
+
+
+    [Tooltip("position limite de joystick")] private float m_limitPosition = 0.5f;
+    [HideInInspector] [Tooltip("variable de déplacement en points par points du sélecteur")] private bool m_hasMoved = false;
     
-    private List<GameObject> m_foundPieces = new List<GameObject>();
     
     // Start is called before the first frame update
     void Start()
@@ -172,33 +173,49 @@ public class MonsterPuzzle : MonoBehaviour
     /// </summary>
     void Update()
     {
+        float horizontalAxis = Input.GetAxis("Horizontal");
+        float verticalAxis = Input.GetAxis("Vertical");
+        bool selectorValidation = Input.GetButtonDown("SelectorValidation");
+        
 
-        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow)) {
+        if (!m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis >m_limitPosition || verticalAxis < -m_limitPosition) {
             
-            //déplacement du sélecteur
-            if (Input.GetKeyDown(KeyCode.LeftArrow) && m_selectorX > 0)   //Déplacement a gauche si position X sélecteur > position  X  première prefab instanciée
+            //déplacement du sélecteur avec le joystick gauche
+            if (!m_hasMoved && horizontalAxis < -m_limitPosition && m_selectorX > 0)   //Déplacement a gauche si position X sélecteur > position  X  première prefab instanciée
             {
                 m_selectorX--;
+                m_hasMoved = true;
             }
-            else if (Input.GetKeyDown(KeyCode.RightArrow) && m_selectorX < m_arrayWidth-1)  //Déplacement à droite si position  X sélecteur  < valeur largeur tableau prefab        // -1 parce que départ de 0
+            else if (!m_hasMoved && horizontalAxis > m_limitPosition && m_selectorX < m_arrayWidth-1)  //Déplacement à droite si position  X sélecteur  < valeur largeur tableau prefab        // -1 parce que départ de 0
             {
                 m_selectorX++;
+                m_hasMoved = true;
             }
-            else if (Input.GetKeyDown(KeyCode.UpArrow) && m_selectorY > 0)  //Déplacement en haut si position Y sélecteur < position Y première prefab
+            else if (!m_hasMoved && verticalAxis >m_limitPosition && m_selectorY > 0)  //Déplacement en haut si position Y sélecteur < position Y première prefab
             {
                 m_selectorY--;
+                m_hasMoved = true;
             }
-            else if (Input.GetKeyDown(KeyCode.DownArrow) && m_selectorY < m_arrayHeight-1) //Déplacement en bas si position Y sélecteur > valeur dernière prefab du tableau prefab       // -1 parce que départ de 0
+            else if (!m_hasMoved && verticalAxis < -m_limitPosition && m_selectorY < m_arrayHeight-1) //Déplacement en bas si position Y sélecteur > valeur dernière prefab du tableau prefab       // -1 parce que départ de 0
             {
                 m_selectorY++;
+                m_hasMoved = true;
             }
 
             m_selectorTransform.position = new Vector3(m_initialPos.x + m_selectorX * m_offsetX, m_initialPos.y - m_selectorY * m_offsetY, m_initialPos.z);
         }
 
-        
-        if (Input.GetKeyDown(KeyCode.T))
+        //Joystick recentré sur la manette
+        if (horizontalAxis < m_limitPosition && horizontalAxis > -m_limitPosition && verticalAxis < m_limitPosition && verticalAxis > -m_limitPosition)
         {
+            m_hasMoved = false;
+        }
+        
+        
+        if (selectorValidation || Input.GetKeyDown(KeyCode.A))
+        {
+            //selectorValidation = false;
+            
             bool isCorrectPiece = false;    //variable booléènne qui indique si le joueur est sur une bonne pièce ou non
             bool isAlreadyFound = false;    //Variable booléènne qui indique si la pièce a déjà été trouvée
             
@@ -229,7 +246,7 @@ public class MonsterPuzzle : MonoBehaviour
                             Debug.Log("Vous avez trouvé toutes les pièces !");
                         }
 
-                        m_prefabStock[m_selectorY, m_selectorX].SetActive(false);   //feedback
+                        m_prefabStock[m_selectorY, m_selectorX].SetActive(false);   //feedback disparition
 
                         i = m_correctPieces.Count; //Arrête la boucle for dès trouvaille de pièce correcte
                     }
@@ -239,7 +256,6 @@ public class MonsterPuzzle : MonoBehaviour
 
             if(isCorrectPiece == false && isAlreadyFound == false) //compteur de défaite s'incrémente de 1
             {
-                Debug.Log("Vous vous êtes trompé.");
                 errorAllowed--;   //nombre d'erreurs possibles avant défaite diminue
                 if (errorAllowed == 0)
                 {
@@ -247,7 +263,9 @@ public class MonsterPuzzle : MonoBehaviour
                 }
                 
             }
-            
+
+            selectorValidation = false;
+
         }
             
     }
