@@ -39,6 +39,7 @@ public class MonsterPuzzle : MonoBehaviour
     
     [Tooltip("compte de pièce à trouver")] private int m_findPiece = 0;
     [SerializeField] private int m_errorAllowed = 3;  //nombre d'essais possibles avant echec de subpuzzle
+    [HideInInspector] [Tooltip("validation de puzzle")] public bool m_achieved = false;
 
     [Tooltip("position limite de joystick")] private float m_limitPosition = 0.5f;
     [HideInInspector] [Tooltip("variable de déplacement en points par points du sélecteur")] private bool m_hasMoved = false;
@@ -235,15 +236,15 @@ public class MonsterPuzzle : MonoBehaviour
 
                     if (!isAlreadyFound)    //Si la pièce n'a pas encore été trouvée
                     {
-                        m_foundPieces.Add(m_correctPieces[i]); //ajout d'une pièce correcte à pièce trouvée
-
-                        Debug.Log("Vous avez trouvé une bonne pièce !");
+                        m_foundPieces.Add(m_correctPieces[i]); //ajout d'une pièce correcte à pièce trouvé
+                        
                         isCorrectPiece = true; //indique qu'une pièce est bonne
                         m_findPiece++; //incrémentation des bonnes pièces trouvées
 
                         if (m_findPiece == m_nbAmalgamePieces) //Si le nombre de pièces trouvées = nombre de pièces à trouver
                         {
                             Debug.Log("Vous avez trouvé toutes les pièces !");
+                            m_achieved = true;  //le joueur a trouvé toutes les pièces
                         }
 
                         m_prefabStock[m_selectorY, m_selectorX].SetActive(false);   //feedback disparition

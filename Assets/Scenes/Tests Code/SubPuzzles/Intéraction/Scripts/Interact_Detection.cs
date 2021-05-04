@@ -8,8 +8,7 @@ public class Interact_Detection : MonoBehaviour
     [HideInInspector] [SerializeField] [Tooltip("variable booléènne qui indique le passage entre puzzle et sub puzzle")] private bool m_isInSubPuzzle = false;
     [Tooltip("Bouton qui apparait afin de déclencher le puzzle")] public GameObject m_activationButton;
     
-    [Tooltip("contrôle d'état du trigger du bouton permettant d'activer le sub puzzle")]
-    public bool m_buttonActivate = false;
+    [Tooltip("contrôle d'état du trigger du bouton permettant d'activer le sub puzzle")] public bool m_buttonActivate = false;
     
     
     [SerializeField] [Tooltip("personnage qui fait le subpuzzle")] private GameObject m_chara = null;
@@ -20,18 +19,11 @@ public class Interact_Detection : MonoBehaviour
 
     [SerializeField] [Tooltip("subpuzzle du monstre")] private GameObject m_puzzle;
 
+    [Tooltip("script du subpuzzle en question")] private MonsterPuzzle m_monsterPuzzleScript = null;
 
-    private void OnEnable()
+    private void Start()
     {
-        m_isInSubPuzzle = true;
-        //GameObject instantiatedPuzzle = Instantiate(m_puzzle,m_camera.transform.position, Quaternion.identity);
-        m_puzzle.SetActive(true);
-    }
-
-    private void OnDisable()
-    {
-        m_isInSubPuzzle = false;
-        m_puzzle.SetActive(false);
+        m_monsterPuzzleScript = GameObject.Find("SubpuzzleMonster").GetComponent<MonsterPuzzle>();
     }
 
     private void Update()
@@ -44,19 +36,23 @@ public class Interact_Detection : MonoBehaviour
         if (inputHuman && m_buttonActivate)
         {
             m_isInSubPuzzle = true;
-           GameObject instantiatedPuzzle = Instantiate(m_puzzle,m_camera.transform.position, Quaternion.identity);
         }
         else //Input du monstre et bouton visible ==> entrée dans subpuzzle
         if (inputMonster && m_buttonActivate)
         {
             m_isInSubPuzzle = true;
-            GameObject instantiatedPuzzle = Instantiate(m_puzzle,m_camera.transform.position, Quaternion.identity);
+            m_puzzle.SetActive(true);
+            m_buttonActivate = false;
         }
         else //Input du robot et bouton visible ==> entrée dans subpuzzle
         if (inputRobot && m_buttonActivate)
         {
-            OnEnable();
+            m_isInSubPuzzle = true;
+            m_puzzle.SetActive(true);
         }
+
+        //En cas de réussite de puzzle, le joueur ne peut plus le refaire
+        if (m_monsterPuzzleScript.m_achieved) m_puzzle.SetActive(true);
         
         //Le bouton d'activation regarde toujours en direction de la caméra de jeu
         m_activationButton.transform.LookAt(m_camera);
@@ -70,7 +66,7 @@ public class Interact_Detection : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         //détection d'un objet de type sub puzzle
-        if (other.gameObject == m_chara)
+        if (!m_isInSubPuzzle && !m_monsterPuzzleScript.m_achieved && other.gameObject == m_chara)
         {
             m_activationButton.SetActive(true);
             m_buttonActivate = true;
@@ -85,7 +81,5 @@ public class Interact_Detection : MonoBehaviour
     {
         m_activationButton.SetActive(false);
         m_buttonActivate = false;
-        
-        if(m_isInSubPuzzle) OnDisable();  //destruction du puzzle si le joueur quitte la zone d'activation
     }
 }
