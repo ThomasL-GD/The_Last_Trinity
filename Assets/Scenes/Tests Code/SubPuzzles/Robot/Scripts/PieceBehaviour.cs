@@ -43,24 +43,6 @@ public class PieceBehaviour : MonoBehaviour
         }
     }
     
-
-    /// <summary>
-    /// Fonction qui implique la rotation de pièce et indique le changement de valeurs de la pièce sur chaque face
-    /// </summary>
-    public void SweepPiece()
-    {
-        int difference = -m_RobotPuzzleManager.QuickSweep((int)transform.position.x,(int)transform.position.y);   //valeur de position au départ
-
-        RotatePiece (); //Fonction qui tourne la pièce ainsi que les valeurs qui lui sont attribbués
-
-        difference += m_RobotPuzzleManager.QuickSweep((int)transform.position.x,(int)transform.position.y);   //valeur de position après rotation de la pièce
-        
-        m_RobotPuzzleManager.m_puzzle.m_curValue += difference; //calcul la différence après rotation et add to curValue
-
-        if (m_RobotPuzzleManager.m_puzzle.m_curValue == m_RobotPuzzleManager.m_puzzle.m_winValue)  m_RobotPuzzleManager.Win ();
-        
-    }
-    
     
     /// <summary>
     /// Fonction qui sert à tourner la pièce d'un certain angle
