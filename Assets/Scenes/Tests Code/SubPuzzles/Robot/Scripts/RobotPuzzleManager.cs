@@ -137,24 +137,24 @@ public class RobotPuzzleManager : MonoBehaviour {
 				if (j == 0) //Si la pièce actuelle se situe à la position minimum sur la largeur
 					auxValues[3] = false; //la valeur de la connexion à gauche est fausse;
 				else
-					auxValues[3] = m_puzzle.m_pieces[j - 1, i].m_values[1];	//Sinon la valeur de la connexion à gauche de la pièce actuelle est égale à la valeur de la connexion à droite de la pièce à gauche
+					auxValues[3] = m_puzzle.m_pieces[j - 1, i].m_values[1];	//Ensuite la valeur de la connexion à gauche de la pièce actuelle est égale à la valeur de la connexion à droite de la pièce à gauche
 
 				if (j == m_puzzle.m_width - 1)	//Si la pièce se situe à la position maximum sur la largeur
 					auxValues [1] = false;	//la valeur de la connexion à droite est fausse
 				else
-					auxValues [1] = (Random.Range(0, 2) == 1);	//Sinon la valeur de la connexion à droite est soit vraie, soit fausse
+					auxValues [1] = (Random.Range(0, 2) == 1);	//Ensuite la valeur de la connexion à droite est soit vraie, soit fausse
 
 
 				//restrictions sur la hauteur
 				if (i == 0)	//Si la pièce actuelle se situe à la position minimum sur la hauteur
 					auxValues [2] = false;	//la valeur de la connexion en bas est fausse
 				else
-					auxValues [2] = m_puzzle.m_pieces [j, i - 1].m_values [0];	//Sinon la valeur de la connexion en bas de la pièce actuelle = la valeur de la connexion en haut de la pièce juste en-dessous	
+					auxValues [2] = m_puzzle.m_pieces [j, i - 1].m_values [0];	//Ensuite la valeur de la connexion en bas de la pièce actuelle est la même que la valeur de la connexion en haut de la pièce juste en-dessous	
 
 				if (i == m_puzzle.m_height - 1)	//Si la pièce actuelle se situe à la position maximum sur la hauteur
 					auxValues [0] = false;	//la valeur de la connexion en haut est fausse
 				else
-					auxValues [0] = (Random.Range (0, 2)== 1);	//Sinon la valeur de la connexion en haut de la pièce actuelle est soit vraie soit fausse
+					auxValues [0] = (Random.Range (0, 2)== 1);	//Ensuite la valeur de la connexion en haut de la pièce actuelle est soit vraie, soit fausse
 
 				
 				//indique le nombre de connexions que la pièce possède
