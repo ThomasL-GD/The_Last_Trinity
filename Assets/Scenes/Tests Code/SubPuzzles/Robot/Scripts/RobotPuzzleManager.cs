@@ -79,7 +79,6 @@ public class RobotPuzzleManager : MonoBehaviour {
 				gameObject.SetActive(false);
 			}
 		}
-		
 	}
 	
 	void OnEnable(){
@@ -94,17 +93,17 @@ public class RobotPuzzleManager : MonoBehaviour {
 			Debug.Break ();
 		}
 		
-		// //création du puzzle et instanciation des pièces
-		// GeneratePuzzle ();
-		//
-		// //récupération dans une variable du nombre de connexions maximum possible dans la puzzle
-		// m_puzzle.m_winValue = GetWinValue ();
-		//
-		// //rotation des pièces d'une valeur aléatoire entre 0, 90, 180 et 270 à l'instanciation
-		// Shuffle ();
-		//
-		// //récupération d'une nombre de connexions présentes sur une pièce
-		// m_puzzle.m_curValue=Sweep ();
+		//création du puzzle et instanciation des pièces
+		GeneratePuzzle ();
+		
+		//récupération dans une variable du nombre de connexions maximum possible dans la puzzle
+		m_puzzle.m_winValue = GetWinValue ();
+		
+		//rotation des pièces d'une valeur aléatoire entre 0, 90, 180 et 270 à l'instanciation
+		//Shuffle ();
+		
+		//récupération d'une nombre de connexions présentes sur une pièce
+		m_puzzle.m_curValue=Sweep ();
 		
 		//création du selecteur dans la scène
 		GameObject instance = Instantiate(m_prefabSelector, transform.position, transform.rotation, gameObject.transform);
@@ -113,7 +112,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 			m_selectorTransform = rectT;
 		}
 		else {
-			
+			Debug.LogError ("JEEZ ! THE GAME DESIGNER PUT A WRONG PREFAB FOR THE SELECTOR, IT MUST BE A UI ELEMENT WITH A RECT TRANSFORM !");
 		}
 	}
 
@@ -181,21 +180,21 @@ public class RobotPuzzleManager : MonoBehaviour {
 				}
 				
 				m_scenePieces.Add(go);
-				
-				//Récupération du script sur chaque pièce
-				PieceBehaviour pieceScript = go.GetComponent<PieceBehaviour>();
-				
-				//à l'instance, prend le script de la pièce et se met dedans
-				pieceScript.m_RobotPuzzleManager = gameObject.GetComponent<RobotPuzzleManager>();
-				
-				//Tourne la pièce pour éviter qu'elle ne soit bien positionnée dès le départ
-				while (pieceScript.m_values [0] != auxValues [0] || pieceScript.m_values [1] != auxValues [1] || pieceScript.m_values [2] != auxValues [2] || pieceScript.m_values [3] != auxValues [3])
-				{
-					pieceScript.RotatePiece ();
-				}
-				
-				//Récupération du script sur la pièce actuelle
-				m_puzzle.m_pieces [j, i] = pieceScript;
+				//
+				// //Récupération du script sur chaque pièce
+				// PieceBehaviour pieceScript = go.GetComponent<PieceBehaviour>();
+				//
+				// //à l'instance, prend le script de la pièce et se met dedans
+				// pieceScript.m_RobotPuzzleManager = gameObject.GetComponent<RobotPuzzleManager>();
+				//
+				// //Tourne la pièce pour éviter qu'elle ne soit bien positionnée dès le départ
+				// while (pieceScript.m_values [0] != auxValues [0] || pieceScript.m_values [1] != auxValues [1] || pieceScript.m_values [2] != auxValues [2] || pieceScript.m_values [3] != auxValues [3])
+				// {
+				// 	pieceScript.RotatePiece ();
+				// }
+				//
+				// //Récupération du script sur la pièce actuelle
+				// m_puzzle.m_pieces [j, i] = pieceScript;
 			}
 		}
 	}
@@ -236,6 +235,26 @@ public class RobotPuzzleManager : MonoBehaviour {
 	public void Win()
 	{
 		m_victoryCanvas.SetActive (true);
+	}
+	
+	
+    
+
+	/// <summary>
+	/// Fonction qui implique la rotation de pièce et indique le changement de valeurs de la pièce sur chaque face
+	/// </summary>
+	public void SweepPiece(int p_x, int p_y)
+	{
+		int difference = -QuickSweep(p_x,p_y);   //valeur de position au départ
+
+		m_puzzle.m_pieces[p_x,p_y].RotatePiece (); //Fonction qui tourne la pièce ainsi que les valeurs qui lui sont attribbués
+
+		difference += QuickSweep(p_x,p_y);   //valeur de position après rotation de la pièce
+        
+		m_puzzle.m_curValue += difference; //calcul la différence après rotation et add to curValue
+
+		if (m_puzzle.m_curValue == m_puzzle.m_winValue)  Win ();
+        
 	}
 
 	
