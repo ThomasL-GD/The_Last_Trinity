@@ -42,8 +42,12 @@ public class PieceBehaviour : MonoBehaviour
             transform.rotation = Quaternion.Lerp (transform.rotation, Quaternion.Euler (0, 0, m_realRotation), m_speed);
         }
     }
-    
-    
+
+    private void OnMouseDown()
+    {
+        RotatePiece();
+    }
+
     /// <summary>
     /// Fonction qui sert à tourner la pièce d'un certain angle
     /// fonction mise en publique parce qu'on l'appelle dans testRobotManager
