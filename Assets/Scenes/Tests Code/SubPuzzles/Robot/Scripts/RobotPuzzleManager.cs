@@ -28,8 +28,8 @@ public class RobotPuzzleManager : MonoBehaviour {
 	[System.Serializable]
 	public class Puzzle
 	{
-		[HideInInspector] public int m_winValue;	//variable qui indique le nombre de connexions à atteindre pour réussir le puzzle
-		[HideInInspector] public int m_curValue;	//variable qui indique la valeur actuelle du nombre de connexions dans le subpuzzle
+		 public int m_winValue;	//variable qui indique le nombre de connexions à atteindre pour réussir le puzzle
+		 public int m_curValue;	//variable qui indique la valeur actuelle du nombre de connexions dans le subpuzzle
 
 		public int m_width;		//variable qui indique la largeur du tableau
 		public int m_height;	//variable qui indique la hauteur du tableau
@@ -63,6 +63,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 	[SerializeField] [Tooltip("autorisation de bouger sur des cases vides")] private bool m_canMoveOnEmpty = false;
 
 	private float m_offset = 0.5f; //The size of each piece (in anchor values)
+	
 	
 	private void Awake()
 	{

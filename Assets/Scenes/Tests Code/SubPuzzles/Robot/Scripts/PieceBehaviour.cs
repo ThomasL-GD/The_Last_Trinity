@@ -54,7 +54,7 @@ public class PieceBehaviour : MonoBehaviour
         if (m_realRotation == 450)
             m_realRotation = 90;
         
-        Debug.Log(m_realRotation);
+        //Debug.Log(m_realRotation);
 
         RotateValues();    //rotation des valeurs
     }
