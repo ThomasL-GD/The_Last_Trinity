@@ -13,7 +13,7 @@ public class PieceBehaviour : MonoBehaviour
     [SerializeField] [Tooltip("Vitesse de rotation des pièces")] private float m_speed = 10.0f;
     
     //Angle à partir de laquelle la pièce va se caler pour rotate dynamiquement
-    private float m_realRotation = 0.0f;
+    private int m_realRotation = 0;
     
     [HideInInspector] [Tooltip("vérifie si la pièce a au moins une connexion")] public bool m_isEmptyPiece = true;
     
@@ -43,11 +43,6 @@ public class PieceBehaviour : MonoBehaviour
         }
     }
 
-    private void OnMouseDown()
-    {
-        RotatePiece();
-    }
-
     /// <summary>
     /// Fonction qui sert à tourner la pièce d'un certain angle
     /// fonction mise en publique parce qu'on l'appelle dans testRobotManager
@@ -56,8 +51,10 @@ public class PieceBehaviour : MonoBehaviour
     {
         m_realRotation += 90;   //valeur de rotation
 
-        if (m_realRotation == 360)
-            m_realRotation = 0;
+        if (m_realRotation == 450)
+            m_realRotation = 90;
+        
+        Debug.Log(m_realRotation);
 
         RotateValues();    //rotation des valeurs
     }

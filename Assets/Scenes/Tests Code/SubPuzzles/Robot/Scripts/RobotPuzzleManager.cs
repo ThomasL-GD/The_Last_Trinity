@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Random = UnityEngine.Random;
@@ -42,8 +43,14 @@ public class RobotPuzzleManager : MonoBehaviour {
 		//coordonnées du sélecteur
 		public int x = 0;
 		public int y = 0;
+		public RectTransform rect = null;
+
+		public Selector(int p_x, int p_y) {
+			x = p_x;
+			y = p_y;
+		}
 	}
-	private Selector m_selector = new Selector();
+	private Selector m_selector = new Selector(0, 0);
 	
 	[SerializeField] [Tooltip("Carré de selection qui se déplace entre les différentes instances de pièces présentes")] private GameObject m_prefabSelector = null;
 
@@ -54,6 +61,8 @@ public class RobotPuzzleManager : MonoBehaviour {
 	[Tooltip("For debug only")] private List<GameObject> m_scenePieces = new List<GameObject>();
 
 	[SerializeField] [Tooltip("autorisation de bouger sur des cases vides")] private bool m_canMoveOnEmpty = false;
+
+	private float m_offset = 0.5f; //The size of each piece (in anchor values)
 	
 	private void Awake()
 	{
@@ -82,6 +91,15 @@ public class RobotPuzzleManager : MonoBehaviour {
 	}
 	
 	void OnEnable(){
+			
+		//We calculate its initial position
+		m_offset = 0f;
+		if (m_puzzle.m_width > m_puzzle.m_height) {
+			m_offset = (1f/m_puzzle.m_width);
+		}
+		else {
+			m_offset = (1f/m_puzzle.m_height);
+		}
 
 		//We resize the panel in order for it to be a square
 		SquarePanelToScreen();
@@ -110,6 +128,16 @@ public class RobotPuzzleManager : MonoBehaviour {
 
 		if (instance.TryGetComponent(out RectTransform rectT)) {
 			m_selectorTransform = rectT;
+			
+			rectT.anchorMin = new Vector2(0,0);
+			rectT.anchorMax = new Vector2(m_offset,m_offset);
+
+			rectT.localPosition = Vector3.zero;
+			rectT.anchoredPosition = Vector2.zero;
+			
+			//We create a selector to stock its coordinates with int in order to have a better navigation
+			m_selector = new Selector(0, 0);
+			m_selector.rect = rectT;
 		}
 		else {
 			Debug.LogError ("JEEZ ! THE GAME DESIGNER PUT A WRONG PREFAB FOR THE SELECTOR, IT MUST BE A UI ELEMENT WITH A RECT TRANSFORM !");
@@ -126,9 +154,6 @@ public class RobotPuzzleManager : MonoBehaviour {
 		m_puzzle.m_pieces = new PieceBehaviour[m_puzzle.m_width, m_puzzle.m_height];	//pièce actuelle à poser au nouvel emplacement
 
 		bool[] auxValues = {false, false, false, false};	//valeur de la pièce à poser au départ
-
-		float offsetX = (1f/m_puzzle.m_width);
-		float offsetY = (1f/m_puzzle.m_height);
 
 		for (int i = 0; i < m_puzzle.m_height; i++) {
 			for (int j = 0; j < m_puzzle.m_width; j++) {
@@ -169,13 +194,12 @@ public class RobotPuzzleManager : MonoBehaviour {
 				
 				if (valueSum == 2 && auxValues[0] != auxValues[2]) valueSum = 5;	//Si la pièce à instancier possède deux connexions et que la valeur de la face du haut est différente de la face en bas, instancier la pièce corner
 
-				Debug.Log($"{valueSum}");
 				
 				//instanciation du prefab en fonction de la valeur de valueSum
 				GameObject go = (GameObject) Instantiate (m_piecePrefabs[valueSum], new Vector3 (j, i, 0), Quaternion.identity, gameObject.transform);		//4ème paramètre met en enfant du gameobject principal
 				if (go.TryGetComponent(out RectTransform goRect)) {
-					goRect.anchorMin = new Vector2(offsetX * j, offsetY * i);
-					goRect.anchorMax = new Vector2(offsetX * (j+1), offsetY * (i+1));
+					goRect.anchorMin = new Vector2(m_offset * j, m_offset * i);
+					goRect.anchorMax = new Vector2(m_offset * (j+1), m_offset * (i+1));
 
 					goRect.localPosition = Vector3.zero;
 
@@ -199,11 +223,6 @@ public class RobotPuzzleManager : MonoBehaviour {
 					}
 					else{pieceScript.RotatePiece ();}
 				}
-				
-				// while (pieceScript.m_values [0] != auxValues [0] || pieceScript.m_values [1] != auxValues [1] || pieceScript.m_values [2] != auxValues [2] || pieceScript.m_values [3] != auxValues [3])
-				// {
-				// 	pieceScript.RotatePiece ();
-				// }
 				
 				//Récupération du script sur la pièce actuelle
 				m_puzzle.m_pieces [j, i] = pieceScript;
@@ -347,64 +366,43 @@ public class RobotPuzzleManager : MonoBehaviour {
 
 	private void Update()
 	{
-		// if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow))
-		// {
-		// 	for (int i = 0; i < m_scenePieces.Count; i++) //pour chaque pièce présente dans la scène
-		// 	{
-		// 		if (m_selectorTransform.position == m_scenePieces[i].transform.position) //si le sélecteur est à la même position que la pièce actuelle de scenePieces
-		// 		{
-		// 			//déplacement du sélecteur
-		// 			if (Input.GetKeyDown(KeyCode.LeftArrow) && m_selector.x > m_puzzle.m_width - m_puzzle.m_width) //Déplacement a gauche si position X sélecteur > position  X  première prefab instanciée
-		// 			{
-		// 				//Récupération du script sur la pièce de puzzle
-		// 				PieceBehaviour pieceScript = m_scenePieces[i-1].GetComponent<PieceBehaviour>();
-		// 				
-		// 				//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
-		// 				if(pieceScript.m_isEmptyPiece == false || m_canMoveOnEmpty) m_selector.x--;
-		// 			}
-		// 			else if (Input.GetKeyDown(KeyCode.RightArrow) && m_selector.x < m_puzzle.m_width - 1) //Déplacement à droite si position  X sélecteur < valeur largeur tableau prefab
-		// 			{
-		// 				//Récupération du script sur la pièce de puzzle
-		// 				PieceBehaviour pieceScript = m_scenePieces[i+1].GetComponent<PieceBehaviour>();
-		// 				
-		// 				if(pieceScript.m_isEmptyPiece == false || m_canMoveOnEmpty) m_selector.x++;		//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
-		// 			}
-		// 			else if (Input.GetKeyDown(KeyCode.UpArrow) && m_selector.y > -m_puzzle.m_height + 1) //Déplacement en haut si position Y sélecteur > position Y dernière prefab
-		// 			{
-		// 				//Récupération du script sur la pièce de puzzle
-		// 				PieceBehaviour pieceScript = m_scenePieces[i+m_puzzle.m_width].GetComponent<PieceBehaviour>();
-		// 				
-		// 				if(pieceScript.m_isEmptyPiece == false || m_canMoveOnEmpty) m_selector.y--;		//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
-		// 			}
-		// 			else if (Input.GetKeyDown(KeyCode.DownArrow) && m_selector.y < m_puzzle.m_height - m_puzzle.m_height) //Déplacement en bas si position Y sélecteur < 0
-		// 			{
-		// 				//Récupération du script sur la pièce de puzzle
-		// 				PieceBehaviour pieceScript = m_scenePieces[i-m_puzzle.m_width].GetComponent<PieceBehaviour>();
-		// 				
-		// 				if(pieceScript.m_isEmptyPiece == false || m_canMoveOnEmpty) m_selector.y++;		//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
-		// 			}
-		// 		}
-		// 	}
-		//
-		// 	m_selectorTransform.position = new Vector3(m_initialPos.x + m_selector.x, m_initialPos.y - m_selector.y, m_initialPos.z);	//nouvelle position du sélecteur
-		// }
-		//
-		//
-		// if (Input.GetKeyDown(KeyCode.Space))
-		// {
-		// 	for (int i = 0; i < m_scenePieces.Count; i++) //pour chaque pièce présente dans la scène
-		// 	{
-		// 		if (m_selectorTransform.position == m_scenePieces[i].transform.position) //si le sélecteur est à la même position que la pièce actuelle de scenePieces
-		// 		{
-		// 			//Récupération du script sur la pièce de puzzle
-		// 			PieceBehaviour pieceScript = m_scenePieces[i].GetComponent<PieceBehaviour>();
-		//
-		// 			//rotation de la pièce
-		// 			pieceScript.SweepPiece();
-		// 		}
-		// 	}
-		// }
+		if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow))
+		{
+			
+			//déplacement du sélecteur
+			if (Input.GetKeyDown(KeyCode.LeftArrow) && m_selector.x > 0) //Déplacement a gauche si position X sélecteur > position  X  première prefab instanciée
+			{
+				//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
+				if(m_puzzle.m_pieces[m_selector.x, m_selector.y].m_isEmptyPiece == false || m_canMoveOnEmpty) m_selector.x--;
+			}
+			else if (Input.GetKeyDown(KeyCode.RightArrow) && m_selector.x < m_puzzle.m_width - 1) //Déplacement à droite si position  X sélecteur < valeur largeur tableau prefab
+			{
+				if(m_puzzle.m_pieces[m_selector.x, m_selector.y].m_isEmptyPiece == false || m_canMoveOnEmpty) m_selector.x++;		//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
+			}
+			else if (Input.GetKeyDown(KeyCode.UpArrow) && m_selector.y < m_puzzle.m_height - 1) //Déplacement en haut si position Y sélecteur > position Y dernière prefab
+			{
+				if(m_puzzle.m_pieces[m_selector.x, m_selector.y].m_isEmptyPiece == false || m_canMoveOnEmpty) m_selector.y++;		//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
+			}
+			else if (Input.GetKeyDown(KeyCode.DownArrow) && m_selector.y > 0) //Déplacement en bas si position Y sélecteur < 0
+			{
+				if(m_puzzle.m_pieces[m_selector.x, m_selector.y].m_isEmptyPiece == false || m_canMoveOnEmpty) m_selector.y--;		//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
+			}
 		
+			m_selector.rect.anchorMin = new Vector2(m_offset * m_selector.x,m_offset * m_selector.y);
+			m_selector.rect.anchorMax = new Vector2(m_offset * (m_selector.x + 1),m_offset * (m_selector.y + 1));
+
+			m_selector.rect.localPosition = Vector3.zero;
+			m_selector.rect.anchoredPosition = Vector2.zero;
+	
+			//m_selectorTransform.position = new Vector3(m_initialPos.x + m_selector.x, m_initialPos.y - m_selector.y, m_initialPos.z);	//nouvelle position du sélecteur
+		}
+
+
+		if (Input.GetKeyDown(KeyCode.Space)) {
+			//rotation de la pièce
+			SweepPiece(m_selector.x, m_selector.y);
+		}
+
 	}
 
 	/// <summary>
