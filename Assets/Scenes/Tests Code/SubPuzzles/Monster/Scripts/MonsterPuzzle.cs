@@ -26,23 +26,25 @@ public class MonsterPuzzle : MonoBehaviour
     [SerializeField] [Tooltip("largeur du tableau de prefab")] public int m_arrayWidth = 10;
 
     [SerializeField] [Tooltip("Carré de selection qui se déplace entre les différentes instances de pièces présentes")] private GameObject m_prefabSelector = null;
-    
+
     //La position de la première case
     private Vector3 m_initialPos = Vector3.zero;
     
     //transform du sélecteur
     private Transform m_selectorTransform = null;
-
+    
     //Coordonnées du sélecteur
     private int m_selectorX = 0;
     private int m_selectorY = 0;
     
-    [Tooltip("compte de pièce à trouver")] private int findPiece = 0;
-    [SerializeField] private int errorAllowed = 3;  //nombre d'essais possibles avant echec de subpuzzle
-
+    [Tooltip("compte de pièce à trouver")] private int m_findPiece = 0;
+    [SerializeField] private int m_errorAllowed = 3;  //nombre d'essais possibles avant echec de subpuzzle
 
     [Tooltip("position limite de joystick")] private float m_limitPosition = 0.5f;
     [HideInInspector] [Tooltip("variable de déplacement en points par points du sélecteur")] private bool m_hasMoved = false;
+
+
+    [SerializeField] public SOInputMultiChara m_inputs = null;
     
     
     // Start is called before the first frame update
@@ -175,7 +177,7 @@ public class MonsterPuzzle : MonoBehaviour
     {
         float horizontalAxis = Input.GetAxis("Horizontal");
         float verticalAxis = Input.GetAxis("Vertical");
-        bool selectorValidation = Input.GetButtonDown("SelectorValidation");
+        bool selectorValidation = Input.GetKeyDown(m_inputs.inputMonster);
         
 
         if (!m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis >m_limitPosition || verticalAxis < -m_limitPosition) {
@@ -212,10 +214,8 @@ public class MonsterPuzzle : MonoBehaviour
         }
         
         
-        if (selectorValidation || Input.GetKeyDown(KeyCode.A))
+        if (selectorValidation)
         {
-            //selectorValidation = false;
-            
             bool isCorrectPiece = false;    //variable booléènne qui indique si le joueur est sur une bonne pièce ou non
             bool isAlreadyFound = false;    //Variable booléènne qui indique si la pièce a déjà été trouvée
             
@@ -239,9 +239,9 @@ public class MonsterPuzzle : MonoBehaviour
 
                         Debug.Log("Vous avez trouvé une bonne pièce !");
                         isCorrectPiece = true; //indique qu'une pièce est bonne
-                        findPiece++; //incrémentation des bonnes pièces trouvées
+                        m_findPiece++; //incrémentation des bonnes pièces trouvées
 
-                        if (findPiece == m_nbAmalgamePieces) //Si le nombre de pièces trouvées = nombre de pièces à trouver
+                        if (m_findPiece == m_nbAmalgamePieces) //Si le nombre de pièces trouvées = nombre de pièces à trouver
                         {
                             Debug.Log("Vous avez trouvé toutes les pièces !");
                         }
@@ -256,8 +256,8 @@ public class MonsterPuzzle : MonoBehaviour
 
             if(isCorrectPiece == false && isAlreadyFound == false) //compteur de défaite s'incrémente de 1
             {
-                errorAllowed--;   //nombre d'erreurs possibles avant défaite diminue
-                if (errorAllowed == 0)
+                m_errorAllowed--;   //nombre d'erreurs possibles avant défaite diminue
+                if (m_errorAllowed == 0)
                 {
                     Debug.Log("Vous avez perdu.");
                 }

@@ -29,7 +29,7 @@ public class PlayerControllerSubPuzzle : MonoBehaviour
     public GameObject m_activationButton;
     
     [SerializeField] [Tooltip("Objet que le joueur bouge dans le sub puzzle")]
-    private GameObject m_charaSubPuzzle;
+    private GameObject m_selectorSubPuzzle;
 
     [SerializeField] [Tooltip("Objet sur lequel le joueur doit faire le sub puzzle")]
     private GameObject m_panneau;
@@ -66,7 +66,7 @@ public class PlayerControllerSubPuzzle : MonoBehaviour
         }
         else if (m_isInSubPuzzle)
         {
-            m_charaSubPuzzle.transform.Translate(subPuzzleDirection * (m_subPuzzleSpeed * Time.deltaTime), Space.Self);
+            m_selectorSubPuzzle.transform.Translate(subPuzzleDirection * (m_subPuzzleSpeed * Time.deltaTime), Space.Self);
         }
 
         //à l'activation de l'input et si le bouton d'activation est visible, le joueur rentre dans le sub puzzle
@@ -123,11 +123,11 @@ public class PlayerControllerSubPuzzle : MonoBehaviour
         //Activation du sub puzzle que si on voit le bouton d'activation
         if(m_buttonActivate) m_globalSubPuzzle.SetActive(true);
 
-        if (m_subPuzzleAnimation != null)
+        if (m_subPuzzleAnimation)
         {
             //Récupération de l'animation sur l'objet m_subPuzzleAnimation
             Animator animator = m_subPuzzleAnimation.GetComponent<Animator>();
-            if (animator != null)
+            if (animator)
             {
                 //attribution d'un booléen à un paramètre de l'animation
                 bool isOpen = animator.GetBool("open");
