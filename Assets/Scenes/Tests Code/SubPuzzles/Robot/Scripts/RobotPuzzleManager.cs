@@ -100,7 +100,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 		m_puzzle.m_winValue = GetWinValue ();
 		
 		//rotation des pièces d'une valeur aléatoire entre 0, 90, 180 et 270 à l'instanciation
-		//Shuffle ();
+		Shuffle ();
 		
 		//récupération d'une nombre de connexions présentes sur une pièce
 		m_puzzle.m_curValue=Sweep ();
@@ -174,27 +174,36 @@ public class RobotPuzzleManager : MonoBehaviour {
 				if (go.TryGetComponent(out RectTransform goRect)) {
 					goRect.anchorMin = new Vector2(offsetX * j, offsetY * i);
 					goRect.anchorMax = new Vector2(offsetX * (j+1), offsetY * (i+1));
-			
-					goRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 0);
-					goRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 0);
+
+					goRect.localPosition = Vector3.zero;
+
+					goRect.anchoredPosition = Vector2.zero;
 				}
 				
 				m_scenePieces.Add(go);
-				//
-				// //Récupération du script sur chaque pièce
-				// PieceBehaviour pieceScript = go.GetComponent<PieceBehaviour>();
-				//
-				// //à l'instance, prend le script de la pièce et se met dedans
-				// pieceScript.m_RobotPuzzleManager = gameObject.GetComponent<RobotPuzzleManager>();
-				//
-				// //Tourne la pièce pour éviter qu'elle ne soit bien positionnée dès le départ
+				
+				//Récupération du script sur chaque pièce
+				PieceBehaviour pieceScript = go.GetComponent<PieceBehaviour>();
+				
+				//à l'instance, prend le script de la pièce et se met dedans
+				pieceScript.m_RobotPuzzleManager = gameObject.GetComponent<RobotPuzzleManager>();
+				
+				//Tourne la pièce pour qu'elle ne soit bien positionnée dès le départ
+				for (int k = 0; k < 4; k++)
+				{
+					if (!(pieceScript.m_values [0] != auxValues [0] || pieceScript.m_values [1] != auxValues [1] || pieceScript.m_values [2] != auxValues [2] || pieceScript.m_values [3] != auxValues [3]))
+					{
+						k = 4;
+					}
+					else{pieceScript.RotatePiece ();}
+				}
 				// while (pieceScript.m_values [0] != auxValues [0] || pieceScript.m_values [1] != auxValues [1] || pieceScript.m_values [2] != auxValues [2] || pieceScript.m_values [3] != auxValues [3])
 				// {
 				// 	pieceScript.RotatePiece ();
 				// }
-				//
-				// //Récupération du script sur la pièce actuelle
-				// m_puzzle.m_pieces [j, i] = pieceScript;
+				
+				//Récupération du script sur la pièce actuelle
+				m_puzzle.m_pieces [j, i] = pieceScript;
 			}
 		}
 	}
