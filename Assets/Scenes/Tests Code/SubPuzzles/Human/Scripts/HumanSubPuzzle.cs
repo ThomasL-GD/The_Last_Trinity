@@ -29,9 +29,7 @@ public class HumanSubPuzzle : MonoBehaviour {
     
     /*Contains every cell of the maze and if each cell have a wall above, under, on the right or on the left of itself*/private Directions[,] m_maze = null;
     
-    [Header("Offsets")]
-    [SerializeField] [Tooltip("Décalage du prefab sur l'axe X")] private float m_offsetX = 4.0f;
-    [SerializeField] [Tooltip("Décalage du prefab sur l'axe Y")] private float m_offsetY = 4.0f;
+    /*"Size of each cell (in anchor values so between 0 and 1"*/ private float m_offset = 0.25f;
 
     [Header("Prefabs for visual representation")]
     [SerializeField] [Tooltip("The visual representation of the player")] private GameObject m_prefabPlayer = null;
@@ -50,12 +48,24 @@ public class HumanSubPuzzle : MonoBehaviour {
     /// In our case, it will initialize the maze
     /// </summary>
     void OnEnable() {
+        
+        SquarePanelToScreen();
+        
 
         if (m_mazeHeight < 2 || m_mazeWidth < 2) {
             Debug.LogError("Invalid size of the maze ! each dimension must be 2 or more cell long");
         }
         if (m_wallsToRemove + m_wallsToRemoveAfterBreaking >= m_mazeHeight * m_mazeWidth * 4) {
             Debug.LogWarning("Warning ! You want to remove to many random walls from the maze, it's gonna be either way too easy or completely fucked up");
+        }
+        
+        //We calculate the size of each cell
+        m_offset = 0f;
+        if (m_mazeWidth > m_mazeHeight) {
+            m_offset = (1f/m_mazeWidth);
+        }
+        else {
+            m_offset = (1f/m_mazeHeight);
         }
         
         m_maze = new Directions[m_mazeHeight, m_mazeWidth];
@@ -130,48 +140,55 @@ public class HumanSubPuzzle : MonoBehaviour {
 
         //Visual representation
         if (m_debugMode) {
-            
-            GameObject emptyContainer = new GameObject("PiecesContainer");
-            GameObject container = Instantiate(emptyContainer);
         
             for (int i = 0; i < m_maze.GetLength(0); i++) {
                 for (int j = 0; j < m_maze.GetLength(1); j++) {
 
-                    transform.position = new Vector3(0 + j * m_offsetX, 0 - i * m_offsetY, 0);
-                    Instantiate(m_prefabBG, new Vector3(transform.position.x, transform.position.y, transform.position.z + 0.5f), transform.rotation, container.transform);
+                    GameObject instance = Instantiate(m_prefabBG, new Vector3(transform.position.x, transform.position.y, transform.position.z + 0.5f), transform.rotation, gameObject.transform);
+                    SetRectPosition(instance,i,j);
 
                     if (m_maze[i, j].HasFlag(Directions.Up)) {
-                        Instantiate(m_prefabUp, transform.position, transform.rotation, container.transform);
+                        instance = Instantiate(m_prefabUp, transform.position, transform.rotation, gameObject.transform);
+                        SetRectPosition(instance,j,i);
                     }
                     if (m_maze[i, j].HasFlag(Directions.Down)) {
-                        Instantiate(m_prefabDown, transform.position, transform.rotation, container.transform);
+                        instance = Instantiate(m_prefabDown, transform.position, transform.rotation, gameObject.transform);
+                        SetRectPosition(instance,j,i);
                     }
                     if (m_maze[i, j].HasFlag(Directions.Left)) {
-                        Instantiate(m_prefabLeft, transform.position, transform.rotation, container.transform);
+                        instance = Instantiate(m_prefabLeft, transform.position, transform.rotation, gameObject.transform);
+                        SetRectPosition(instance,j,i);
                     }
                     if (m_maze[i, j].HasFlag(Directions.Right)) {
-                        Instantiate(m_prefabRight, transform.position, transform.rotation, container.transform);
+                        instance = Instantiate(m_prefabRight, transform.position, transform.rotation, gameObject.transform);
+                        SetRectPosition(instance,j,i);
                     }
                 
                 }
             }
         }
         else { // If we're not in debug mode, we just display the background
-            GameObject emptyContainer = new GameObject("PiecesContainer");
-            GameObject container = Instantiate(emptyContainer);
         
             for (int i = 0; i < m_maze.GetLength(0); i++) {
                 for (int j = 0; j < m_maze.GetLength(1); j++) {
 
-                    transform.position = new Vector3(0 + j * m_offsetX, 0 - i * m_offsetY, 0);
-                    Instantiate(m_prefabBG, new Vector3(transform.position.x, transform.position.y, transform.position.z + 0.5f), transform.rotation, container.transform);
-
+                    GameObject instance = Instantiate(m_prefabBG, new Vector3(transform.position.x, transform.position.y, transform.position.z + 0.5f), transform.rotation, gameObject.transform);
+                    SetRectPosition(instance, i, j);
+                    
                 }
             }
         }
         
         //Player sprite instantiate
-        if(m_prefabPlayer!=null) m_player = Instantiate(m_prefabPlayer, new Vector3(0, 0, 0), transform.rotation);
+        if (m_prefabPlayer != null) {
+            m_player = Instantiate(m_prefabPlayer, new Vector3(0, 0, 0), transform.rotation, gameObject.transform);
+            SetRectPosition(m_player, 0, m_mazeHeight - 1);
+            m_selector.x = 0;
+            m_selector.y = 0;
+        }
+        else {
+            Debug.LogError("Missing prefab for the player in the Human SubPuzzle script");
+        }
 
     }
 
@@ -406,13 +423,71 @@ public class HumanSubPuzzle : MonoBehaviour {
                 }
 
                 //Then, we update the visual representation for the player
-                m_player.transform.position = new Vector3(m_offsetX * m_selector.x, -m_offsetY * m_selector.y, 0);
+                SetRectPosition(m_player, m_selector.x, m_selector.y);
                 
                 //Win verification
                 if (m_selector.x == m_mazeWidth - 1 && m_selector.y == m_mazeHeight - 1) {
                     Debug.Log("IT'S A WIN !");
                 }
             }
+        }
+    }
+
+    /// <summary>
+    /// Place correctly an element with its rect transform
+    /// </summary>
+    /// <param name="p_o">The game object you want to move</param>
+    /// <param name="p_x">Its X coordinate</param>
+    /// <param name="p_y">Its Y coordinate</param>
+    private void SetRectPosition(GameObject p_o, int p_x, int p_y) {
+        if (p_o.TryGetComponent(out RectTransform goRect)) {
+            goRect.anchorMin = new Vector2(m_offset * p_x, m_offset * p_y);
+            goRect.anchorMax = new Vector2(m_offset * (p_x+1), m_offset * (p_y+1));
+
+            goRect.localPosition = Vector3.zero;
+
+            goRect.anchoredPosition = Vector2.zero;
+        }
+    }
+    
+    /// <summary>
+    /// Resize the current GameObject (must be a panel) in order to be a square without going out of the screen
+    /// </summary>
+    private void SquarePanelToScreen()
+    {
+        if (gameObject.TryGetComponent(out RectTransform thisRect)) 
+        {
+            thisRect.anchorMax = new Vector2(0.5f, 0.5f);
+            thisRect.anchorMin = new Vector2(0.5f, 0.5f);
+			
+            if (Screen.width >= Screen.height) {
+                thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Screen.height);
+                thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Screen.height);
+            } 
+            else {
+                Debug.Log("Dang it, that's a weird monitor you got there");
+                thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Screen.width);
+                thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Screen.width);
+            }
+            //Debug.Log(Screen.height);
+        } 
+        else {
+            Debug.LogError ("JEEZ ! THIS SCRIPT IS MEANT TO BE ON A PANEL NOT A RANDOM GAMEOBJECT ! GAME DESIGNER DO YOUR JOB !");
+        }
+    }
+	
+	
+    /// <summary>
+    /// Is called when this gameObject is setActive(false)
+    /// Is used to destroy everything it created
+    /// </summary>
+    void OnDisable()
+    {
+
+        // https://memegenerator.net/instance/44816816/plotracoon-we-shall-destroy-them-all
+        //As all the gameobjects we instantiated are child of this gameobject, we just have to erase all the children of this
+        foreach(Transform child in gameObject.transform) {
+            Destroy(child.gameObject);
         }
     }
 }

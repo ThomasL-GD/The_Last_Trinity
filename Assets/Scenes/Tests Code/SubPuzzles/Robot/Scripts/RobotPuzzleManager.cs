@@ -417,6 +417,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 				thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Screen.width);
 				thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Screen.width);
 			}
+			//Debug.Log(Screen.height);
 		} 
 		else {
 			Debug.LogError ("JEEZ ! THIS SCRIPT IS MEANT TO BE ON A PANEL NOT A RANDOM GAMEOBJECT ! GAME DESIGNER DO YOUR JOB !");
