@@ -22,11 +22,6 @@ public class PlayerController : MonoBehaviour
     public bool m_isForbiddenToMove = false;
     [SerializeField] private bool m_isSwitchingChara = false;
     
-    [Header("Key & Door")]
-    
-    public List<Key_SO> m_keyInventory = new List<Key_SO>();
-    private Quaternion m_rotateTo;
-    
     [Header("Soul")]
 
     [SerializeField]
@@ -57,8 +52,6 @@ public class PlayerController : MonoBehaviour
         m_vCamR = GameObject.FindGameObjectWithTag("Camera Robot")?.GetComponent<CinemachineVirtualCamera>();
         
         if (m_chara == Charas.Human) m_isActive = true;
-
-        m_rotateTo = Quaternion.Euler(0, 0, 105);
 
     #if UNITY_EDITOR
         if(m_vCamH == null) Debug.LogError("Aucune caméra avec le tag Camera Humain");
@@ -196,27 +189,5 @@ public class PlayerController : MonoBehaviour
     private void ResetValues() {
         m_isDying = false;
         m_deathCounter = 0.0f;
-    }
-    
-    private void OnCollisionEnter(UnityEngine.Collision p_other)
-    {
-        //Debug.Log("touch");
-        if (p_other.gameObject.TryGetComponent(out KeyHolder key))
-        {
-            if (key.m_keyHolded != null)
-            {
-                m_keyInventory.Add(key.m_keyHolded);
-                key.m_keyHolded = null;
-            }
-        } else if (p_other.gameObject.TryGetComponent(out Door door))
-        {
-            for (int i = 0; i < m_keyInventory.Count; i++)
-            {
-                if (m_keyInventory[i] == door.m_keyToOpen)
-                {
-                    door.m_isOpened = true;
-                }
-            }
-        }
     }
 }
