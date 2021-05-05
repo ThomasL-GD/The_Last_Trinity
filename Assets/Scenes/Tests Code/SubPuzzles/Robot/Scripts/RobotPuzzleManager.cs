@@ -8,8 +8,6 @@ using UnityEngine.Rendering;
 using Random = UnityEngine.Random;
 
 public class RobotPuzzleManager : MonoBehaviour {
-	
-	[Tooltip("Image de réussite de subPuzzle")] public GameObject m_victoryCanvas;
 
 	[Serializable]
 	public class PiecePrefabs
@@ -53,9 +51,6 @@ public class RobotPuzzleManager : MonoBehaviour {
 	private Selector m_selector = new Selector(0, 0);
 	
 	[SerializeField] [Tooltip("Carré de selection qui se déplace entre les différentes instances de pièces présentes")] private GameObject m_prefabSelector = null;
-
-	//transform du sélecteur
-	private RectTransform m_selectorTransform = null;
 	
 	//liste des pièces dans la scène
 	[Tooltip("For debug only")] private List<GameObject> m_scenePieces = new List<GameObject>();
@@ -104,8 +99,6 @@ public class RobotPuzzleManager : MonoBehaviour {
 
 		//We resize the panel in order for it to be a square
 		SquarePanelToScreen();
-
-		m_victoryCanvas.SetActive (false);	//encadrement de réussite de subpuzzle cachée
 		
 		if (m_puzzle.m_width == 0 || m_puzzle.m_height == 0) {
 			Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE DIMENSIONS OF THE ARRAY !");
@@ -128,7 +121,6 @@ public class RobotPuzzleManager : MonoBehaviour {
 		GameObject instance = Instantiate(m_prefabSelector, transform.position, transform.rotation, gameObject.transform);
 
 		if (instance.TryGetComponent(out RectTransform rectT)) {
-			m_selectorTransform = rectT;
 			
 			rectT.anchorMin = new Vector2(0,0);
 			rectT.anchorMax = new Vector2(m_offset,m_offset);
@@ -266,7 +258,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 	/// </summary>
 	public void Win()
 	{
-		m_victoryCanvas.SetActive (true);
+		gameObject.SetActive(false);
 	}
 	
 	
@@ -428,6 +420,23 @@ public class RobotPuzzleManager : MonoBehaviour {
 		} 
 		else {
 			Debug.LogError ("JEEZ ! THIS SCRIPT IS MEANT TO BE ON A PANEL NOT A RANDOM GAMEOBJECT ! GAME DESIGNER DO YOUR JOB !");
+		}
+	}
+	
+	
+	/// <summary>
+	/// Is called when this gameObject is setActive(false)
+	/// Is used to destroy everything it created
+	/// </summary>
+	void OnDisable()
+	{
+		m_puzzle.m_curValue = 0;
+		m_puzzle.m_winValue = 0;
+		
+		// https://memegenerator.net/instance/44816816/plotracoon-we-shall-destroy-them-all
+		//As all the gameobjects we instantiated are child of this gameobject, we just have to erase all the children of this
+		foreach(Transform child in gameObject.transform) {
+			Destroy(child.gameObject);
 		}
 	}
 	

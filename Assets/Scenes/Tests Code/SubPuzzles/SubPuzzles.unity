@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0.99999946, b: 0.99999946, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -604,7 +604,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &507478938
 RectTransform:
   m_ObjectHideFlags: 0
@@ -674,7 +674,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56e72e5316df5b141ae6e2d6041c6687, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_victoryCanvas: {fileID: 571190608}
   m_piecesPrefabClass:
     prefabEmpty: {fileID: 7710828181753326196, guid: df8d853fce8e4944ba7c1bae749d4b4c, type: 3}
     prefabOneDirection: {fileID: 7710828181753326196, guid: 155b87992c120804bb09939e4575b41c, type: 3}
@@ -686,8 +685,8 @@ MonoBehaviour:
   m_puzzle:
     m_winValue: 0
     m_curValue: 0
-    m_width: 4
-    m_height: 5
+    m_width: 2
+    m_height: 2
   m_prefabSelector: {fileID: 7710828181753326196, guid: 5c25bb0b05c70b24bafb7a84e2fe0bce, type: 3}
   m_canMoveOnEmpty: 1
 --- !u!1 &561956083
