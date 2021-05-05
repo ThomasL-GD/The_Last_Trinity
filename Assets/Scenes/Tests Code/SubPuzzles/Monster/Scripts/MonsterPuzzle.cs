@@ -8,20 +8,22 @@ public class MonsterPuzzle : MonoBehaviour
 {
     [SerializeField] [Tooltip("Liste des pièces qui vont spawn")] private GameObject[] m_piecePrefab;
     
+    [Header("Listes")]
     [Tooltip("liste des pièces qui peuvent apparaitre")]private List<GameObject> m_stockPieces = new List<GameObject>();
     [Tooltip("liste des pièces dans la scène")] private List<GameObject> m_potentialPieces = new List<GameObject>();
     [Tooltip("liste des pièces correctes")] private List<GameObject> m_correctPieces = new List<GameObject>();
     [Tooltip("List des pièces trouvées")] private List<GameObject> m_foundPieces = new List<GameObject>();
-    
-    [SerializeField] [Tooltip("nombre de pièces présentes dans l'amalgame")] [Range(2, 15)] public int m_nbAmalgamePieces = 3;
-    
+
+    [Header("Décalage")]
     [SerializeField] [Tooltip("Décalage du prefab sur l'axe X")] private float m_offsetX = 4.0f;
     [SerializeField] [Tooltip("Décalage du prefab sur l'axe Y")] private float m_offsetY = 4.0f;
 
     [SerializeField] [Tooltip("The shift of height attributed to the jumble")] [Range(0.8f, 3f)] private float m_jumbleShift = 1f;
-
+    
+    
     //Tableau à double entrée qui stocke les prefab
     private GameObject[,] m_prefabStock;
+    [Header("Dimensions")]
     [SerializeField] [Tooltip("hauteur du tableau de prefab")] public int m_arrayHeight = 10;
     [SerializeField] [Tooltip("largeur du tableau de prefab")] public int m_arrayWidth = 10;
 
@@ -29,24 +31,24 @@ public class MonsterPuzzle : MonoBehaviour
 
     //La position de la première case
     private Vector3 m_initialPos = Vector3.zero;
-    
     //transform du sélecteur
     private Transform m_selectorTransform = null;
-    
     //Coordonnées du sélecteur
     private int m_selectorX = 0;
     private int m_selectorY = 0;
     
+    [Header("Valeurs en jeu")]
+    [SerializeField] [Tooltip("nombre de pièces présentes dans l'amalgame")] [Range(2, 15)] public int m_nbAmalgamePieces = 3;
     [Tooltip("compte de pièce à trouver")] private int m_findPiece = 0;
     [SerializeField] private int m_errorAllowed = 3;  //nombre d'essais possibles avant echec de subpuzzle
     [HideInInspector] [Tooltip("validation de puzzle")] public bool m_achieved = false;
 
+    [Header("Joystick Manager")]
     [Tooltip("position limite de joystick")] private float m_limitPosition = 0.5f;
     [HideInInspector] [Tooltip("variable de déplacement en points par points du sélecteur")] private bool m_hasMoved = false;
-
-
     [SerializeField] public SOInputMultiChara m_inputs = null;
-    
+
+    [HideInInspector] [Tooltip("Script d'intéraction entre le personnage et l'objet comprenant le subpuzzle")] public Interact_Detection m_interactDetection = null;
     
     // Start is called before the first frame update
     void Start()
@@ -166,7 +168,8 @@ public class MonsterPuzzle : MonoBehaviour
     
     
     /// <summary>
-    /// Déplacement du sélecteur avec différents inputs
+    /// Déplacement du sélecteur par à coups avec différents inputs
+    /// 
     /// Input de sélection de pièce :
     ///  1 - vérification si la pièce sur laquelle le sélecteur se situe est correcte
     ///  2 - Si elle est correcte, on vérifie qu'elle n'a pas déjà été ajouté
@@ -189,7 +192,7 @@ public class MonsterPuzzle : MonoBehaviour
                 m_selectorX--;
                 m_hasMoved = true;
             }
-            else if (!m_hasMoved && horizontalAxis > m_limitPosition && m_selectorX < m_arrayWidth-1)  //Déplacement à droite si position  X sélecteur  < valeur largeur tableau prefab        // -1 parce que départ de 0
+            else if (!m_hasMoved && horizontalAxis > m_limitPosition && m_selectorX < m_arrayWidth-1)  //Déplacement à droite si position  X sélecteur  < valeur largeur tableau prefab
             {
                 m_selectorX++;
                 m_hasMoved = true;
@@ -199,23 +202,24 @@ public class MonsterPuzzle : MonoBehaviour
                 m_selectorY--;
                 m_hasMoved = true;
             }
-            else if (!m_hasMoved && verticalAxis < -m_limitPosition && m_selectorY < m_arrayHeight-1) //Déplacement en bas si position Y sélecteur > valeur dernière prefab du tableau prefab       // -1 parce que départ de 0
+            else if (!m_hasMoved && verticalAxis < -m_limitPosition && m_selectorY < m_arrayHeight-1) //Déplacement en bas si position Y sélecteur > valeur dernière prefab du tableau prefab
             {
                 m_selectorY++;
                 m_hasMoved = true;
             }
 
+            //nouvelle position du sélecteur
             m_selectorTransform.position = new Vector3(m_initialPos.x + m_selectorX * m_offsetX, m_initialPos.y - m_selectorY * m_offsetY, m_initialPos.z);
         }
 
-        //Joystick recentré sur la manette
+        //Joystick se recentre sur la manette
         if (horizontalAxis < m_limitPosition && horizontalAxis > -m_limitPosition && verticalAxis < m_limitPosition && verticalAxis > -m_limitPosition)
         {
             m_hasMoved = false;
         }
         
         
-        if (selectorValidation)
+        if (selectorValidation) //input monster
         {
             bool isCorrectPiece = false;    //variable booléènne qui indique si le joueur est sur une bonne pièce ou non
             bool isAlreadyFound = false;    //Variable booléènne qui indique si la pièce a déjà été trouvée
@@ -260,15 +264,31 @@ public class MonsterPuzzle : MonoBehaviour
                 m_errorAllowed--;   //nombre d'erreurs possibles avant défaite diminue
                 if (m_errorAllowed == 0)
                 {
+                    OnDisable();
                     Debug.Log("Vous avez perdu.");
                 }
-                
             }
 
             selectorValidation = false;
-
         }
-            
     }
+    
+    
+    /// <summary>
+    /// Is called when this gameObject is setActive(false)
+    /// Is used to destroy everything it created
+    /// </summary>
+    void OnDisable()
+    {
+        m_interactDetection.PuzzleDeactivation();
+        
+        // https://memegenerator.net/instance/44816816/plotracoon-we-shall-destroy-them-all
+        //As all the gameobjects we instantiated are child of this gameobject, we just have to erase all the children of this
+        foreach(Transform child in gameObject.transform) {
+            Destroy(child.gameObject);
+        }
+        
+    }
+    
     
 }
