@@ -142,7 +142,7 @@ GameObject:
   - component: {fileID: 6590652175406110485}
   - component: {fileID: 6590652175406110484}
   - component: {fileID: 6590652175406110487}
-  - component: {fileID: 6590652175406110486}
+  - component: {fileID: 6170255469129782004}
   m_Layer: 0
   m_Name: Robot
   m_TagString: Untagged
@@ -243,7 +243,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &6590652175406110486
+--- !u!114 &6170255469129782004
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -252,13 +252,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 6590652175406110481}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 86df78cc8abe1d74196e7cd87725bbab, type: 3}
+  m_Script: {fileID: 11500000, guid: 8f67b46a3e4cdad41be96f3fdea398f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_speed: 5
   m_rotationSpeed: 700
   m_selector: {fileID: 11400000, guid: 3e2a3114791b8ac4e9bb4d94fd064d6d, type: 2}
   m_chara: 2
+  m_isActive: 0
+  m_isForbiddenToMove: 0
+  m_isSwitchingChara: 0
+  m_soulPrefab: {fileID: 3936441117308932647, guid: 13db4a81e30060045bec075d70ea6482, type: 3}
+  m_timeBeforeDying: 0.5
 --- !u!1 &6590652175594776880
 GameObject:
   m_ObjectHideFlags: 0
@@ -272,7 +277,7 @@ GameObject:
   - component: {fileID: 6590652175594776887}
   - component: {fileID: 6590652175594776886}
   - component: {fileID: 6590652175594776842}
-  - component: {fileID: 6590652175594776881}
+  - component: {fileID: 793675767506756148}
   m_Layer: 0
   m_Name: Monster
   m_TagString: Untagged
@@ -373,7 +378,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &6590652175594776881
+--- !u!114 &793675767506756148
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -382,13 +387,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 6590652175594776880}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 86df78cc8abe1d74196e7cd87725bbab, type: 3}
+  m_Script: {fileID: 11500000, guid: 8f67b46a3e4cdad41be96f3fdea398f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_speed: 5
   m_rotationSpeed: 700
   m_selector: {fileID: 11400000, guid: 3e2a3114791b8ac4e9bb4d94fd064d6d, type: 2}
   m_chara: 1
+  m_isActive: 0
+  m_isForbiddenToMove: 0
+  m_isSwitchingChara: 0
+  m_soulPrefab: {fileID: 3936441117308932647, guid: 13db4a81e30060045bec075d70ea6482, type: 3}
+  m_timeBeforeDying: 0.5
 --- !u!1 &6590652175718737996
 GameObject:
   m_ObjectHideFlags: 0
@@ -594,7 +604,7 @@ GameObject:
   - component: {fileID: 6590652176170718743}
   - component: {fileID: 6590652176170718742}
   - component: {fileID: 6590652176170718737}
-  - component: {fileID: 6590652176170718736}
+  - component: {fileID: 5651427892577087291}
   m_Layer: 0
   m_Name: Human
   m_TagString: Untagged
@@ -695,7 +705,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &6590652176170718736
+--- !u!114 &5651427892577087291
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -704,10 +714,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 6590652176170718739}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 86df78cc8abe1d74196e7cd87725bbab, type: 3}
+  m_Script: {fileID: 11500000, guid: 8f67b46a3e4cdad41be96f3fdea398f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_speed: 5
   m_rotationSpeed: 700
   m_selector: {fileID: 11400000, guid: 3e2a3114791b8ac4e9bb4d94fd064d6d, type: 2}
   m_chara: 0
+  m_isActive: 0
+  m_isForbiddenToMove: 0
+  m_isSwitchingChara: 0
+  m_soulPrefab: {fileID: 3936441117308932647, guid: 13db4a81e30060045bec075d70ea6482, type: 3}
+  m_timeBeforeDying: 0.5

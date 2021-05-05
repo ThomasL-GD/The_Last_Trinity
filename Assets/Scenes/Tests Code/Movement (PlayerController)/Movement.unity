@@ -174,7 +174,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 5dac2b31dd45bb441b7b402f29b963fb, type: 2}
+  - {fileID: 2100000, guid: 9d669ad56f4c16647bdbaaca92d2ad5e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -367,7 +367,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 5dac2b31dd45bb441b7b402f29b963fb, type: 2}
+  - {fileID: 2100000, guid: 9d669ad56f4c16647bdbaaca92d2ad5e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -520,11 +520,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 1924588506}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f3d168fc60c518f4db2eefc8e797cc0d, type: 3}
+  m_Script: {fileID: 11500000, guid: 8f67b46a3e4cdad41be96f3fdea398f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_speed: 5
   m_rotationSpeed: 700
+  m_selector: {fileID: 11400000, guid: 3e2a3114791b8ac4e9bb4d94fd064d6d, type: 2}
+  m_chara: 0
+  m_isActive: 0
+  m_isForbiddenToMove: 0
+  m_isSwitchingChara: 0
+  m_soul: {fileID: 0}
+  m_timeBeforeDying: 0.5
+  m_vCamH: {fileID: 0}
+  m_vCamM: {fileID: 0}
+  m_vCamR: {fileID: 0}
 --- !u!65 &1924588508
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -557,7 +567,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 9d669ad56f4c16647bdbaaca92d2ad5e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
