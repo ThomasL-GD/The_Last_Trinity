@@ -77,6 +77,10 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+
+        // TODO technique a verifier dans le projet complet
+        if (Time.timeScale == 0) return;
+        
         //If the character is in a transition between two characters
         if (!m_isSwitchingChara) {
             
