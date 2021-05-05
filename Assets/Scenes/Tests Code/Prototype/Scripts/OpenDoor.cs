@@ -8,6 +8,7 @@ namespace Scenes.Tests_Code.Prototype.Scripts
         [SerializeField] private GameObject m_door;
         private float m_speed = 2.0f;
         private bool m_liftDoor = false;
+
         private void OnTriggerEnter(Collider p_other)
         {
             m_liftDoor = true;
