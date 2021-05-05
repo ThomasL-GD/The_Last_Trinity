@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using Scenes.Tests_Code.Prototype.Scripts;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -58,7 +59,8 @@ public class RobotPuzzleManager : MonoBehaviour {
 	[SerializeField] [Tooltip("autorisation de bouger sur des cases vides")] private bool m_canMoveOnEmpty = false;
 
 	private float m_offset = 0.5f; //The size of each piece (in anchor values)
-	
+
+	[HideInInspector] public Interact_Detection m_otherScript = null;
 	
 	private void Awake()
 	{
@@ -259,6 +261,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 	public void Win()
 	{
 		gameObject.SetActive(false);
+		m_otherScript.m_openDoor = true;
 	}
 	
 	
@@ -277,8 +280,7 @@ public class RobotPuzzleManager : MonoBehaviour {
         
 		m_puzzle.m_curValue += difference; //calcul la différence après rotation et add to curValue
 
-		if (m_puzzle.m_curValue == m_puzzle.m_winValue)  Win ();
-        
+		if (m_puzzle.m_curValue == m_puzzle.m_winValue)  Win();
 	}
 
 	

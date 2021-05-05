@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Scenes.Tests_Code.Prototype.Scripts;
 using UnityEngine;
 
 public class Interact_Detection : MonoBehaviour
@@ -10,20 +11,19 @@ public class Interact_Detection : MonoBehaviour
     
     [Tooltip("contrôle d'état du trigger du bouton permettant d'activer le sub puzzle")] public bool m_buttonActivate = false;
     
-    
+    [Header("Player")]
     [SerializeField] [Tooltip("personnage qui fait le subpuzzle")] private GameObject m_chara = null;
-
     [SerializeField] [Tooltip("camera à attacher au joueur pour le bouton d'activation au-dessus")] private Transform m_camera;
-    
     [SerializeField] [Tooltip("boutons d'intéractions de la manette")] public SOInputMultiChara m_inputs = null;
-
+    
+    [Header("Puzzle")]
     [SerializeField] [Tooltip("subpuzzle du monstre")] private GameObject m_puzzle;
-
-    [Tooltip("script du subpuzzle en question")] private MonsterPuzzle m_monsterPuzzleScript = null;
+    
+    public bool m_openDoor = false;
 
     private void Start()
     {
-        m_monsterPuzzleScript = GameObject.Find("SubpuzzleMonster").GetComponent<MonsterPuzzle>();
+        //m_monsterPuzzleScript = GameObject.Find("SubpuzzleMonster").GetComponent<MonsterPuzzle>();
     }
 
     private void Update()
@@ -49,10 +49,18 @@ public class Interact_Detection : MonoBehaviour
         {
             m_isInSubPuzzle = true;
             m_puzzle.SetActive(true);
+            if (m_puzzle.TryGetComponent(out RobotPuzzleManager scriptRobot))
+            {
+                scriptRobot.m_otherScript = this;
+            }
+            else
+            {
+                Debug.LogError("ça pue");
+            }
         }
 
         //En cas de réussite de puzzle, le joueur ne peut plus le refaire
-        if (m_monsterPuzzleScript.m_achieved) m_puzzle.SetActive(true);
+        //if (m_monsterPuzzleScript.m_achieved) m_puzzle.SetActive(true);
         
         //Le bouton d'activation regarde toujours en direction de la caméra de jeu
         m_activationButton.transform.LookAt(m_camera);
@@ -66,7 +74,7 @@ public class Interact_Detection : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         //détection d'un objet de type sub puzzle
-        if (!m_isInSubPuzzle && !m_monsterPuzzleScript.m_achieved && other.gameObject == m_chara)
+        if (!m_isInSubPuzzle /*&& !m_monsterPuzzleScript.m_achieved */&& other.gameObject == m_chara)
         {
             m_activationButton.SetActive(true);
             m_buttonActivate = true;
