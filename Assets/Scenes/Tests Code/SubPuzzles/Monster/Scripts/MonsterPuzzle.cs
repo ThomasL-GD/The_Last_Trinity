@@ -17,7 +17,6 @@ public class MonsterPuzzle : MonoBehaviour
     [Header("Décalage")]
     [SerializeField] [Tooltip("Décalage du prefab sur l'axe X")] private float m_offsetX = 4.0f;
     [SerializeField] [Tooltip("Décalage du prefab sur l'axe Y")] private float m_offsetY = 4.0f;
-
     [SerializeField] [Tooltip("The shift of height attributed to the jumble")] [Range(0.8f, 3f)] private float m_jumbleShift = 1f;
     
     
@@ -37,7 +36,7 @@ public class MonsterPuzzle : MonoBehaviour
     private int m_selectorX = 0;
     private int m_selectorY = 0;
     
-    [Header("Valeurs en jeu")]
+    [Header("Gestion Difficulté")]
     [SerializeField] [Tooltip("nombre de pièces présentes dans l'amalgame")] [Range(2, 15)] public int m_nbAmalgamePieces = 3;
     [Tooltip("compte de pièce à trouver")] private int m_findPiece = 0;
     [SerializeField] private int m_errorAllowed = 3;  //nombre d'essais possibles avant echec de subpuzzle
@@ -50,6 +49,8 @@ public class MonsterPuzzle : MonoBehaviour
 
     [HideInInspector] [Tooltip("Script d'intéraction entre le personnage et l'objet comprenant le subpuzzle")] public Interact_Detection m_interactDetection = null;
     
+    
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -58,21 +59,24 @@ public class MonsterPuzzle : MonoBehaviour
         {
             Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO MODIFY THE HEIGHT AND THE WIDTH OF THE ARRAY ACCORDING TO THE NUMBER OF DIFFERENT SYMBOLS !");
         }
-        else PuzzlePiecesInstantiate();
+        else PuzzleGenerate();
 
         if(m_prefabSelector == null) Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE PREFAB OF THE SELECTOR !");
-        
     }
     
 
+    
     /// <summary>
-    /// Fonction de création du puzzle dans la scène
-    /// 1 - ajout de tous les préfab du tableau de base dans une liste
-    /// 2 - création du tableau à deux dimensions dans la scène avec les prefab de la liste
-    /// 3 - création du sélecteur dans la scène et positionnnement de celle-ci
-    /// 4 - ajout des pièces correctes à dénicher parmi les pièces présentes dans la scène à une nouvelle liste de pièces correctes
+    /// CREATION DES PIECES A CHERCHER, DU SELECTEUR ET DES PIECES A TROUVER
+    ///
+    /// 1 - Déplacement des prefab d'un tableau vers une liste (stock)
+    /// 2 - Création des dimensions du tableau dans la scène et des places des prefab de pièce
+    /// 3 - On ajoute une pièce du stock à la scène
+    /// 4 - On l'enlève ensuite du stock pour ne pas avoir deux fois la même pièce dans la scène
+    /// 5 - On récupère la position de la première pièce instanciée pour positionner ensuite notre sélecteur
+    /// 6 - On instancie ensuite une pièce de la scène dans les pièces correctes
     /// </summary>
-    private void PuzzlePiecesInstantiate()
+    private void PuzzleGenerate()
     {
         //déplace toutes les prefab du tableau dans une liste (list stockPieces)
         for (int i = 0; i < m_piecePrefab.Length; i++)
@@ -80,37 +84,18 @@ public class MonsterPuzzle : MonoBehaviour
             m_stockPieces.Add(m_piecePrefab[i]);
         }
         
-        //Fonction qui va instancier les pièces aléatoirement dans la scène
-        PuzzleStructure();
-
-        //création du selecteur dans la scène
-        GameObject instance = Instantiate(m_prefabSelector, m_initialPos, transform.rotation);
-        
-        //transform du sélecteur récupéré à l'instanciation
-        m_selectorTransform = instance.transform;
-        
-        //Position des prefab à trouver
-        transform.position = new Vector3(transform.position.x + (((float)m_arrayWidth /2f) +0.5f)*m_offsetX, transform.position.y + m_offsetY*m_arrayHeight + (m_offsetY*m_jumbleShift), transform.position.z);
-        
-        //Fonction des pièces à trouver parmi les pièces présentes
-        CorrectPiecesInstantiate();
-        
-    }
-
-    /// <summary>
-    /// Fonction de création des dimensions du tableau dans la scène et des places des prefab de pièce
-    /// On ajoute une pièce de la liste des pièces du stock à la liste des pièces dans la scène
-    /// On l'enlève ensuite du stock pour ne pas avoir deux fois la même pièce dans la scène
-    /// On récupère la position de la première pièce instanciée pour positionner ensuite notre sélecteur
-    /// </summary>
-    private void PuzzleStructure()
-    {
         //tableau à deux dimensions qui place les pièces
         m_prefabStock = new GameObject[m_arrayHeight, m_arrayWidth];
 
+        //Parent dans lequel on instancie les futurs gameObject
         GameObject emptyContainer = new GameObject("PiecesContainer");
-        GameObject container = Instantiate(emptyContainer);
+        
+        GameObject container = Instantiate(emptyContainer, transform.position, transform.rotation,emptyContainer.transform);
+        
+        
+        /////////////////////////////////////////////////////////////////////////////   RANDOM PIECES   /////////////////////////////////////////////////////////////////////////////
 
+        
         //double boucle for pour créer le tableau
         for (int x = 0; x < m_arrayHeight; x++)
         {
@@ -123,7 +108,7 @@ public class MonsterPuzzle : MonoBehaviour
                 transform.position = new Vector3(transform.position.x + m_offsetX,transform.position.y,0);
                 
                 //instantiation dans la scène d'une pièce tirée dans le stock de prefab 
-                m_prefabStock[x,y] = Instantiate(m_stockPieces[random], transform.position, transform.rotation,container.transform);
+                m_prefabStock[x,y] = Instantiate(m_stockPieces[random], transform.position, transform.rotation, container.transform);
                 
                 //ajout du prefab instancié dans une nouvelle liste regroupant les pièces actives
                 //enlèvement du prefab instancié des prefab du stock pour ne pas avoir de pièces en double
@@ -131,25 +116,34 @@ public class MonsterPuzzle : MonoBehaviour
                 m_stockPieces.RemoveAt(random);
 
                 //récupération de la position de la première prefab instanciée
-                //position sert à placer le sélecteur qui reprend m_initialPos
                 if (x == 0 && y == 0) m_initialPos = transform.position;
             }
             //Retour à la ligne
             transform.position = new Vector3(transform.position.x - m_offsetX * m_arrayWidth,transform.position.y - m_offsetY,0);
         }
-    }
-    
-    /// <summary>
-    /// Ajout d'une pièce aléatoire dans la scène à la liste des pièces à trouver
-    /// On enlève ensuite cette pièce des pièces de la scène pour ne pas à avoir trouver deux fois la même
-    /// </summary>
-    private void CorrectPiecesInstantiate()
-    {
+        
+        
+        /////////////////////////////////////////////////////////////////////////////   SELECTEUR   /////////////////////////////////////////////////////////////////////////////
+        
+        
+        //création du selecteur dans la scène
+        GameObject instance = Instantiate(m_prefabSelector, m_initialPos, transform.rotation, container.transform);
+        
+        //transform du sélecteur récupéré à l'instanciation
+        m_selectorTransform = instance.transform;
+
+
+        /////////////////////////////////////////////////////////////////////////////   CORRECT PIECES   /////////////////////////////////////////////////////////////////////////////
+
+        
+        //Position des prefab à trouver
+        transform.position = new Vector3(transform.position.x + (((float)m_arrayWidth /2f) +0.5f)*m_offsetX, transform.position.y + m_offsetY*m_arrayHeight + (m_offsetY*m_jumbleShift), transform.position.z);
+
         //Instanciation des pièces à trouver parmi les pièces actives dans la scène
         //Si il y a plus de pièces à trouver que de pièces actives, erreur
         if (m_nbAmalgamePieces > m_potentialPieces.Count)
         {
-            Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO MODIFY THE AMALGAM PIECES WICH IS TALLER THAN THE CORRECT PIECES !");
+            Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO MODIFY THE AMALGAM PIECES WHICH IS TALLER THAN THE CORRECT PIECES !");
         }
         else for (int i = 0; i < m_nbAmalgamePieces; i++)
         {
@@ -157,14 +151,17 @@ public class MonsterPuzzle : MonoBehaviour
             int random = Random.Range(0, m_potentialPieces.Count);
             
             //ajout du prefab à l'emplacement des prefab à trouver
-            Instantiate(m_potentialPieces[random], transform.position, transform.rotation);
+            Instantiate(m_potentialPieces[random], transform.position, transform.rotation, container.transform);
             
             //ajout du préfab présent dans la scène à la liste de prefab à trouver (correctPieces)
             //enlèvement de ce prefab de la liste des prefab à instancier dans la scène pour éviter de devoir trouver deux fois le même
             m_correctPieces.Add(m_potentialPieces[random]);
             m_potentialPieces.RemoveAt(random);
         }
+
+        emptyContainer.transform.parent = gameObject.transform; //on place le container de tous les gameobject instanciées en enfant du gameObject principal
     }
+    
     
     
     /// <summary>
@@ -233,7 +230,6 @@ public class MonsterPuzzle : MonoBehaviour
                         if (m_prefabStock[m_selectorY, m_selectorX] == m_foundPieces[j])    //Si le sélecteur est à la même position que la pièce actuelle dans foundPiece
                         {
                             isAlreadyFound = true;  //la pièce en question a déjà été trouvé
-                            Debug.Log("Vous avez déjà trouvé sur cette pièce");
                             j = m_foundPieces.Count;
                         }
                     }
@@ -248,7 +244,11 @@ public class MonsterPuzzle : MonoBehaviour
                         if (m_findPiece == m_nbAmalgamePieces) //Si le nombre de pièces trouvées = nombre de pièces à trouver
                         {
                             Debug.Log("Vous avez trouvé toutes les pièces !");
+                            
                             m_achieved = true;  //le joueur a trouvé toutes les pièces
+                            
+                            if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
+                            gameObject.SetActive(false);
                         }
 
                         m_prefabStock[m_selectorY, m_selectorX].SetActive(false);   //feedback disparition
@@ -256,7 +256,6 @@ public class MonsterPuzzle : MonoBehaviour
                         i = m_correctPieces.Count; //Arrête la boucle for dès trouvaille de pièce correcte
                     }
                 }
-
             }
 
             if(isCorrectPiece == false && isAlreadyFound == false) //compteur de défaite s'incrémente de 1
@@ -264,8 +263,10 @@ public class MonsterPuzzle : MonoBehaviour
                 m_errorAllowed--;   //nombre d'erreurs possibles avant défaite diminue
                 if (m_errorAllowed == 0)
                 {
-                    OnDisable();
                     Debug.Log("Vous avez perdu.");
+                    
+                    if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
+                    gameObject.SetActive(false);
                 }
             }
 
@@ -280,14 +281,11 @@ public class MonsterPuzzle : MonoBehaviour
     /// </summary>
     void OnDisable()
     {
-        m_interactDetection.PuzzleDeactivation();
-        
         // https://memegenerator.net/instance/44816816/plotracoon-we-shall-destroy-them-all
         //As all the gameobjects we instantiated are child of this gameobject, we just have to erase all the children of this
         foreach(Transform child in gameObject.transform) {
             Destroy(child.gameObject);
         }
-        
     }
     
     

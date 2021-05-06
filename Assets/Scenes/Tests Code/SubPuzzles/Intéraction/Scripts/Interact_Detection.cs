@@ -48,7 +48,7 @@ public class Interact_Detection : MonoBehaviour
             
             if (m_chara == Charas.Human)
             {
-                //m_puzzle.GetComponent<HumanSubPuzzle>().m_intaeracttakapté
+                //m_puzzle.GetComponent<HumanSubPuzzle>().m_interacttakapté
             }
             else if (m_chara == Charas.Monster)
             {

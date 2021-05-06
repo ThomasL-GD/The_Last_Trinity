@@ -22,13 +22,17 @@ public class RobotPuzzleManager : MonoBehaviour {
 
 	[SerializeField] [Tooltip("Tableau des pièces à instancier avec leur nom")] private PiecePrefabs m_piecesPrefabClass=null;
 	[HideInInspector] [Tooltip("Tableau des pièces à instancier")] public GameObject[] m_piecePrefabs;
-
+	//liste des pièces dans la scène
+	[Tooltip("For debug only")] private List<GameObject> m_scenePieces = new List<GameObject>();
+	
 	[System.Serializable]
 	public class Puzzle
 	{
-		 public int m_winValue;	//variable qui indique le nombre de connexions à atteindre pour réussir le puzzle
-		 public int m_curValue;	//variable qui indique la valeur actuelle du nombre de connexions dans le subpuzzle
+		[Header("Win Condition")]
+		[HideInInspector] public int m_winValue;	//variable qui indique le nombre de connexions à atteindre pour réussir le puzzle
+		[HideInInspector] public int m_curValue;	//variable qui indique la valeur actuelle du nombre de connexions dans le subpuzzle
 
+		[Header("Dimensions")]
 		public int m_width;		//variable qui indique la largeur du tableau
 		public int m_height;	//variable qui indique la hauteur du tableau
 		public PieceBehaviour[,] m_pieces;	//tableau à deux dimensions des positions des pièces
@@ -50,15 +54,13 @@ public class RobotPuzzleManager : MonoBehaviour {
 	}
 	private Selector m_selector = new Selector(0, 0);
 	
+	[Header("Sélecteur")]
 	[SerializeField] [Tooltip("Carré de selection qui se déplace entre les différentes instances de pièces présentes")] private GameObject m_prefabSelector = null;
-	
-	//liste des pièces dans la scène
-	[Tooltip("For debug only")] private List<GameObject> m_scenePieces = new List<GameObject>();
-
 	[SerializeField] [Tooltip("autorisation de bouger sur des cases vides")] private bool m_canMoveOnEmpty = true;
 
 	private float m_offset = 0.5f; //The size of each piece (in anchor values)
 	
+	[Header("SO Input")]
 	[SerializeField] [Tooltip("controller input")] public SOInputMultiChara m_inputs = null;
 	[Tooltip("position limite de joystick")] private float m_limitPosition = 0.5f;
 	[HideInInspector] [Tooltip("variable de déplacement en points par points du sélecteur")] private bool m_hasMoved = false;
@@ -264,7 +266,6 @@ public class RobotPuzzleManager : MonoBehaviour {
 	/// </summary>
 	public void Win()
 	{
-		Debug.Log($"{m_interactDetection}");
 		if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
 		gameObject.SetActive(false);
 	}
@@ -467,8 +468,6 @@ public class RobotPuzzleManager : MonoBehaviour {
 		foreach(Transform child in gameObject.transform) {
 			Destroy(child.gameObject);
 		}
-		
-		//m_interactDetection.PuzzleDeactivation();
 	}
 	
 }
