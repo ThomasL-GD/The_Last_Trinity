@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &8266698999028534091
+--- !u!1 &8296638139966472882
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,36 +8,36 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8266698999028534101}
-  - component: {fileID: 2669733092788272257}
+  - component: {fileID: 8296638139966472876}
+  - component: {fileID: 2636416149318497656}
   m_Layer: 0
-  m_Name: SubpuzzleMonster
+  m_Name: MonsterObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &8266698999028534101
+  m_IsActive: 1
+--- !u!4 &8296638139966472876
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8266698999028534091}
+  m_GameObject: {fileID: 8296638139966472882}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 12.34, y: 11.75, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2669733092788272257
+--- !u!114 &2636416149318497656
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8266698999028534091}
+  m_GameObject: {fileID: 8296638139966472882}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b118f7ba2eabd744b830e13187ae360a, type: 3}
@@ -76,8 +76,7 @@ MonoBehaviour:
   m_arrayHeight: 3
   m_arrayWidth: 4
   m_prefabSelector: {fileID: 3457204076349033787, guid: 7ed14220dfe7f79428bf93938638153f, type: 3}
-  m_nbAmalgamePieces: 2
+  m_nbAmalgamePieces: 3
   m_errorAllowed: 3
   m_achieved: 0
   m_inputs: {fileID: 11400000, guid: 3e2a3114791b8ac4e9bb4d94fd064d6d, type: 2}
-  m_interactDetection: {fileID: 0}

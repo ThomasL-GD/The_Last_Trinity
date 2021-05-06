@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using Scenes.Tests_Code.Prototype.Scripts;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -23,13 +22,17 @@ public class RobotPuzzleManager : MonoBehaviour {
 
 	[SerializeField] [Tooltip("Tableau des pièces à instancier avec leur nom")] private PiecePrefabs m_piecesPrefabClass=null;
 	[HideInInspector] [Tooltip("Tableau des pièces à instancier")] public GameObject[] m_piecePrefabs;
-
+	//liste des pièces dans la scène
+	[Tooltip("For debug only")] private List<GameObject> m_scenePieces = new List<GameObject>();
+	
 	[System.Serializable]
 	public class Puzzle
 	{
-		 public int m_winValue;	//variable qui indique le nombre de connexions à atteindre pour réussir le puzzle
-		 public int m_curValue;	//variable qui indique la valeur actuelle du nombre de connexions dans le subpuzzle
+		[Header("Win Condition")]
+		[HideInInspector] public int m_winValue;	//variable qui indique le nombre de connexions à atteindre pour réussir le puzzle
+		[HideInInspector] public int m_curValue;	//variable qui indique la valeur actuelle du nombre de connexions dans le subpuzzle
 
+		[Header("Dimensions")]
 		public int m_width;		//variable qui indique la largeur du tableau
 		public int m_height;	//variable qui indique la hauteur du tableau
 		public PieceBehaviour[,] m_pieces;	//tableau à deux dimensions des positions des pièces
@@ -51,16 +54,19 @@ public class RobotPuzzleManager : MonoBehaviour {
 	}
 	private Selector m_selector = new Selector(0, 0);
 	
+	[Header("Sélecteur")]
 	[SerializeField] [Tooltip("Carré de selection qui se déplace entre les différentes instances de pièces présentes")] private GameObject m_prefabSelector = null;
-	
-	//liste des pièces dans la scène
-	[Tooltip("For debug only")] private List<GameObject> m_scenePieces = new List<GameObject>();
-
-	[SerializeField] [Tooltip("autorisation de bouger sur des cases vides")] private bool m_canMoveOnEmpty = false;
+	[SerializeField] [Tooltip("autorisation de bouger sur des cases vides")] private bool m_canMoveOnEmpty = true;
 
 	private float m_offset = 0.5f; //The size of each piece (in anchor values)
-
-	[HideInInspector] public Interact_Detection m_otherScript = null;
+	
+	[Header("SO Input")]
+	[SerializeField] [Tooltip("controller input")] public SOInputMultiChara m_inputs = null;
+	[Tooltip("position limite de joystick")] private float m_limitPosition = 0.5f;
+	[HideInInspector] [Tooltip("variable de déplacement en points par points du sélecteur")] private bool m_hasMoved = false;
+	
+	[HideInInspector] [Tooltip("Script d'intéraction entre le personnage et l'objet comprenant le subpuzzle")] public Interact_Detection m_interactDetection = null;
+	
 	
 	private void Awake()
 	{
@@ -260,10 +266,9 @@ public class RobotPuzzleManager : MonoBehaviour {
 	/// </summary>
 	public void Win()
 	{
+		if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
 		gameObject.SetActive(false);
-		m_otherScript.m_openDoor = true;
 	}
-	
 	
     
 
@@ -280,7 +285,8 @@ public class RobotPuzzleManager : MonoBehaviour {
         
 		m_puzzle.m_curValue += difference; //calcul la différence après rotation et add to curValue
 
-		if (m_puzzle.m_curValue == m_puzzle.m_winValue)  Win();
+		if (m_puzzle.m_curValue == m_puzzle.m_winValue)  Win ();
+        
 	}
 
 	
@@ -361,28 +367,43 @@ public class RobotPuzzleManager : MonoBehaviour {
 
 	private void Update()
 	{
-		if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow))
+		float horizontalAxis = Input.GetAxis("Horizontal");
+		float verticalAxis = Input.GetAxis("Vertical");
+		bool selectorValidation = Input.GetKeyDown(m_inputs.inputRobot);
+		
+		if (!m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis >m_limitPosition || verticalAxis < -m_limitPosition)
 		{
 			
 			//déplacement du sélecteur
-			if (Input.GetKeyDown(KeyCode.LeftArrow) && m_selector.x > 0) //Déplacement a gauche si position X sélecteur > position  X  première prefab instanciée
+			if (!m_hasMoved && horizontalAxis < -m_limitPosition && m_selector.x > 0) //Déplacement a gauche si position X sélecteur > position  X  première prefab instanciée
 			{
 				//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
 				if(m_puzzle.m_pieces[m_selector.x, m_selector.y].m_isEmptyPiece == false || m_canMoveOnEmpty) m_selector.x--;
+				m_hasMoved = true;
 			}
-			else if (Input.GetKeyDown(KeyCode.RightArrow) && m_selector.x < m_puzzle.m_width - 1) //Déplacement à droite si position  X sélecteur < valeur largeur tableau prefab
+			else if (!m_hasMoved && horizontalAxis > m_limitPosition && m_selector.x < m_puzzle.m_width - 1) //Déplacement à droite si position  X sélecteur < valeur largeur tableau prefab
 			{
 				if(m_puzzle.m_pieces[m_selector.x, m_selector.y].m_isEmptyPiece == false || m_canMoveOnEmpty) m_selector.x++;		//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
+				m_hasMoved = true;
 			}
-			else if (Input.GetKeyDown(KeyCode.UpArrow) && m_selector.y < m_puzzle.m_height - 1) //Déplacement en haut si position Y sélecteur > position Y dernière prefab
+			else if (!m_hasMoved && verticalAxis > m_limitPosition && m_selector.y < m_puzzle.m_height - 1) //Déplacement en haut si position Y sélecteur > position Y dernière prefab
 			{
-				if(m_puzzle.m_pieces[m_selector.x, m_selector.y].m_isEmptyPiece == false || m_canMoveOnEmpty) m_selector.y++;		//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
+				if (m_puzzle.m_pieces[m_selector.x, m_selector.y].m_isEmptyPiece == false || m_canMoveOnEmpty)
+				{
+					m_selector.y++; //vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
+					m_hasMoved = true;
+				}
 			}
-			else if (Input.GetKeyDown(KeyCode.DownArrow) && m_selector.y > 0) //Déplacement en bas si position Y sélecteur < 0
+			else if (!m_hasMoved && verticalAxis < -m_limitPosition && m_selector.y > 0) //Déplacement en bas si position Y sélecteur < 0
 			{
-				if(m_puzzle.m_pieces[m_selector.x, m_selector.y].m_isEmptyPiece == false || m_canMoveOnEmpty) m_selector.y--;		//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
+				if (m_puzzle.m_pieces[m_selector.x, m_selector.y].m_isEmptyPiece == false || m_canMoveOnEmpty)
+				{
+					m_selector.y--; //vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
+					m_hasMoved = true;
+				}
 			}
-		
+
+
 			m_selector.rect.anchorMin = new Vector2(m_offset * m_selector.x,m_offset * m_selector.y);
 			m_selector.rect.anchorMax = new Vector2(m_offset * (m_selector.x + 1),m_offset * (m_selector.y + 1));
 
@@ -392,8 +413,14 @@ public class RobotPuzzleManager : MonoBehaviour {
 			//m_selectorTransform.position = new Vector3(m_initialPos.x + m_selector.x, m_initialPos.y - m_selector.y, m_initialPos.z);	//nouvelle position du sélecteur
 		}
 
+		//Joystick recentré sur la manette
+		if (horizontalAxis < m_limitPosition && horizontalAxis > -m_limitPosition && verticalAxis < m_limitPosition && verticalAxis > -m_limitPosition)
+		{
+			m_hasMoved = false;
+		}
+		
 
-		if (Input.GetKeyDown(KeyCode.Space)) {
+		if (selectorValidation) {
 			//rotation de la pièce
 			SweepPiece(m_selector.x, m_selector.y);
 		}
