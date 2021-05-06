@@ -18,6 +18,8 @@ public class Interact_Detection : MonoBehaviour
     [HideInInspector] [Tooltip("variable booléènne qui indique le passage entre le jeu et sub puzzle")] public bool m_isInSubPuzzle = false;
     [SerializeField] [Tooltip("Bouton qui apparait afin de déclencher le puzzle")] private GameObject m_activationButton;
     [HideInInspector] [Tooltip("contrôle d'état du trigger du bouton permettant d'activer le sub puzzle")] private bool m_buttonActivate = false;
+
+    public bool m_openDoor = false;
     
 
     private void Update()
@@ -70,6 +72,7 @@ public class Interact_Detection : MonoBehaviour
     /// </summary>
     public void PuzzleDeactivation()
     {
+        m_openDoor = true;
         m_activationButton.SetActive(false);
         this.enabled = false;
     }
