@@ -2,11 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 public class MonsterPuzzle : MonoBehaviour
 {
+    [Header("Prefabs")]
     [SerializeField] [Tooltip("Liste des pièces qui vont spawn")] private GameObject[] m_piecePrefab;
+    [SerializeField] [Tooltip("Carré de selection qui se déplace entre les différentes instances de pièces présentes")] private GameObject m_prefabSelector = null;
     
     [Header("Listes")]
     [Tooltip("liste des pièces qui peuvent apparaitre")]private List<GameObject> m_stockPieces = new List<GameObject>();
@@ -26,8 +29,6 @@ public class MonsterPuzzle : MonoBehaviour
     [SerializeField] [Tooltip("hauteur du tableau de prefab")] public int m_arrayHeight = 10;
     [SerializeField] [Tooltip("largeur du tableau de prefab")] public int m_arrayWidth = 10;
 
-    [SerializeField] [Tooltip("Carré de selection qui se déplace entre les différentes instances de pièces présentes")] private GameObject m_prefabSelector = null;
-
     //La position de la première case
     private Vector3 m_initialPos = Vector3.zero;
     //transform du sélecteur
@@ -40,7 +41,7 @@ public class MonsterPuzzle : MonoBehaviour
     [SerializeField] [Tooltip("nombre de pièces présentes dans l'amalgame")] [Range(2, 15)] public int m_nbAmalgamePieces = 3;
     [Tooltip("compte de pièce à trouver")] private int m_findPiece = 0;
     [SerializeField] private int m_errorAllowed = 3;  //nombre d'essais possibles avant echec de subpuzzle
-    [HideInInspector] [Tooltip("validation de puzzle")] public bool m_achieved = false;
+    private int m_errorDone = 0; //reset du nombre d'erreurs possibles
 
     [Header("Joystick Manager")]
     [Tooltip("position limite de joystick")] private float m_limitPosition = 0.5f;
@@ -51,8 +52,8 @@ public class MonsterPuzzle : MonoBehaviour
     
     
     
-    // Start is called before the first frame update
-    void Start()
+    // OnEnable is called before the first frame update
+    void OnEnable()
     {
         //Si nombre de pièces demandées à être affichées est inférieur au nombre de pièces possibles à afficher
         if (m_arrayHeight*m_arrayWidth > m_piecePrefab.Length)
@@ -139,6 +140,7 @@ public class MonsterPuzzle : MonoBehaviour
         //Position des prefab à trouver
         transform.position = new Vector3(transform.position.x + (((float)m_arrayWidth /2f) +0.5f)*m_offsetX, transform.position.y + m_offsetY*m_arrayHeight + (m_offsetY*m_jumbleShift), transform.position.z);
 
+        
         //Instanciation des pièces à trouver parmi les pièces actives dans la scène
         //Si il y a plus de pièces à trouver que de pièces actives, erreur
         if (m_nbAmalgamePieces > m_potentialPieces.Count)
@@ -147,16 +149,17 @@ public class MonsterPuzzle : MonoBehaviour
         }
         else for (int i = 0; i < m_nbAmalgamePieces; i++)
         {
-            //variable qui recherche un préfab aléatoirement dans la liste des pièces présentes dans la scène (potentialPieces)
-            int random = Random.Range(0, m_potentialPieces.Count);
+                //variable qui recherche un préfab aléatoirement dans la liste des pièces présentes dans la scène (potentialPieces)
+                int random = Random.Range(0, m_potentialPieces.Count);
+
+                //ajout du prefab à l'emplacement des prefab à trouver
+                Instantiate(m_potentialPieces[random], transform.position, transform.rotation, container.transform);
+
+                //ajout du préfab présent dans la scène à la liste de prefab à trouver (correctPieces)
+                //enlèvement de ce prefab de la liste des prefab à instancier dans la scène pour éviter de devoir trouver deux fois le même
+                m_correctPieces.Add(m_potentialPieces[random]);
+                m_potentialPieces.RemoveAt(random);
             
-            //ajout du prefab à l'emplacement des prefab à trouver
-            Instantiate(m_potentialPieces[random], transform.position, transform.rotation, container.transform);
-            
-            //ajout du préfab présent dans la scène à la liste de prefab à trouver (correctPieces)
-            //enlèvement de ce prefab de la liste des prefab à instancier dans la scène pour éviter de devoir trouver deux fois le même
-            m_correctPieces.Add(m_potentialPieces[random]);
-            m_potentialPieces.RemoveAt(random);
         }
 
         emptyContainer.transform.parent = gameObject.transform; //on place le container de tous les gameobject instanciées en enfant du gameObject principal
@@ -206,7 +209,7 @@ public class MonsterPuzzle : MonoBehaviour
             }
 
             //nouvelle position du sélecteur
-            m_selectorTransform.position = new Vector3(m_initialPos.x + m_selectorX * m_offsetX, m_initialPos.y - m_selectorY * m_offsetY, m_initialPos.z);
+            if(m_selectorTransform != null)m_selectorTransform.position = new Vector3(m_initialPos.x + m_selectorX * m_offsetX, m_initialPos.y - m_selectorY * m_offsetY, m_initialPos.z);
         }
 
         //Joystick se recentre sur la manette
@@ -245,7 +248,7 @@ public class MonsterPuzzle : MonoBehaviour
                         {
                             Debug.Log("Vous avez trouvé toutes les pièces !");
                             
-                            m_achieved = true;  //le joueur a trouvé toutes les pièces
+                            m_interactDetection.m_achieved = true;  //le joueur a trouvé toutes les pièces
                             
                             if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
                             gameObject.SetActive(false);
@@ -260,8 +263,8 @@ public class MonsterPuzzle : MonoBehaviour
 
             if(isCorrectPiece == false && isAlreadyFound == false) //compteur de défaite s'incrémente de 1
             {
-                m_errorAllowed--;   //nombre d'erreurs possibles avant défaite diminue
-                if (m_errorAllowed == 0)
+                m_errorDone++;   //nombre d'erreurs possibles avant défaite diminue
+                if (m_errorDone == m_errorAllowed)
                 {
                     Debug.Log("Vous avez perdu.");
                     
@@ -281,6 +284,16 @@ public class MonsterPuzzle : MonoBehaviour
     /// </summary>
     void OnDisable()
     {
+        m_errorDone = 0;
+        m_findPiece = 0;
+        
+        m_selectorTransform = null;
+        
+        m_foundPieces.Clear();
+        m_potentialPieces.Clear();
+        m_correctPieces.Clear();
+        m_foundPieces.Clear();
+        
         // https://memegenerator.net/instance/44816816/plotracoon-we-shall-destroy-them-all
         //As all the gameobjects we instantiated are child of this gameobject, we just have to erase all the children of this
         foreach(Transform child in gameObject.transform) {

@@ -266,6 +266,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 	/// </summary>
 	public void Win()
 	{
+		m_interactDetection.m_achieved = true;
 		if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
 		gameObject.SetActive(false);
 	}
