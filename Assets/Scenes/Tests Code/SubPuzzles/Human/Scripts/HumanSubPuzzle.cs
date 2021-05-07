@@ -19,7 +19,13 @@ public class HumanSubPuzzle : MonoBehaviour {
     
     private Selector m_selector = new Selector(0,0); //Contains the coordinates of our selector aka the position of th player
     private GameObject m_player = null; //Contains the coordinates of our selector aka the position of th player
-
+    [HideInInspector] [Tooltip("Script d'intéraction entre le personnage et l'objet comprenant le subpuzzle")] public Interact_Detection m_interactDetection = null;
+    
+    [Header("Input Manager")]
+    [SerializeField] public SOInputMultiChara m_inputs = null;
+    [HideInInspector] [Tooltip("position limite de joystick")] private float m_limitPosition = 0.5f;
+    [HideInInspector] [Tooltip("variable de déplacement en points par points du sélecteur")] private bool m_hasMoved = false;
+    
     [Header("Balancing")]
     [SerializeField] [Tooltip("The height of the maze (unit : cells)")] [Range(2,50)] public int m_mazeHeight = 5;
     [SerializeField] [Tooltip("The width of the maze (unit : cells)")] [Range(2,50)] public int m_mazeWidth = 5;
@@ -384,23 +390,31 @@ public class HumanSubPuzzle : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
+        
+        float horizontalAxis = Input.GetAxis("Horizontal");
+        float verticalAxis = Input.GetAxis("Vertical");
+        bool selectorValidation = Input.GetKeyDown(m_inputs.inputHuman);
 
-        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow)) {
+        if (!m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis >m_limitPosition || verticalAxis < -m_limitPosition) {
             
             Directions attemptedMovement = Directions.None;
             
             //We first stocks the way the player wants to go if he's not blocked by the limits of the maze
-            if (Input.GetKeyDown(KeyCode.LeftArrow) && m_selector.x > 0) {
+            if (!m_hasMoved && horizontalAxis < -m_limitPosition && m_selector.x > 0) {
                 attemptedMovement = Directions.Left;
+                m_hasMoved = true;
             }
-            else if (Input.GetKeyDown(KeyCode.RightArrow) && m_selector.x < m_maze.GetLength(1) - 1) {
+            else if (!m_hasMoved && horizontalAxis > m_limitPosition && m_selector.x < m_maze.GetLength(1) - 1) {
                 attemptedMovement = Directions.Right;
+                m_hasMoved = true;
             }
-            else if (Input.GetKeyDown(KeyCode.UpArrow) && m_selector.y < m_maze.GetLength(0) - 1) {
+            else if (!m_hasMoved && verticalAxis > m_limitPosition && m_selector.y < m_maze.GetLength(0) - 1) {
                 attemptedMovement = Directions.Up;
+                m_hasMoved = true;
             }
-            else if (Input.GetKeyDown(KeyCode.DownArrow) && m_selector.y > 0) {
+            else if (!m_hasMoved && verticalAxis < -m_limitPosition && m_selector.y > 0) {
                 attemptedMovement = Directions.Down;
+                m_hasMoved = true;
             }
 
             //First we verify the player has no wall blocking the way he wants to go;
@@ -427,15 +441,29 @@ public class HumanSubPuzzle : MonoBehaviour {
 
                 //Then, we update the visual representation for the player
                 SetRectPosition(m_player, m_selector.x, m_selector.y);
-                
-                //Win verification
-                if (m_selector.x == m_mazeWidth - 1 && m_selector.y == 0) {
-                    Win();
-                }
             }
-            
+
             Debug.Log($"X : {m_selector.x}        Y : {m_selector.y}");
         }
+        
+        //Joystick se recentre sur la manette
+        if (horizontalAxis < m_limitPosition && horizontalAxis > -m_limitPosition && verticalAxis < m_limitPosition && verticalAxis > -m_limitPosition)
+        {
+            m_hasMoved = false;
+        }
+        
+        //Win verification
+        if (m_selector.x == m_mazeWidth - 1 && m_selector.y == 0) {
+            Win();
+        }
+        
+        //Sortie du subPuzzle en cas de changement de personnage
+        if (m_interactDetection.m_isInSubPuzzle && Input.GetKeyDown(m_inputs.inputMonster) || Input.GetKeyDown(m_inputs.inputRobot))
+        {
+            if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
+            gameObject.SetActive(false);
+        }
+        
     }
 
     /// <summary>
@@ -484,6 +512,11 @@ public class HumanSubPuzzle : MonoBehaviour {
 
     private void Win() {
         Debug.Log("IT'S A WIN !");
+        
+        m_interactDetection.m_achieved = true;  //le joueur est arrivé au bout
+        
+        if(m_interactDetection.enabled) m_interactDetection.PuzzleDeactivation();
+        gameObject.SetActive(false);
     }
 	
 	

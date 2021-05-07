@@ -19,7 +19,7 @@ public class Interact_Detection : MonoBehaviour
     [SerializeField] [Tooltip("Bouton qui apparait afin de déclencher le puzzle")] private GameObject m_activationButton;
     [HideInInspector] [Tooltip("contrôle d'état du trigger du bouton permettant d'activer le sub puzzle")] private bool m_buttonActivate = false;
 
-    [Tooltip("indicateur de réussite de subPuzzle")] public bool m_achieved = false;
+    [HideInInspector] [Tooltip("indicateur de réussite de subPuzzle")] public bool m_achieved = false;
 
     private void Update()
     {
@@ -39,7 +39,7 @@ public class Interact_Detection : MonoBehaviour
             
             if (m_chara == Charas.Human)
             {
-                //m_puzzle.GetComponent<HumanSubPuzzle>().m_interacttakapté
+                m_puzzle.GetComponent<HumanSubPuzzle>().m_interactDetection = this;
             }
             else if (m_chara == Charas.Monster)
             {
@@ -52,20 +52,18 @@ public class Interact_Detection : MonoBehaviour
         }
 
         
-        if (m_isInSubPuzzle && m_chara == Charas.Robot)
+        if (m_isInSubPuzzle && m_chara == Charas.Robot && Input.GetKeyDown(m_inputs.inputMonster) || Input.GetKeyDown(m_inputs.inputHuman))
         {
-            if (Input.GetKeyDown(m_inputs.inputMonster) || Input.GetKeyDown(m_inputs.inputHuman))
-            {
-                PuzzleDeactivation();
-            }
+            Debug.Log("Vous arretez le subpuzzle en cours");
+            //PuzzleDeactivation();
         }
-        
-        
-        
+
+
         //Le bouton d'activation regarde toujours en direction de la caméra de jeu
         m_activationButton.transform.LookAt(m_camera);
     }
 
+    
     /// <summary>
     /// désactivation du script actuel
     /// </summary>
@@ -79,11 +77,9 @@ public class Interact_Detection : MonoBehaviour
         }
         else
         {
-            Debug.Log($"3 + {m_isInSubPuzzle}");
             m_activationButton.SetActive(true);
             m_buttonActivate = true;
             m_isInSubPuzzle = false;
-            Debug.Log($"4 + {m_isInSubPuzzle}");
         }
     }
     

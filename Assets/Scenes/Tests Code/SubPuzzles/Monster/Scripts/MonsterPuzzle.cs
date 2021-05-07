@@ -197,7 +197,7 @@ public class MonsterPuzzle : MonoBehaviour
                 m_selectorX++;
                 m_hasMoved = true;
             }
-            else if (!m_hasMoved && verticalAxis >m_limitPosition && m_selectorY > 0)  //Déplacement en haut si position Y sélecteur < position Y première prefab
+            else if (!m_hasMoved && verticalAxis > m_limitPosition && m_selectorY > 0)  //Déplacement en haut si position Y sélecteur < position Y première prefab
             {
                 m_selectorY--;
                 m_hasMoved = true;
@@ -274,6 +274,13 @@ public class MonsterPuzzle : MonoBehaviour
             }
 
             selectorValidation = false;
+        }
+        
+        //Sortie du subPuzzle en cas de changement de personnage
+        if (m_interactDetection.m_isInSubPuzzle && Input.GetKeyDown(m_inputs.inputHuman) || Input.GetKeyDown(m_inputs.inputRobot))
+        {
+            if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
+            gameObject.SetActive(false);
         }
     }
     
