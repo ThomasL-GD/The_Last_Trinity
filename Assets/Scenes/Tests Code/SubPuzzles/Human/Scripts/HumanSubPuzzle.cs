@@ -80,7 +80,6 @@ public class HumanSubPuzzle : MonoBehaviour {
         for (int i = 0; i < m_maze.GetLength(0); i++) {
             for (int j = 0; j < m_maze.GetLength(1); j++) {
                 m_maze[i, j] = Directions.All; //It's basically 0b0000_1111
-                m_maze[i, j] = Directions.All; //It's basically 0b0000_1111
             }
         }
 

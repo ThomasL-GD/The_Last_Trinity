@@ -18,8 +18,7 @@ public class MonsterPuzzle : MonoBehaviour
     [Tooltip("List des pièces trouvées")] private List<GameObject> m_foundPieces = new List<GameObject>();
 
     [Header("Décalage")]
-    [SerializeField] [Tooltip("Décalage du prefab sur l'axe X")] private float m_offsetX = 4.0f;
-    [SerializeField] [Tooltip("Décalage du prefab sur l'axe Y")] private float m_offsetY = 4.0f;
+    [SerializeField] [Tooltip("FOR DEBUG ONLY\nSize of each cell in Rect Transorm anchor units")] private float m_offset = 4.0f;
     [SerializeField] [Tooltip("The shift of height attributed to the jumble")] [Range(0.8f, 3f)] private float m_jumbleShift = 1f;
     
     
@@ -40,7 +39,7 @@ public class MonsterPuzzle : MonoBehaviour
     [Header("Gestion Difficulté")]
     [SerializeField] [Tooltip("nombre de pièces présentes dans l'amalgame")] [Range(2, 15)] public int m_nbAmalgamePieces = 3;
     [Tooltip("compte de pièce à trouver")] private int m_findPiece = 0;
-    [SerializeField] private int m_errorAllowed = 3;  //nombre d'essais possibles avant echec de subpuzzle
+    [SerializeField] public int m_errorAllowed = 3;  //nombre d'essais possibles avant echec de subpuzzle
     private int m_errorDone = 0; //reset du nombre d'erreurs possibles
 
     [Header("Joystick Manager")]
@@ -53,8 +52,9 @@ public class MonsterPuzzle : MonoBehaviour
     
     
     // OnEnable is called before the first frame update
-    void OnEnable()
-    {
+    void OnEnable() {
+        SquarePanelToScreen();
+        
         //Si nombre de pièces demandées à être affichées est inférieur au nombre de pièces possibles à afficher
         if (m_arrayHeight*m_arrayWidth > m_piecePrefab.Length)
         {
@@ -63,6 +63,15 @@ public class MonsterPuzzle : MonoBehaviour
         else PuzzleGenerate();
 
         if(m_prefabSelector == null) Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE PREFAB OF THE SELECTOR !");
+        
+        //We calculate the size of each cell
+        m_offset = 0f;
+        if (m_arrayWidth > m_arrayHeight + 2) {
+            m_offset = (1f/m_arrayWidth);
+        }
+        else {
+            m_offset = (1f/m_arrayHeight+2);
+        }
     }
     
 
@@ -87,11 +96,6 @@ public class MonsterPuzzle : MonoBehaviour
         
         //tableau à deux dimensions qui place les pièces
         m_prefabStock = new GameObject[m_arrayHeight, m_arrayWidth];
-
-        //Parent dans lequel on instancie les futurs gameObject
-        GameObject emptyContainer = new GameObject("PiecesContainer");
-        
-        GameObject container = Instantiate(emptyContainer, transform.position, transform.rotation,emptyContainer.transform);
         
         
         /////////////////////////////////////////////////////////////////////////////   RANDOM PIECES   /////////////////////////////////////////////////////////////////////////////
@@ -106,10 +110,11 @@ public class MonsterPuzzle : MonoBehaviour
                 int random = Random.Range(0, m_stockPieces.Count);
                 
                 //décalage de la position en x avant instance du prefab
-                transform.position = new Vector3(transform.position.x + m_offsetX,transform.position.y,0);
+                transform.position = new Vector3(transform.position.x + m_offset,transform.position.y,0);
                 
                 //instantiation dans la scène d'une pièce tirée dans le stock de prefab 
-                m_prefabStock[x,y] = Instantiate(m_stockPieces[random], transform.position, transform.rotation, container.transform);
+                m_prefabStock[x,y] = Instantiate(m_stockPieces[random], transform.position, transform.rotation, gameObject.transform);
+                SetRectPosition(m_prefabStock[x,y], x, y);
                 
                 //ajout du prefab instancié dans une nouvelle liste regroupant les pièces actives
                 //enlèvement du prefab instancié des prefab du stock pour ne pas avoir de pièces en double
@@ -119,8 +124,6 @@ public class MonsterPuzzle : MonoBehaviour
                 //récupération de la position de la première prefab instanciée
                 if (x == 0 && y == 0) m_initialPos = transform.position;
             }
-            //Retour à la ligne
-            transform.position = new Vector3(transform.position.x - m_offsetX * m_arrayWidth,transform.position.y - m_offsetY,0);
         }
         
         
@@ -128,7 +131,8 @@ public class MonsterPuzzle : MonoBehaviour
         
         
         //création du selecteur dans la scène
-        GameObject instance = Instantiate(m_prefabSelector, m_initialPos, transform.rotation, container.transform);
+        GameObject instance = Instantiate(m_prefabSelector, m_initialPos, transform.rotation, gameObject.transform);
+        SetRectPosition(instance, 0, m_arrayHeight -1);
         
         //transform du sélecteur récupéré à l'instanciation
         m_selectorTransform = instance.transform;
@@ -138,7 +142,7 @@ public class MonsterPuzzle : MonoBehaviour
 
         
         //Position des prefab à trouver
-        transform.position = new Vector3(transform.position.x + (((float)m_arrayWidth /2f) +0.5f)*m_offsetX, transform.position.y + m_offsetY*m_arrayHeight + (m_offsetY*m_jumbleShift), transform.position.z);
+        transform.position = new Vector3(transform.position.x + (((float)m_arrayWidth /2f) +0.5f)*m_offset, transform.position.y + m_offset*m_arrayHeight + (m_offset*m_jumbleShift), transform.position.z);
 
         
         //Instanciation des pièces à trouver parmi les pièces actives dans la scène
@@ -153,7 +157,8 @@ public class MonsterPuzzle : MonoBehaviour
                 int random = Random.Range(0, m_potentialPieces.Count);
 
                 //ajout du prefab à l'emplacement des prefab à trouver
-                Instantiate(m_potentialPieces[random], transform.position, transform.rotation, container.transform);
+                GameObject gameO = Instantiate(m_potentialPieces[random], transform.position, transform.rotation, gameObject.transform);
+                SetRectPosition(gameO, ((float)m_arrayWidth)/2, m_arrayHeight - 1);
 
                 //ajout du préfab présent dans la scène à la liste de prefab à trouver (correctPieces)
                 //enlèvement de ce prefab de la liste des prefab à instancier dans la scène pour éviter de devoir trouver deux fois le même
@@ -161,8 +166,6 @@ public class MonsterPuzzle : MonoBehaviour
                 m_potentialPieces.RemoveAt(random);
             
         }
-
-        emptyContainer.transform.parent = gameObject.transform; //on place le container de tous les gameobject instanciées en enfant du gameObject principal
     }
     
     
@@ -199,17 +202,17 @@ public class MonsterPuzzle : MonoBehaviour
             }
             else if (!m_hasMoved && verticalAxis > m_limitPosition && m_selectorY > 0)  //Déplacement en haut si position Y sélecteur < position Y première prefab
             {
-                m_selectorY--;
+                m_selectorY++;
                 m_hasMoved = true;
             }
             else if (!m_hasMoved && verticalAxis < -m_limitPosition && m_selectorY < m_arrayHeight-1) //Déplacement en bas si position Y sélecteur > valeur dernière prefab du tableau prefab
             {
-                m_selectorY++;
+                m_selectorY--;
                 m_hasMoved = true;
             }
 
             //nouvelle position du sélecteur
-            if(m_selectorTransform != null)m_selectorTransform.position = new Vector3(m_initialPos.x + m_selectorX * m_offsetX, m_initialPos.y - m_selectorY * m_offsetY, m_initialPos.z);
+            SetRectPosition(m_selectorTransform.gameObject, m_selectorX, m_selectorY);
         }
 
         //Joystick se recentre sur la manette
@@ -281,6 +284,49 @@ public class MonsterPuzzle : MonoBehaviour
         {
             if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
             gameObject.SetActive(false);
+        }
+    }
+    
+    /// <summary>
+    /// Resize the current GameObject (must be a panel) in order to be a square without going out of the screen
+    /// </summary>
+    private void SquarePanelToScreen()
+    {
+        if (gameObject.TryGetComponent(out RectTransform thisRect)) 
+        {
+            thisRect.anchorMax = new Vector2(0.5f, 0.5f);
+            thisRect.anchorMin = new Vector2(0.5f, 0.5f);
+			
+            if (Screen.width >= Screen.height) {
+                thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Screen.height);
+                thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Screen.height);
+            } 
+            else {
+                Debug.Log("Dang it, that's a weird monitor you got there");
+                thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Screen.width);
+                thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Screen.width);
+            }
+            //Debug.Log(Screen.height);
+        } 
+        else {
+            Debug.LogError ("JEEZ ! THIS SCRIPT IS MEANT TO BE ON A PANEL NOT A RANDOM GAMEOBJECT ! GAME DESIGNER DO YOUR JOB !");
+        }
+    }
+
+    /// <summary>
+    /// Place correctly an element with its rect transform
+    /// </summary>
+    /// <param name="p_o">The game object you want to move</param>
+    /// <param name="p_x">Its X coordinate</param>
+    /// <param name="p_y">Its Y coordinate</param>
+    private void SetRectPosition(GameObject p_o, float p_x, int p_y) {
+        if (p_o.TryGetComponent(out RectTransform goRect)) {
+            goRect.anchorMin = new Vector2(m_offset * p_x, m_offset * p_y);
+            goRect.anchorMax = new Vector2(m_offset * (p_x+1), m_offset * (p_y+1));
+
+            goRect.localPosition = Vector3.zero;
+
+            goRect.anchoredPosition = Vector2.zero;
         }
     }
     
