@@ -19,7 +19,13 @@ public class HumanSubPuzzle : MonoBehaviour {
     
     private Selector m_selector = new Selector(0,0); //Contains the coordinates of our selector aka the position of th player
     private GameObject m_player = null; //Contains the coordinates of our selector aka the position of th player
-
+    [HideInInspector] [Tooltip("Script d'intéraction entre le personnage et l'objet comprenant le subpuzzle")] public Interact_Detection m_interactDetection = null;
+    
+    [Header("Input Manager")]
+    [SerializeField] public SOInputMultiChara m_inputs = null;
+    [HideInInspector] [Tooltip("position limite de joystick")] private float m_limitPosition = 0.5f;
+    [HideInInspector] [Tooltip("variable de déplacement en points par points du sélecteur")] private bool m_hasMoved = false;
+    
     [Header("Balancing")]
     [SerializeField] [Tooltip("The height of the maze (unit : cells)")] [Range(2,50)] public int m_mazeHeight = 5;
     [SerializeField] [Tooltip("The width of the maze (unit : cells)")] [Range(2,50)] public int m_mazeWidth = 5;
@@ -73,7 +79,7 @@ public class HumanSubPuzzle : MonoBehaviour {
         //Initialization of the array, we fill it with full cells
         for (int i = 0; i < m_maze.GetLength(0); i++) {
             for (int j = 0; j < m_maze.GetLength(1); j++) {
-                m_maze[i, j] = Directions.None; //It's basically 0b0000_1111
+                m_maze[i, j] = Directions.All; //It's basically 0b0000_1111
             }
         }
 
@@ -86,7 +92,7 @@ public class HumanSubPuzzle : MonoBehaviour {
     private void MazeInitialization() {
 
         
-        //GenerateMazeSolution();
+        GenerateMazeSolution();
         
         
         //Now it's time to break random walls in order to have new paths emerging
@@ -145,7 +151,8 @@ public class HumanSubPuzzle : MonoBehaviour {
                 for (int j = 0; j < m_maze.GetLength(1); j++) {
 
                     GameObject instance = Instantiate(m_prefabBG, new Vector3(transform.position.x, transform.position.y, transform.position.z + 0.5f), transform.rotation, gameObject.transform);
-                    SetRectPosition(instance,i,j);
+                    SetRectPosition(instance,j,i);
+                    instance.transform.SetSiblingIndex(0);
 
                     if (m_maze[i, j].HasFlag(Directions.Up)) {
                         instance = Instantiate(m_prefabUp, transform.position, transform.rotation, gameObject.transform);
@@ -173,7 +180,7 @@ public class HumanSubPuzzle : MonoBehaviour {
                 for (int j = 0; j < m_maze.GetLength(1); j++) {
 
                     GameObject instance = Instantiate(m_prefabBG, new Vector3(transform.position.x, transform.position.y, transform.position.z + 0.5f), transform.rotation, gameObject.transform);
-                    SetRectPosition(instance, i, j);
+                    SetRectPosition(instance, j, i);
                     
                 }
             }
@@ -183,6 +190,7 @@ public class HumanSubPuzzle : MonoBehaviour {
         if (m_prefabPlayer != null) {
             m_player = Instantiate(m_prefabPlayer, new Vector3(0, 0, 0), transform.rotation, gameObject.transform);
             SetRectPosition(m_player, 0, m_mazeHeight - 1);
+            m_player.transform.SetSiblingIndex(m_mazeHeight*m_mazeWidth+1);
             m_selector.x = 0;
             m_selector.y = m_mazeHeight - 1;
         }
@@ -207,11 +215,11 @@ public class HumanSubPuzzle : MonoBehaviour {
         m_maze[p_select.y, p_select.x] &= ~removedDirection;
             
         //Once we removed a wall, we make sure the adjacent cell (if it exists) will have its opposite wall removed as well
-        if (removedDirection == Directions.Up && p_select.y != 0) {
-            m_maze[p_select.y-1, p_select.x] &= ~Directions.Down;
+        if (removedDirection == Directions.Up && p_select.y != m_mazeHeight - 1) {
+            m_maze[p_select.y+1, p_select.x] &= ~Directions.Down;
         }
-        else if (removedDirection == Directions.Down && p_select.y != m_mazeHeight - 1) {
-            m_maze[p_select.y+1, p_select.x] &= ~Directions.Up;
+        else if (removedDirection == Directions.Down && p_select.y != 0) {
+            m_maze[p_select.y-1, p_select.x] &= ~Directions.Up;
         }
         else if (removedDirection == Directions.Left && p_select.x != 0) {
             m_maze[p_select.y, p_select.x-1] &= ~Directions.Right;
@@ -242,15 +250,15 @@ public class HumanSubPuzzle : MonoBehaviour {
                 //The Left border forbids left & up
                 authorizedDirections &= ~(Directions.Left | Directions.Up);
             }
-            if (pathHead.y == m_mazeWidth - 1) {
+            if (pathHead.y == m_mazeHeight - 1) {
                 //The Up border forbids left & up
                 authorizedDirections &= ~(Directions.Left | Directions.Up);
             }
-            if (pathHead.x == 0) {
+            if (pathHead.x == m_mazeWidth - 1) {
                 //The Right border forbids right & up
                 authorizedDirections &= ~(Directions.Right | Directions.Up);
             }
-            if (pathHead.y == m_mazeHeight - 1) {
+            if (pathHead.y == 0) {
                 //The Down border forbids down & left
                 authorizedDirections &= ~(Directions.Down | Directions.Left);
             }
@@ -259,7 +267,7 @@ public class HumanSubPuzzle : MonoBehaviour {
             //We verify the path head is not going in a cell he already was before
             if (pathHead.y != m_mazeHeight - 1 && authorizedDirections.HasFlag(Directions.Up)) {
                 //The position above the path head
-                Vector2 expectedPos = new Vector2(pathHead.x, pathHead.y-1);
+                Vector2 expectedPos = new Vector2(pathHead.x, pathHead.y+1);
                 for (int i = 0; i < path.Count; i++) {
                     if (path[i] == expectedPos) {
                         //If we already visited the cell above us, we remove it from our choices of directions
@@ -281,7 +289,7 @@ public class HumanSubPuzzle : MonoBehaviour {
             }
             if (pathHead.y != 0 && authorizedDirections.HasFlag(Directions.Down)) {
                 //The position under the path head
-                Vector2 expectedPos = new Vector2(pathHead.x, pathHead.y+1);
+                Vector2 expectedPos = new Vector2(pathHead.x, pathHead.y-1);
                 for (int i = 0; i < path.Count; i++) {
                     if (path[i] == expectedPos) {
                         //If we already visited the cell under us, we remove it from our choices of directions
@@ -309,7 +317,7 @@ public class HumanSubPuzzle : MonoBehaviour {
                     //We force him to go right if it's not facing the right wall already
                     authorizedDirections = Directions.Right;
                 }
-                else if (pathHead.y != m_mazeHeight - 1) {
+                else if (pathHead.y != 0) {
                     //If it faces the right wall, we force him to go down if it's not facing the down wall already
                     authorizedDirections = Directions.Down;
                 }
@@ -381,23 +389,31 @@ public class HumanSubPuzzle : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
+        
+        float horizontalAxis = Input.GetAxis("Horizontal");
+        float verticalAxis = Input.GetAxis("Vertical");
+        bool selectorValidation = Input.GetKeyDown(m_inputs.inputHuman);
 
-        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow)) {
+        if (!m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis >m_limitPosition || verticalAxis < -m_limitPosition) {
             
             Directions attemptedMovement = Directions.None;
             
             //We first stocks the way the player wants to go if he's not blocked by the limits of the maze
-            if (Input.GetKeyDown(KeyCode.LeftArrow) && m_selector.x > 0) {
+            if (!m_hasMoved && horizontalAxis < -m_limitPosition && m_selector.x > 0) {
                 attemptedMovement = Directions.Left;
+                m_hasMoved = true;
             }
-            else if (Input.GetKeyDown(KeyCode.RightArrow) && m_selector.x < m_maze.GetLength(1) - 1) {
+            else if (!m_hasMoved && horizontalAxis > m_limitPosition && m_selector.x < m_maze.GetLength(1) - 1) {
                 attemptedMovement = Directions.Right;
+                m_hasMoved = true;
             }
-            else if (Input.GetKeyDown(KeyCode.UpArrow) && m_selector.y < m_maze.GetLength(0) - 1) {
+            else if (!m_hasMoved && verticalAxis > m_limitPosition && m_selector.y < m_maze.GetLength(0) - 1) {
                 attemptedMovement = Directions.Up;
+                m_hasMoved = true;
             }
-            else if (Input.GetKeyDown(KeyCode.DownArrow) && m_selector.y > 0) {
+            else if (!m_hasMoved && verticalAxis < -m_limitPosition && m_selector.y > 0) {
                 attemptedMovement = Directions.Down;
+                m_hasMoved = true;
             }
 
             //First we verify the player has no wall blocking the way he wants to go;
@@ -424,15 +440,29 @@ public class HumanSubPuzzle : MonoBehaviour {
 
                 //Then, we update the visual representation for the player
                 SetRectPosition(m_player, m_selector.x, m_selector.y);
-                
-                //Win verification
-                if (m_selector.x == m_mazeWidth - 1 && m_selector.y == 0) {
-                    Debug.Log("IT'S A WIN !");
-                }
             }
-            
+
             Debug.Log($"X : {m_selector.x}        Y : {m_selector.y}");
         }
+        
+        //Joystick se recentre sur la manette
+        if (horizontalAxis < m_limitPosition && horizontalAxis > -m_limitPosition && verticalAxis < m_limitPosition && verticalAxis > -m_limitPosition)
+        {
+            m_hasMoved = false;
+        }
+        
+        //Win verification
+        if (m_selector.x == m_mazeWidth - 1 && m_selector.y == 0) {
+            Win();
+        }
+        
+        //Sortie du subPuzzle en cas de changement de personnage
+        if (m_interactDetection.m_isInSubPuzzle && Input.GetKeyDown(m_inputs.inputMonster) || Input.GetKeyDown(m_inputs.inputRobot))
+        {
+            if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
+            gameObject.SetActive(false);
+        }
+        
     }
 
     /// <summary>
@@ -476,6 +506,16 @@ public class HumanSubPuzzle : MonoBehaviour {
         else {
             Debug.LogError ("JEEZ ! THIS SCRIPT IS MEANT TO BE ON A PANEL NOT A RANDOM GAMEOBJECT ! GAME DESIGNER DO YOUR JOB !");
         }
+    }
+
+
+    private void Win() {
+        Debug.Log("IT'S A WIN !");
+        
+        m_interactDetection.m_achieved = true;  //le joueur est arrivé au bout
+        
+        if(m_interactDetection.enabled) m_interactDetection.PuzzleDeactivation();
+        gameObject.SetActive(false);
     }
 	
 	

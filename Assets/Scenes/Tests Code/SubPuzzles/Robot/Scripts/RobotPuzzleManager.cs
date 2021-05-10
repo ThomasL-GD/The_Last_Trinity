@@ -266,6 +266,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 	/// </summary>
 	public void Win()
 	{
+		m_interactDetection.m_achieved = true;
 		if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
 		gameObject.SetActive(false);
 	}
@@ -423,6 +424,13 @@ public class RobotPuzzleManager : MonoBehaviour {
 		if (selectorValidation) {
 			//rotation de la pièce
 			SweepPiece(m_selector.x, m_selector.y);
+		}
+		
+		//Sortie du subPuzzle en cas de changement de personnage
+		if (m_interactDetection.m_isInSubPuzzle && Input.GetKeyDown(m_inputs.inputMonster) || Input.GetKeyDown(m_inputs.inputHuman))
+		{
+			if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
+			gameObject.SetActive(false);
 		}
 
 	}
