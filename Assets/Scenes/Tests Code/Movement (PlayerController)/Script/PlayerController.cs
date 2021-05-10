@@ -32,6 +32,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] [Range(0.2f, 5f)] [Tooltip("The time the player is allowed to stay in this death zone (unit : seconds)")] private float m_timeBeforeDying = 0.5f;
     private float m_deathCounter = 0.0f;
     private bool m_isDying = false;
+    [HideInInspector] public Vector3 m_spawnPoint = Vector3.zero;
 
     //Cinemachine cameras des trois personnages
     private CinemachineVirtualCamera m_vCamH;
@@ -40,7 +41,7 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        DeathManager.DeathDelegator += ResetValues;
+        DeathManager.DeathDelegator += Death;
 
         //We create an array (because it's easier to manipulate) of all the inputs of the characters
         m_keyCodes[0] = m_selector.inputHuman;
@@ -52,6 +53,9 @@ public class PlayerController : MonoBehaviour
         m_vCamR = GameObject.FindGameObjectWithTag("Camera Robot")?.GetComponent<CinemachineVirtualCamera>();
         
         if (m_chara == Charas.Human) m_isActive = true;
+
+        //We set the first spawnpoint at its original position
+        m_spawnPoint = transform.position;
 
     #if UNITY_EDITOR
         if(m_vCamH == null) Debug.LogError("Aucune caméra avec le tag Camera Humain");
@@ -192,8 +196,11 @@ public class PlayerController : MonoBehaviour
     /// <summary>
     /// For safety, we reset a few values in case of death & respawn
     /// </summary>
-    private void ResetValues() {
+    private void Death() {
+        //Reset of all death-related values
         m_isDying = false;
         m_deathCounter = 0.0f;
+
+        transform.position = m_spawnPoint;
     }
 }
