@@ -98,32 +98,34 @@ public class PlayerController : MonoBehaviour
             }
 
             //We activate this chara if its corresponding input is pressed
-            if (!s_inBetweenSwitching && Input.GetKeyDown(m_keyCodes[(int)m_chara]))
-            {
-                switch (m_chara)
-                {
-                    case Charas.Human:
-                        m_vCamH.Priority = 2;
-                        m_vCamM.Priority = 1;
-                        m_vCamR.Priority = 0;
-                        break;
-                    case Charas.Monster:
-                        m_vCamH.Priority = 1;
-                        m_vCamM.Priority = 2;
-                        m_vCamR.Priority = 0;
-                        break;
-                    case Charas.Robot:
-                        m_vCamH.Priority = 0;
-                        m_vCamM.Priority = 1;
-                        m_vCamR.Priority = 2;
-                        break;
-                    default:
-                        Debug.LogError("Incorrect parameter on m_chara");
-                        break;
+            if (Input.GetKeyDown(m_keyCodes[(int)m_chara])) {
+                if (!m_isActive && !s_inBetweenSwitching) {
+                    
+                    switch (m_chara) {
+                        case Charas.Human:
+                            m_vCamH.Priority = 2;
+                            m_vCamM.Priority = 1;
+                            m_vCamR.Priority = 0;
+                            break;
+                        case Charas.Monster:
+                            m_vCamH.Priority = 1;
+                            m_vCamM.Priority = 2;
+                            m_vCamR.Priority = 0;
+                            break;
+                        case Charas.Robot:
+                            m_vCamH.Priority = 0;
+                            m_vCamM.Priority = 1;
+                            m_vCamR.Priority = 2;
+                            break;
+                        default:
+                            Debug.LogError("Incorrect parameter on m_chara");
+                            break;
+                    }
+                    m_isSwitchingChara = true;
+                    s_inBetweenSwitching = true;
+                    StartCoroutine(SwitchTimer());
+                    
                 }
-                m_isSwitchingChara = true;
-                s_inBetweenSwitching = true;
-                StartCoroutine(SwitchTimer());
             }
             //If any other input corresponding to another character is pressed, we inactive this chara
             else if (Input.GetKeyDown(m_keyCodes[0]) || Input.GetKeyDown(m_keyCodes[1]) || Input.GetKeyDown(m_keyCodes[2])){
