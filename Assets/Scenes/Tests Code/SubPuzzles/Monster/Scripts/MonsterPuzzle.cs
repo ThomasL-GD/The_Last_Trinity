@@ -53,7 +53,7 @@ public class MonsterPuzzle : MonoBehaviour
     
     // OnEnable is called before the first frame update
     void OnEnable() {
-        SquarePanelToScreen();
+        m_interactDetection.SquarePanelToScreen();
         
         //We calculate the size of each cell
         m_offset = 0f;
@@ -185,28 +185,28 @@ public class MonsterPuzzle : MonoBehaviour
         
         float horizontalAxis = Input.GetAxis("Horizontal");
         float verticalAxis = Input.GetAxis("Vertical");
-        bool selectorValidation = Input.GetKeyDown(KeyCode.Joystick1Button3);
+        bool selectorValidation = Input.GetKeyDown(m_inputs.inputMonster);
         
 
         if (!m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis >m_limitPosition || verticalAxis < -m_limitPosition) {
             
             //déplacement du sélecteur avec le joystick gauche
-            if (!m_hasMoved && horizontalAxis < -m_limitPosition && m_selectorX > 0)   //Déplacement a gauche si position X sélecteur > position  X  première prefab instanciée
+            if (m_interactDetection.m_canMove && !m_hasMoved && horizontalAxis < -m_limitPosition && m_selectorX > 0)   //Déplacement a gauche si position X sélecteur > position  X  première prefab instanciée
             {
                 m_selectorX--;
                 m_hasMoved = true;
             }
-            else if (!m_hasMoved && horizontalAxis > m_limitPosition && m_selectorX < m_arrayWidth-1)  //Déplacement à droite si position  X sélecteur  < valeur largeur tableau prefab
+            else if (m_interactDetection.m_canMove && !m_hasMoved && horizontalAxis > m_limitPosition && m_selectorX < m_arrayWidth-1)  //Déplacement à droite si position  X sélecteur  < valeur largeur tableau prefab
             {
                 m_selectorX++;
                 m_hasMoved = true;
             }
-            else if (!m_hasMoved && verticalAxis > m_limitPosition && m_selectorY < m_arrayHeight-1)  //Déplacement en haut si position Y sélecteur < position Y première prefab
+            else if (m_interactDetection.m_canMove && !m_hasMoved && verticalAxis > m_limitPosition && m_selectorY < m_arrayHeight-1)  //Déplacement en haut si position Y sélecteur < position Y première prefab
             {
                 m_selectorY++;
                 m_hasMoved = true;
             }
-            else if (!m_hasMoved && verticalAxis < -m_limitPosition && m_selectorY > 0) //Déplacement en bas si position Y sélecteur > valeur dernière prefab du tableau prefab
+            else if (m_interactDetection.m_canMove && !m_hasMoved && verticalAxis < -m_limitPosition && m_selectorY > 0) //Déplacement en bas si position Y sélecteur > valeur dernière prefab du tableau prefab
             {
                 m_selectorY--;
                 m_hasMoved = true;
@@ -253,9 +253,8 @@ public class MonsterPuzzle : MonoBehaviour
                             Debug.Log("Vous avez trouvé toutes les pièces !");
                             
                             m_interactDetection.m_achieved = true;  //le joueur a trouvé toutes les pièces
-                            
+                            m_interactDetection.m_canMove = false;  //le joueur ne peut plus bouger le selecteur
                             if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
-                            gameObject.SetActive(false);
                         }
 
                         m_prefabStock[m_selectorY, m_selectorX].SetActive(false);   //feedback disparition
@@ -270,9 +269,7 @@ public class MonsterPuzzle : MonoBehaviour
                 if (m_errorDone == m_errorAllowed)
                 {
                     Debug.Log("Vous avez perdu.");
-                    
                     if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
-                    gameObject.SetActive(false);
                 }
                 m_errorDone++;   //nombre d'erreurs possibles avant défaite diminue
             }
@@ -284,35 +281,6 @@ public class MonsterPuzzle : MonoBehaviour
         if (m_interactDetection.m_isInSubPuzzle && Input.GetKeyDown(m_inputs.inputHuman) || Input.GetKeyDown(m_inputs.inputRobot))
         {
             if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
-            gameObject.SetActive(false);
-        }
-    }
-    
-    /// <summary>
-    /// Resize the current GameObject (must be a panel) in order to be a square without going out of the screen
-    /// </summary>
-    private void SquarePanelToScreen()
-    {
-        if (gameObject.TryGetComponent(out RectTransform thisRect)) 
-        {
-            thisRect.anchorMax = new Vector2(0.5f, 0.5f);
-            thisRect.anchorMin = new Vector2(0.5f, 0.5f);
-			
-            if (Screen.width >= Screen.height) {
-                thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Screen.height);
-                thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Screen.height);
-            } 
-            else {
-                Debug.Log("Dang it, that's a weird monitor you got there");
-                thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Screen.width);
-                thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Screen.width);
-            }
-            thisRect.localPosition = Vector3.zero;
-            thisRect.anchoredPosition = Vector2.zero;
-            //Debug.Log(Screen.height);
-        } 
-        else {
-            Debug.LogError ("JEEZ ! THIS SCRIPT IS MEANT TO BE ON A PANEL NOT A RANDOM GAMEOBJECT ! GAME DESIGNER DO YOUR JOB !");
         }
     }
 

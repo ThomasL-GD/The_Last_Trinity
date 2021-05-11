@@ -106,7 +106,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 		}
 
 		//We resize the panel in order for it to be a square
-		SquarePanelToScreen();
+		m_interactDetection.SquarePanelToScreen();
 		
 		if (m_puzzle.m_width == 0 || m_puzzle.m_height == 0) {
 			Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE DIMENSIONS OF THE ARRAY !");
@@ -137,12 +137,13 @@ public class RobotPuzzleManager : MonoBehaviour {
 			rectT.anchoredPosition = Vector2.zero;
 			
 			//We create a selector to stock its coordinates with int in order to have a better navigation
-			m_selector = new Selector(0, 0);
-			m_selector.rect = rectT;
+			m_selector = new Selector(0, 0) {rect = rectT};
 		}
 		else {
 			Debug.LogError ("JEEZ ! THE GAME DESIGNER PUT A WRONG PREFAB FOR THE SELECTOR, IT MUST BE A UI ELEMENT WITH A RECT TRANSFORM !");
 		}
+		
+		
 	}
 
 
@@ -267,8 +268,8 @@ public class RobotPuzzleManager : MonoBehaviour {
 	public void Win()
 	{
 		m_interactDetection.m_achieved = true;
+		m_interactDetection.m_canMove = false;
 		if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
-		gameObject.SetActive(false);
 	}
 	
     
@@ -278,9 +279,10 @@ public class RobotPuzzleManager : MonoBehaviour {
 	/// </summary>
 	public void SweepPiece(int p_x, int p_y)
 	{
+		Debug.Log("test 2");
 		int difference = -QuickSweep(p_x,p_y);   //valeur de position au départ
 
-		m_puzzle.m_pieces[p_x,p_y].RotatePiece (); //Fonction qui tourne la pièce ainsi que les valeurs qui lui sont attribbués
+		m_puzzle.m_pieces[p_x,p_y].RotatePiece (); //Fonction qui tourne la pièce ainsi que les valeurs qui lui sont attribués
 
 		difference += QuickSweep(p_x,p_y);   //valeur de position après rotation de la pièce
         
@@ -370,24 +372,24 @@ public class RobotPuzzleManager : MonoBehaviour {
 	{
 		float horizontalAxis = Input.GetAxis("Horizontal");
 		float verticalAxis = Input.GetAxis("Vertical");
-		bool selectorValidation = Input.GetKeyDown(KeyCode.Joystick1Button1);
-		
+		bool selectorValidation = Input.GetKeyDown(m_inputs.inputRobot);
+
 		if (!m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis >m_limitPosition || verticalAxis < -m_limitPosition)
 		{
 			
 			//déplacement du sélecteur
-			if (!m_hasMoved && horizontalAxis < -m_limitPosition && m_selector.x > 0) //Déplacement a gauche si position X sélecteur > position  X  première prefab instanciée
+			if (m_interactDetection.m_canMove && !m_hasMoved && horizontalAxis < -m_limitPosition && m_selector.x > 0) //Déplacement a gauche si position X sélecteur > position  X  première prefab instanciée
 			{
 				//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
 				if(m_puzzle.m_pieces[m_selector.x, m_selector.y].m_isEmptyPiece == false || m_canMoveOnEmpty) m_selector.x--;
 				m_hasMoved = true;
 			}
-			else if (!m_hasMoved && horizontalAxis > m_limitPosition && m_selector.x < m_puzzle.m_width - 1) //Déplacement à droite si position  X sélecteur < valeur largeur tableau prefab
+			else if (m_interactDetection.m_canMove && !m_hasMoved && horizontalAxis > m_limitPosition && m_selector.x < m_puzzle.m_width - 1) //Déplacement à droite si position  X sélecteur < valeur largeur tableau prefab
 			{
 				if(m_puzzle.m_pieces[m_selector.x, m_selector.y].m_isEmptyPiece == false || m_canMoveOnEmpty) m_selector.x++;		//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
 				m_hasMoved = true;
 			}
-			else if (!m_hasMoved && verticalAxis > m_limitPosition && m_selector.y < m_puzzle.m_height - 1) //Déplacement en haut si position Y sélecteur > position Y dernière prefab
+			else if (m_interactDetection.m_canMove && !m_hasMoved && verticalAxis > m_limitPosition && m_selector.y < m_puzzle.m_height - 1) //Déplacement en haut si position Y sélecteur > position Y dernière prefab
 			{
 				if (m_puzzle.m_pieces[m_selector.x, m_selector.y].m_isEmptyPiece == false || m_canMoveOnEmpty)
 				{
@@ -395,7 +397,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 					m_hasMoved = true;
 				}
 			}
-			else if (!m_hasMoved && verticalAxis < -m_limitPosition && m_selector.y > 0) //Déplacement en bas si position Y sélecteur < 0
+			else if (m_interactDetection.m_canMove && !m_hasMoved && verticalAxis < -m_limitPosition && m_selector.y > 0) //Déplacement en bas si position Y sélecteur < 0
 			{
 				if (m_puzzle.m_pieces[m_selector.x, m_selector.y].m_isEmptyPiece == false || m_canMoveOnEmpty)
 				{
@@ -430,38 +432,10 @@ public class RobotPuzzleManager : MonoBehaviour {
 		if (m_interactDetection.m_isInSubPuzzle && Input.GetKeyDown(m_inputs.inputMonster) || Input.GetKeyDown(m_inputs.inputHuman))
 		{
 			if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
-			gameObject.SetActive(false);
 		}
 
 	}
 
-	/// <summary>
-	/// Resize the current GameObject (must be a panel) in order to be a square without going out of the screen
-	/// </summary>
-	private void SquarePanelToScreen()
-	{
-		if (gameObject.TryGetComponent(out RectTransform thisRect)) 
-		{
-			thisRect.anchorMax = new Vector2(0.5f, 0.5f);
-			thisRect.anchorMin = new Vector2(0.5f, 0.5f);
-			
-			if (Screen.width >= Screen.height) {
-				thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Screen.height);
-				thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Screen.height);
-			} 
-			else {
-				Debug.Log("Dang it, that's a weird monitor you got there");
-				thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Screen.width);
-				thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Screen.width);
-			}
-			//Debug.Log(Screen.height);
-		} 
-		else {
-			Debug.LogError ("JEEZ ! THIS SCRIPT IS MEANT TO BE ON A PANEL NOT A RANDOM GAMEOBJECT ! GAME DESIGNER DO YOUR JOB !");
-		}
-	}
-	
-	
 	/// <summary>
 	/// Is called when this gameObject is setActive(false)
 	/// Is used to destroy everything it created
@@ -477,5 +451,4 @@ public class RobotPuzzleManager : MonoBehaviour {
 			Destroy(child.gameObject);
 		}
 	}
-	
 }
