@@ -185,7 +185,7 @@ public class MonsterPuzzle : MonoBehaviour
         
         float horizontalAxis = Input.GetAxis("Horizontal");
         float verticalAxis = Input.GetAxis("Vertical");
-        bool selectorValidation = Input.GetKeyDown(m_inputs.inputMonster);
+        bool selectorValidation = Input.GetKeyDown(KeyCode.Joystick1Button3);
         
 
         if (!m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis >m_limitPosition || verticalAxis < -m_limitPosition) {

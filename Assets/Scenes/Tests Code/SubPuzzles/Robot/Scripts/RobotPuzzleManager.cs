@@ -370,7 +370,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 	{
 		float horizontalAxis = Input.GetAxis("Horizontal");
 		float verticalAxis = Input.GetAxis("Vertical");
-		bool selectorValidation = Input.GetKeyDown(m_inputs.inputRobot);
+		bool selectorValidation = Input.GetKeyDown(KeyCode.Joystick1Button1);
 		
 		if (!m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis >m_limitPosition || verticalAxis < -m_limitPosition)
 		{
