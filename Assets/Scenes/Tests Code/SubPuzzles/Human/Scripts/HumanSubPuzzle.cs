@@ -392,26 +392,25 @@ public class HumanSubPuzzle : MonoBehaviour {
         
         float horizontalAxis = Input.GetAxis("Horizontal");
         float verticalAxis = Input.GetAxis("Vertical");
-        bool selectorValidation = Input.GetKeyDown(KeyCode.Joystick1Button0);
 
         if (!m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis >m_limitPosition || verticalAxis < -m_limitPosition) {
             
             Directions attemptedMovement = Directions.None;
             
             //We first stocks the way the player wants to go if he's not blocked by the limits of the maze
-            if (!m_hasMoved && horizontalAxis < -m_limitPosition && m_selector.x > 0) {
+            if (m_interactDetection.m_canMove && !m_hasMoved && horizontalAxis < -m_limitPosition && m_selector.x > 0) {
                 attemptedMovement = Directions.Left;
                 m_hasMoved = true;
             }
-            else if (!m_hasMoved && horizontalAxis > m_limitPosition && m_selector.x < m_maze.GetLength(1) - 1) {
+            else if (m_interactDetection.m_canMove && !m_hasMoved && horizontalAxis > m_limitPosition && m_selector.x < m_maze.GetLength(1) - 1) {
                 attemptedMovement = Directions.Right;
                 m_hasMoved = true;
             }
-            else if (!m_hasMoved && verticalAxis > m_limitPosition && m_selector.y < m_maze.GetLength(0) - 1) {
+            else if (m_interactDetection.m_canMove && !m_hasMoved && verticalAxis > m_limitPosition && m_selector.y < m_maze.GetLength(0) - 1) {
                 attemptedMovement = Directions.Up;
                 m_hasMoved = true;
             }
-            else if (!m_hasMoved && verticalAxis < -m_limitPosition && m_selector.y > 0) {
+            else if (m_interactDetection.m_canMove && !m_hasMoved && verticalAxis < -m_limitPosition && m_selector.y > 0) {
                 attemptedMovement = Directions.Down;
                 m_hasMoved = true;
             }
@@ -459,7 +458,6 @@ public class HumanSubPuzzle : MonoBehaviour {
         if (m_interactDetection.m_isInSubPuzzle && Input.GetKeyDown(m_inputs.inputMonster) || Input.GetKeyDown(m_inputs.inputRobot))
         {
             if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
-            gameObject.SetActive(false);
         }
         
     }
@@ -486,9 +484,8 @@ public class HumanSubPuzzle : MonoBehaviour {
         Debug.Log("IT'S A WIN !");
         
         m_interactDetection.m_achieved = true;  //le joueur est arrivé au bout
-        
+        m_interactDetection.m_canMove = false; //le joueur ne peut plus bouger le sélecteur
         if(m_interactDetection.enabled) m_interactDetection.PuzzleDeactivation();
-        gameObject.SetActive(false);
     }
 	
 	

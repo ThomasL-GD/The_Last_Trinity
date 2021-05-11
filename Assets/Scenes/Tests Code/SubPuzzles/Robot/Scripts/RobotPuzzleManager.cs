@@ -268,8 +268,8 @@ public class RobotPuzzleManager : MonoBehaviour {
 	public void Win()
 	{
 		m_interactDetection.m_achieved = true;
+		m_interactDetection.m_canMove = false;
 		if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
-		gameObject.SetActive(false);
 	}
 	
     
@@ -279,9 +279,10 @@ public class RobotPuzzleManager : MonoBehaviour {
 	/// </summary>
 	public void SweepPiece(int p_x, int p_y)
 	{
+		Debug.Log("test 2");
 		int difference = -QuickSweep(p_x,p_y);   //valeur de position au départ
 
-		m_puzzle.m_pieces[p_x,p_y].RotatePiece (); //Fonction qui tourne la pièce ainsi que les valeurs qui lui sont attribbués
+		m_puzzle.m_pieces[p_x,p_y].RotatePiece (); //Fonction qui tourne la pièce ainsi que les valeurs qui lui sont attribués
 
 		difference += QuickSweep(p_x,p_y);   //valeur de position après rotation de la pièce
         
@@ -371,24 +372,24 @@ public class RobotPuzzleManager : MonoBehaviour {
 	{
 		float horizontalAxis = Input.GetAxis("Horizontal");
 		float verticalAxis = Input.GetAxis("Vertical");
-		bool selectorValidation = Input.GetKeyDown(KeyCode.Joystick1Button1);
-		
+		bool selectorValidation = Input.GetKeyDown(m_inputs.inputRobot);
+
 		if (!m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis >m_limitPosition || verticalAxis < -m_limitPosition)
 		{
 			
 			//déplacement du sélecteur
-			if (!m_hasMoved && horizontalAxis < -m_limitPosition && m_selector.x > 0) //Déplacement a gauche si position X sélecteur > position  X  première prefab instanciée
+			if (m_interactDetection.m_canMove && !m_hasMoved && horizontalAxis < -m_limitPosition && m_selector.x > 0) //Déplacement a gauche si position X sélecteur > position  X  première prefab instanciée
 			{
 				//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
 				if(m_puzzle.m_pieces[m_selector.x, m_selector.y].m_isEmptyPiece == false || m_canMoveOnEmpty) m_selector.x--;
 				m_hasMoved = true;
 			}
-			else if (!m_hasMoved && horizontalAxis > m_limitPosition && m_selector.x < m_puzzle.m_width - 1) //Déplacement à droite si position  X sélecteur < valeur largeur tableau prefab
+			else if (m_interactDetection.m_canMove && !m_hasMoved && horizontalAxis > m_limitPosition && m_selector.x < m_puzzle.m_width - 1) //Déplacement à droite si position  X sélecteur < valeur largeur tableau prefab
 			{
 				if(m_puzzle.m_pieces[m_selector.x, m_selector.y].m_isEmptyPiece == false || m_canMoveOnEmpty) m_selector.x++;		//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
 				m_hasMoved = true;
 			}
-			else if (!m_hasMoved && verticalAxis > m_limitPosition && m_selector.y < m_puzzle.m_height - 1) //Déplacement en haut si position Y sélecteur > position Y dernière prefab
+			else if (m_interactDetection.m_canMove && !m_hasMoved && verticalAxis > m_limitPosition && m_selector.y < m_puzzle.m_height - 1) //Déplacement en haut si position Y sélecteur > position Y dernière prefab
 			{
 				if (m_puzzle.m_pieces[m_selector.x, m_selector.y].m_isEmptyPiece == false || m_canMoveOnEmpty)
 				{
@@ -396,7 +397,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 					m_hasMoved = true;
 				}
 			}
-			else if (!m_hasMoved && verticalAxis < -m_limitPosition && m_selector.y > 0) //Déplacement en bas si position Y sélecteur < 0
+			else if (m_interactDetection.m_canMove && !m_hasMoved && verticalAxis < -m_limitPosition && m_selector.y > 0) //Déplacement en bas si position Y sélecteur < 0
 			{
 				if (m_puzzle.m_pieces[m_selector.x, m_selector.y].m_isEmptyPiece == false || m_canMoveOnEmpty)
 				{
@@ -431,7 +432,6 @@ public class RobotPuzzleManager : MonoBehaviour {
 		if (m_interactDetection.m_isInSubPuzzle && Input.GetKeyDown(m_inputs.inputMonster) || Input.GetKeyDown(m_inputs.inputHuman))
 		{
 			if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
-			gameObject.SetActive(false);
 		}
 
 	}

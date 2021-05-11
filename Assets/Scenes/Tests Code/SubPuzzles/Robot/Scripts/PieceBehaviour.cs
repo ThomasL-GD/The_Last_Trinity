@@ -9,7 +9,6 @@ public class PieceBehaviour : MonoBehaviour
     [HideInInspector] public RobotPuzzleManager m_RobotPuzzleManager = null;
     
     [Tooltip("tableau des valeurs vraies ou fausses")] public bool[] m_values = null;
-    
     [SerializeField] [Tooltip("Vitesse de rotation des pièces")] private float m_speed = 10.0f;
     
     //Angle à partir de laquelle la pièce va se caler pour rotate dynamiquement
@@ -51,10 +50,7 @@ public class PieceBehaviour : MonoBehaviour
     {
         m_realRotation += 90;   //valeur de rotation
 
-        if (m_realRotation == 450)
-            m_realRotation = 90;
-        
-        //Debug.Log(m_realRotation);
+        if (m_realRotation == 450) m_realRotation = 90;
 
         RotateValues();    //rotation des valeurs
     }

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 
 public class Interact_Detection : MonoBehaviour
 {
@@ -22,8 +23,9 @@ public class Interact_Detection : MonoBehaviour
     
     public bool m_openDoor = false;
     [HideInInspector] [Tooltip("indicateur de réussite de subPuzzle")] public bool m_achieved = false;
+    [HideInInspector] [Tooltip("variable qui autorise le déplacement dans le subPuzzle")] public bool m_canMove = true;
+    [SerializeField] [Tooltip("Temps que l'écran de fin reste activé quand le subpuzzle est réussit")] [Range(0f,500f)] private float m_timer = 1f;
     
-
     private void Start()
     {
         if (m_puzzle == null) {
@@ -52,6 +54,8 @@ public class Interact_Detection : MonoBehaviour
         if (m_inputs == null) {
             Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO ADD THE INPUTS IN INTERACT_DETECTION !");
         }
+        
+        
     }
 
     private void Update()
@@ -103,20 +107,31 @@ public class Interact_Detection : MonoBehaviour
     /// </summary>
     public void PuzzleDeactivation()
     {
-        m_playerController.m_isForbiddenToMove = false;
-        
-        if (m_achieved == true)
-        {
-            m_activationButton.SetActive(false);
-            m_buttonActivate = false;
-            this.enabled = false;
+        if (m_achieved == true) {
+            StartCoroutine(EndLook());
         }
-        else
-        {
+        else {
+            m_playerController.m_isForbiddenToMove = false;
             m_activationButton.SetActive(true);
             m_buttonActivate = true;
             m_isInSubPuzzle = false;
+            m_puzzle.SetActive(false);
         }
+    }
+    
+    /// <summary>
+    /// Temps que le puzzle reste encore actif après réussite
+    /// </summary>
+    IEnumerator EndLook() {
+
+        yield return new WaitForSeconds(m_timer);
+
+        m_canMove = false;
+        m_puzzle.SetActive(false);
+        m_activationButton.SetActive(false);
+        m_buttonActivate = false;
+        m_playerController.m_isForbiddenToMove = false;
+        this.enabled = false;
     }
     
     
@@ -133,7 +148,6 @@ public class Interact_Detection : MonoBehaviour
                 m_playerController = charaScript;
                 m_activationButton.SetActive(true);
                 m_buttonActivate = true;
-                
             }
         }
         
