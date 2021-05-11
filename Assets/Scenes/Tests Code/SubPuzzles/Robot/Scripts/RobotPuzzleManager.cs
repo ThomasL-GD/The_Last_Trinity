@@ -435,8 +435,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 		}
 
 	}
-	
-	
+
 	/// <summary>
 	/// Is called when this gameObject is setActive(false)
 	/// Is used to destroy everything it created
@@ -452,5 +451,4 @@ public class RobotPuzzleManager : MonoBehaviour {
 			Destroy(child.gameObject);
 		}
 	}
-	
 }

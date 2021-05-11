@@ -187,7 +187,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &135304632
 PrefabInstance:
@@ -202,7 +202,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2709011857169168625, guid: 6083e2ab3f9d9874a856077562141f56, type: 3}
       propertyPath: m_timer
-      value: 3
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 2709011857169168625, guid: 6083e2ab3f9d9874a856077562141f56, type: 3}
       propertyPath: m_camera
@@ -210,7 +210,7 @@ PrefabInstance:
       objectReference: {fileID: 1031546554}
     - target: {fileID: 4259052466329631836, guid: 6083e2ab3f9d9874a856077562141f56, type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 4259052466329631836, guid: 6083e2ab3f9d9874a856077562141f56, type: 3}
       propertyPath: m_LocalPosition.x
@@ -251,6 +251,14 @@ PrefabInstance:
     - target: {fileID: 4259052466329631836, guid: 6083e2ab3f9d9874a856077562141f56, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6763997824056000105, guid: 6083e2ab3f9d9874a856077562141f56, type: 3}
+      propertyPath: m_puzzle.m_width
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6763997824056000105, guid: 6083e2ab3f9d9874a856077562141f56, type: 3}
+      propertyPath: m_puzzle.m_height
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7394581402424050771, guid: 6083e2ab3f9d9874a856077562141f56, type: 3}
       propertyPath: m_LocalPosition.x
@@ -637,7 +645,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3996719904508524687, guid: 8a5adbb57ea89094882c6c7cbb5f7164, type: 3}
       propertyPath: m_RootOrder
-      value: 4
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3996719904508524687, guid: 8a5adbb57ea89094882c6c7cbb5f7164, type: 3}
       propertyPath: m_LocalPosition.x
@@ -685,7 +693,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8390682086853772333, guid: 8a5adbb57ea89094882c6c7cbb5f7164, type: 3}
       propertyPath: m_timer
-      value: 3
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 8390682086853772333, guid: 8a5adbb57ea89094882c6c7cbb5f7164, type: 3}
       propertyPath: m_camera
@@ -793,7 +801,7 @@ Transform:
   - {fileID: 216461711}
   - {fileID: 662199562}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!1 &641011842
 GameObject:
@@ -827,7 +835,7 @@ Transform:
   - {fileID: 205744753}
   - {fileID: 952073404}
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &662199558
 GameObject:
@@ -983,7 +991,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 780364263}
-  m_LocalRotation: {x: 0.48734856, y: -0.0021382987, z: 0.0011934172, w: 0.8732042}
+  m_LocalRotation: {x: 0.4873485, y: -0.002138299, z: 0.0011934169, w: 0.8732042}
   m_LocalPosition: {x: 0.07876992, y: 15.41, z: -9.481777}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -1297,7 +1305,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!1 &1505053060 stripped
 GameObject:
@@ -1603,7 +1611,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2336672372731008466, guid: c57d7e2a2b0fbcf45a4c650f1a70caf1, type: 3}
       propertyPath: m_RootOrder
-      value: 3
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 2336672372731008466, guid: c57d7e2a2b0fbcf45a4c650f1a70caf1, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1647,12 +1655,24 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2685741725615250525, guid: c57d7e2a2b0fbcf45a4c650f1a70caf1, type: 3}
       propertyPath: m_timer
-      value: 3
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 2685741725615250525, guid: c57d7e2a2b0fbcf45a4c650f1a70caf1, type: 3}
       propertyPath: m_camera
       value: 
       objectReference: {fileID: 1031546554}
+    - target: {fileID: 3583066987470857220, guid: c57d7e2a2b0fbcf45a4c650f1a70caf1, type: 3}
+      propertyPath: m_debugMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3583066987470857220, guid: c57d7e2a2b0fbcf45a4c650f1a70caf1, type: 3}
+      propertyPath: m_mazeWidth
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3583066987470857220, guid: c57d7e2a2b0fbcf45a4c650f1a70caf1, type: 3}
+      propertyPath: m_mazeHeight
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 8794468579606654065, guid: c57d7e2a2b0fbcf45a4c650f1a70caf1, type: 3}
       propertyPath: m_Name
       value: HumanPuzzle
@@ -1668,7 +1688,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4145983062592664370, guid: f003976da38f7944b9948bca20225ac6, type: 3}
       propertyPath: m_timer
-      value: 3
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 4145983062592664370, guid: f003976da38f7944b9948bca20225ac6, type: 3}
       propertyPath: m_camera
@@ -1676,7 +1696,7 @@ PrefabInstance:
       objectReference: {fileID: 1031546554}
     - target: {fileID: 4150715988157924070, guid: f003976da38f7944b9948bca20225ac6, type: 3}
       propertyPath: m_RootOrder
-      value: 2
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 4150715988157924070, guid: f003976da38f7944b9948bca20225ac6, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1718,6 +1738,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4622563909794635407, guid: f003976da38f7944b9948bca20225ac6, type: 3}
+      propertyPath: m_arrayWidth
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4622563909794635407, guid: f003976da38f7944b9948bca20225ac6, type: 3}
+      propertyPath: m_arrayHeight
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4622563909794635407, guid: f003976da38f7944b9948bca20225ac6, type: 3}
+      propertyPath: m_nbAmalgamePieces
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 6659173275729363456, guid: f003976da38f7944b9948bca20225ac6, type: 3}
       propertyPath: m_Name
       value: MonsterPuzzle
@@ -1745,7 +1777,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1047692315363729588, guid: 06ba45be42bc0e940949ed6b96d10ec6, type: 3}
       propertyPath: m_RootOrder
-      value: 6
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1047692315363729588, guid: 06ba45be42bc0e940949ed6b96d10ec6, type: 3}
       propertyPath: m_AnchorMax.x
@@ -1819,6 +1851,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1047692316632580639, guid: 06ba45be42bc0e940949ed6b96d10ec6, type: 3}
+      propertyPath: m_arrayWidth
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1047692316632580639, guid: 06ba45be42bc0e940949ed6b96d10ec6, type: 3}
+      propertyPath: m_arrayHeight
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 06ba45be42bc0e940949ed6b96d10ec6, type: 3}
 --- !u!1001 &6590652176439020266
@@ -1830,7 +1870,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1102013299315327333, guid: 5a04c930a68b0694982f7b37b5504c75, type: 3}
       propertyPath: m_RootOrder
-      value: 8
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 1102013299315327333, guid: 5a04c930a68b0694982f7b37b5504c75, type: 3}
       propertyPath: m_LocalPosition.x

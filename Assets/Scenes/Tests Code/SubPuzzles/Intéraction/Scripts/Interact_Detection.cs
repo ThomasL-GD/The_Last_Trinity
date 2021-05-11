@@ -124,13 +124,13 @@ public class Interact_Detection : MonoBehaviour
     /// </summary>
     IEnumerator EndLook() {
 
+        m_playerController.m_isForbiddenToMove = false;
         yield return new WaitForSeconds(m_timer);
 
         m_canMove = false;
         m_puzzle.SetActive(false);
         m_activationButton.SetActive(false);
         m_buttonActivate = false;
-        m_playerController.m_isForbiddenToMove = false;
         this.enabled = false;
     }
     
@@ -150,7 +150,6 @@ public class Interact_Detection : MonoBehaviour
                 m_buttonActivate = true;
             }
         }
-        
     }
     
     /// <summary>
@@ -159,7 +158,7 @@ public class Interact_Detection : MonoBehaviour
     /// <param name="p_other"></param>
     private void OnTriggerExit(Collider p_other)
     {
-        m_playerController = null;
+        //m_playerController = null;
         m_activationButton.SetActive(false);
         m_buttonActivate = false;
     }
