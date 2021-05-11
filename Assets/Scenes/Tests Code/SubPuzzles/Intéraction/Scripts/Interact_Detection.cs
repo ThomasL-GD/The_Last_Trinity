@@ -103,6 +103,7 @@ public class Interact_Detection : MonoBehaviour
     /// </summary>
     public void PuzzleDeactivation()
     {
+        m_playerController.m_isForbiddenToMove = false;
         if (m_achieved == true)
         {
             m_activationButton.SetActive(false);
@@ -114,7 +115,6 @@ public class Interact_Detection : MonoBehaviour
             m_activationButton.SetActive(true);
             m_buttonActivate = true;
             m_isInSubPuzzle = false;
-            m_playerController.m_isForbiddenToMove = false;
         }
     }
     
