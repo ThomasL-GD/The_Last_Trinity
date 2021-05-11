@@ -106,7 +106,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 		}
 
 		//We resize the panel in order for it to be a square
-		SquarePanelToScreen();
+		m_interactDetection.SquarePanelToScreen();
 		
 		if (m_puzzle.m_width == 0 || m_puzzle.m_height == 0) {
 			Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE DIMENSIONS OF THE ARRAY !");
@@ -137,8 +137,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 			rectT.anchoredPosition = Vector2.zero;
 			
 			//We create a selector to stock its coordinates with int in order to have a better navigation
-			m_selector = new Selector(0, 0);
-			m_selector.rect = rectT;
+			m_selector = new Selector(0, 0) {rect = rectT};
 		}
 		else {
 			Debug.LogError ("JEEZ ! THE GAME DESIGNER PUT A WRONG PREFAB FOR THE SELECTOR, IT MUST BE A UI ELEMENT WITH A RECT TRANSFORM !");
@@ -435,32 +434,6 @@ public class RobotPuzzleManager : MonoBehaviour {
 			gameObject.SetActive(false);
 		}
 
-	}
-
-	/// <summary>
-	/// Resize the current GameObject (must be a panel) in order to be a square without going out of the screen
-	/// </summary>
-	private void SquarePanelToScreen()
-	{
-		if (gameObject.TryGetComponent(out RectTransform thisRect)) 
-		{
-			thisRect.anchorMax = new Vector2(0.5f, 0.5f);
-			thisRect.anchorMin = new Vector2(0.5f, 0.5f);
-			
-			if (Screen.width >= Screen.height) {
-				thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Screen.height);
-				thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Screen.height);
-			} 
-			else {
-				Debug.Log("Dang it, that's a weird monitor you got there");
-				thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Screen.width);
-				thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Screen.width);
-			}
-			//Debug.Log(Screen.height);
-		} 
-		else {
-			Debug.LogError ("JEEZ ! THIS SCRIPT IS MEANT TO BE ON A PANEL NOT A RANDOM GAMEOBJECT ! GAME DESIGNER DO YOUR JOB !");
-		}
 	}
 	
 	

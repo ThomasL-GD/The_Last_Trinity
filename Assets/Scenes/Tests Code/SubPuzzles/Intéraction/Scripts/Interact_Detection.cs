@@ -8,7 +8,7 @@ public class Interact_Detection : MonoBehaviour
 
     [Header("Player")]
     [SerializeField] [Tooltip("personnage qui fait le subpuzzle")] private Charas m_chara = 0;
-    [SerializeField] [Tooltip("camera à attacher au joueur pour le bouton d'activation au-dessus")] private Transform m_camera;
+    [SerializeField] [Tooltip("Main Camera devrait marcher")] private Transform m_camera;
     [SerializeField] [Tooltip("boutons d'intéractions de la manette")] private SOInputMultiChara m_inputs = null;
     [Tooltip("script chara")] private PlayerController m_playerController = null;
 
@@ -75,10 +75,6 @@ public class Interact_Detection : MonoBehaviour
                 //Input et bouton visible ==> entrée dans subpuzzle 
                 if (input) {
 
-                    m_puzzle.SetActive(true);
-                    m_isInSubPuzzle = true;
-                    m_buttonActivate = false;
-
                     if (m_chara == Charas.Human) {
                         m_puzzle.GetComponent<HumanSubPuzzle>().m_interactDetection = this;
                     }
@@ -88,6 +84,10 @@ public class Interact_Detection : MonoBehaviour
                     else if (m_chara == Charas.Robot) {
                         m_puzzle.GetComponent<RobotPuzzleManager>().m_interactDetection = this;
                     }
+
+                    m_puzzle.SetActive(true);
+                    m_isInSubPuzzle = true;
+                    m_buttonActivate = false;
                 }
             }
             else m_activationButton.SetActive(false);
@@ -150,6 +150,34 @@ public class Interact_Detection : MonoBehaviour
         m_playerController = null;
         m_activationButton.SetActive(false);
         m_buttonActivate = false;
+    }
+    
+    /// <summary>
+    /// Resize the current GameObject (must be a panel) in order to be a square without going out of the screen
+    /// </summary>
+    public void SquarePanelToScreen()
+    {
+        if (m_puzzle.TryGetComponent(out RectTransform thisRect)) 
+        {
+            thisRect.anchorMax = new Vector2(0.5f, 0.5f);
+            thisRect.anchorMin = new Vector2(0.5f, 0.5f);
+			
+            if (Screen.width >= Screen.height) {
+                thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Screen.height);
+                thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Screen.height);
+            } 
+            else {
+                Debug.Log("Dang it, that's a weird monitor you got there");
+                thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Screen.width);
+                thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Screen.width);
+            }
+            thisRect.localPosition = Vector3.zero;
+            thisRect.anchoredPosition = Vector2.zero;
+            //Debug.Log(Screen.height);
+        } 
+        else {
+            Debug.LogError ("JEEZ ! THIS SCRIPT IS MEANT TO BE ON A PANEL NOT A RANDOM GAMEOBJECT ! GAME DESIGNER DO YOUR JOB !");
+        }
     }
     
     //if(delegator !=null) delegator();
