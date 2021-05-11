@@ -19,9 +19,9 @@ public class Interact_Detection : MonoBehaviour
     [HideInInspector] [Tooltip("variable booléènne qui indique le passage entre le jeu et sub puzzle")] public bool m_isInSubPuzzle = false;
     [SerializeField] [Tooltip("Bouton qui apparait afin de déclencher le puzzle")] private GameObject m_activationButton;
     [HideInInspector] [Tooltip("contrôle d'état du trigger du bouton permettant d'activer le sub puzzle")] private bool m_buttonActivate = false;
-
-    [HideInInspector] [Tooltip("indicateur de réussite de subPuzzle")] public bool m_achieved = false;
     
+    public bool m_openDoor = false;
+    [HideInInspector] [Tooltip("indicateur de réussite de subPuzzle")] public bool m_achieved = false;
     
 
     private void Start()
@@ -104,6 +104,7 @@ public class Interact_Detection : MonoBehaviour
     public void PuzzleDeactivation()
     {
         m_playerController.m_isForbiddenToMove = false;
+        
         if (m_achieved == true)
         {
             m_activationButton.SetActive(false);

@@ -10,6 +10,7 @@ using Cinemachine;
 /// </summary>
 public class PlayerController : MonoBehaviour
 {
+    [Header("Player Controller")]
     
     [SerializeField] [Tooltip("Vitesse du joueur")] private float m_speed = 5f;
     [SerializeField] [Tooltip("Vitesse de Rotation du Quaternion")] private float m_rotationSpeed = 700f;
@@ -26,9 +27,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     [Tooltip("The prefab of what represents the soul, it will be driven from a character to another when a switch occurs")] private GameObject m_soulPrefab = null;
     
+    [Header("Death Manager")]
+    
     [SerializeField] [Range(0.2f, 5f)] [Tooltip("The time the player is allowed to stay in this death zone (unit : seconds)")] private float m_timeBeforeDying = 0.5f;
     private float m_deathCounter = 0.0f;
     private bool m_isDying = false;
+    [HideInInspector] public Vector3 m_spawnPoint = Vector3.zero;
 
     //Cinemachine cameras des trois personnages
     private CinemachineVirtualCamera m_vCamH;
@@ -37,7 +41,7 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        DeathManager.DeathDelegator += ResetValues;
+        DeathManager.DeathDelegator += Death;
 
         //We create an array (because it's easier to manipulate) of all the inputs of the characters
         m_keyCodes[0] = m_selector.inputHuman;
@@ -49,6 +53,9 @@ public class PlayerController : MonoBehaviour
         m_vCamR = GameObject.FindGameObjectWithTag("Camera Robot")?.GetComponent<CinemachineVirtualCamera>();
         
         if (m_chara == Charas.Human) m_isActive = true;
+
+        //We set the first spawnpoint at its original position
+        m_spawnPoint = transform.position;
 
     #if UNITY_EDITOR
         if(m_vCamH == null) Debug.LogError("Aucune caméra avec le tag Camera Humain");
@@ -67,6 +74,10 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+
+        // TODO technique a verifier dans le projet complet
+        if (Time.timeScale == 0) return;
+        
         //If the character is in a transition between two characters
         if (!m_isSwitchingChara) {
             
@@ -91,32 +102,34 @@ public class PlayerController : MonoBehaviour
             }
 
             //We activate this chara if its corresponding input is pressed
-            if (!s_inBetweenSwitching && Input.GetKeyDown(m_keyCodes[(int)m_chara]))
-            {
-                switch (m_chara)
-                {
-                    case Charas.Human:
-                        m_vCamH.Priority = 2;
-                        m_vCamM.Priority = 1;
-                        m_vCamR.Priority = 0;
-                        break;
-                    case Charas.Monster:
-                        m_vCamH.Priority = 1;
-                        m_vCamM.Priority = 2;
-                        m_vCamR.Priority = 0;
-                        break;
-                    case Charas.Robot:
-                        m_vCamH.Priority = 0;
-                        m_vCamM.Priority = 1;
-                        m_vCamR.Priority = 2;
-                        break;
-                    default:
-                        Debug.LogError("Incorrect parameter on m_chara");
-                        break;
+            if (Input.GetKeyDown(m_keyCodes[(int)m_chara])) {
+                if (!m_isActive && !s_inBetweenSwitching) {
+                    
+                    switch (m_chara) {
+                        case Charas.Human:
+                            m_vCamH.Priority = 2;
+                            m_vCamM.Priority = 1;
+                            m_vCamR.Priority = 0;
+                            break;
+                        case Charas.Monster:
+                            m_vCamH.Priority = 1;
+                            m_vCamM.Priority = 2;
+                            m_vCamR.Priority = 0;
+                            break;
+                        case Charas.Robot:
+                            m_vCamH.Priority = 0;
+                            m_vCamM.Priority = 1;
+                            m_vCamR.Priority = 2;
+                            break;
+                        default:
+                            Debug.LogError("Incorrect parameter on m_chara");
+                            break;
+                    }
+                    m_isSwitchingChara = true;
+                    s_inBetweenSwitching = true;
+                    StartCoroutine(SwitchTimer());
+                    
                 }
-                m_isSwitchingChara = true;
-                s_inBetweenSwitching = true;
-                StartCoroutine(SwitchTimer());
             }
             //If any other input corresponding to another character is pressed, we inactive this chara
             else if (Input.GetKeyDown(m_keyCodes[0]) || Input.GetKeyDown(m_keyCodes[1]) || Input.GetKeyDown(m_keyCodes[2])){
@@ -183,8 +196,11 @@ public class PlayerController : MonoBehaviour
     /// <summary>
     /// For safety, we reset a few values in case of death & respawn
     /// </summary>
-    private void ResetValues() {
+    private void Death() {
+        //Reset of all death-related values
         m_isDying = false;
         m_deathCounter = 0.0f;
+
+        transform.position = m_spawnPoint;
     }
 }

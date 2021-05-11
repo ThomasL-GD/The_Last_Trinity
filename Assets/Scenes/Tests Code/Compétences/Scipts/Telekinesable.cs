@@ -4,26 +4,29 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-public class CompRobot : MonoBehaviour
+public class Telekinesable : MonoBehaviour
 {
+    [Header("Inputs")]
     [SerializeField] [Tooltip("The input used to select this character")] private SOInputMultiChara m_selector = null;
-    private bool m_telekinesieOpen = false;
-    private bool m_activeTelekinesie = false;
-    private bool m_isInBetweenTravel = false;
-
-    private Vector3 m_originalPos;
-    private Vector3 m_targetPos;
-    [SerializeField] [Tooltip("Time of Travel")] [Range(0.1f, 3f)] private float m_smoothTime = 1f;
-    [SerializeField] [Tooltip("Height of Travel")] [Range(1f, 30f)] private float m_teleVal = 10f;
     
+    private bool m_telekinesieOpen = false; //Possibilité d'activer la télékinésie avec la touche de compétence du Robot
+    private bool m_activeTelekinesie = false; //Télékinésie en Activation
+    private bool m_isInBetweenTravel = false; //Caisse est en mouvement
+
+    private Vector3 m_originalPos; //Position originale de la caisse au Start
+    private Vector3 m_targetPos; //Position Résultante arpès le déplacement et le clamping
+    
+    [Header("Téléknésie")]
+    [SerializeField] [Tooltip("Time of Travel")] [Range(0.1f, 3f)] private float m_smoothTime = 1f; //Temps pour que la caisse atteigne son point d'arrivé
+    [SerializeField] [Tooltip("Height of Travel")] [Range(1f, 30f)] private float m_teleVal = 10f; //Hauteur de la Télékinésie
+    
+    [Header("Clamping")]
     [SerializeField] [Tooltip("Un slider d'int")] [Range(0, 4)] private int m_unSliderDint = 2;
     //[SerializeField] [Tooltip("The maximum authorized difference between the position to reach and the current position (unit : Unity meters)")] [Range(0f, 1f)] private float m_uncertainty = 0.1f;
-    private Vector3 m_velocity = Vector3.zero;
-
-    private PlayerController m_robotScript = null;
+   
+    private Vector3 m_velocity = Vector3.zero; //Vélocité 0 pour le smoothDamp
+    private PlayerController m_robotScript = null; //Récupération du script du plauerController pour obtenir le Robot
     
-
-
     void Start()
     {
         m_originalPos = transform.position;
@@ -35,7 +38,7 @@ public class CompRobot : MonoBehaviour
             Debug.LogError("Manque le scriptable object d'input");
         }    
     }
-
+    
     private void Update()
     {
         Vector3 posClamp = ClampEnjoyer(transform.position);
@@ -71,13 +74,10 @@ public class CompRobot : MonoBehaviour
         }
     }
 
-    IEnumerator SmoothDown(bool p_activeTelekinesie)
-    {
-        yield return new WaitForSeconds(m_smoothTime);
-        if (!p_activeTelekinesie)m_robotScript.m_isForbiddenToMove = false;
-        m_isInBetweenTravel = false;
-    }
-
+    /// <summary>
+    /// Permet au joueur (p_other) d'activer la télékinésie qu'à l'entrée de la zone
+    /// </summary>
+    /// <param name="p_other"></param>
     private void OnTriggerEnter(Collider p_other)
     {
         if (p_other.gameObject.TryGetComponent(out PlayerController player))
@@ -89,7 +89,11 @@ public class CompRobot : MonoBehaviour
             }
         }
     }
-
+    
+    /// <summary>
+    /// Désactive la possibilité de pouvoir utiliser la télékinésie à la sortie de la zone
+    /// </summary>
+    /// <param name="p_other"></param>
     private void OnTriggerExit(Collider p_other)
     {
         if (p_other.gameObject.TryGetComponent(out PlayerController player))
@@ -104,6 +108,11 @@ public class CompRobot : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Permet de clamper la position d'un Vector3 (p_pos) pour éviter qu'elle ne décroisse indéfiniment après le SmoothDamp
+    /// </summary>
+    /// <param name="p_pos"></param>
+    /// <returns></returns>
     private Vector3 ClampEnjoyer(Vector3 p_pos)
     {
         float pow = Mathf.Pow(10, m_unSliderDint);

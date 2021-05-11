@@ -14,7 +14,7 @@ public class DeathManager : MonoBehaviour {
     public static Death DeathDelegator;
     
         
-        //All of the tabulated code under is what it take to make a singleton
+        //All of the tabulated code under is what it takes to make a singleton
         [SerializeField] private string m_objectName = "";
         private static DeathManager m_instance;
 
@@ -58,14 +58,11 @@ public class DeathManager : MonoBehaviour {
         
     //The "real" code starts here
     private void Start() {
-        DeathDelegator += ReplaceElements;
+        //Not used right now, may be useful later
+        //DeathDelegator += ReplaceElements;
 
         for (int i = 0; i < m_objectsToRespawn.Count; i++) {
             m_saveState.Add(m_objectsToRespawn[i].transform.position);
-        }
-
-        if (m_objectsToRespawn.Count == 0) {
-            Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT OBJECTS IN THE DEATH MANAGER ! WHAT A JACKA$$");
         }
     }
 
