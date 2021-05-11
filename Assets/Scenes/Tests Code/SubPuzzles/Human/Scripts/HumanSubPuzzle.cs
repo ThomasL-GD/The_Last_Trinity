@@ -442,7 +442,6 @@ public class HumanSubPuzzle : MonoBehaviour {
                 SetRectPosition(m_player, m_selector.x, m_selector.y);
             }
 
-            Debug.Log($"X : {m_selector.x}        Y : {m_selector.y}");
         }
         
         //Joystick se recentre sur la manette

@@ -87,16 +87,12 @@ public class Interact_Detection : MonoBehaviour
 
                     m_puzzle.SetActive(true);
                     m_isInSubPuzzle = true;
+                    m_playerController.m_isForbiddenToMove = true; //We forbid the movements for the player
                     m_buttonActivate = false;
                 }
             }
             else m_activationButton.SetActive(false);
-
-
-            if (m_isInSubPuzzle && m_chara == Charas.Robot && Input.GetKeyDown(m_inputs.inputMonster) || Input.GetKeyDown(m_inputs.inputHuman)) {
-                Debug.Log("Vous arretez le subpuzzle en cours");
-                //PuzzleDeactivation();
-            }
+            
         }
 
     }
@@ -118,6 +114,7 @@ public class Interact_Detection : MonoBehaviour
             m_activationButton.SetActive(true);
             m_buttonActivate = true;
             m_isInSubPuzzle = false;
+            m_playerController.m_isForbiddenToMove = false;
         }
     }
     
@@ -179,7 +176,4 @@ public class Interact_Detection : MonoBehaviour
             Debug.LogError ("JEEZ ! THIS SCRIPT IS MEANT TO BE ON A PANEL NOT A RANDOM GAMEOBJECT ! GAME DESIGNER DO YOUR JOB !");
         }
     }
-    
-    //if(delegator !=null) delegator();
-    //delegator?.Invoke();
 }
