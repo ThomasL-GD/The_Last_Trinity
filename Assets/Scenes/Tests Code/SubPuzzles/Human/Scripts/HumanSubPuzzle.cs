@@ -43,6 +43,7 @@ public class HumanSubPuzzle : MonoBehaviour {
     
     [Header("Debug")]
     [SerializeField] [Tooltip("If on, the walls will be displayed for debug")] private bool m_debugMode = false;
+    [SerializeField] [Tooltip("If on, the walls will be displayed once the sub-puzzle is done\nIs useless if debug mode is already on")] private bool m_halfDebugMode = true;
     [SerializeField] [Tooltip("For debug only")] private GameObject m_prefabUp = null;
     [SerializeField] [Tooltip("For debug only")] private GameObject m_prefabLeft = null;
     [SerializeField] [Tooltip("For debug only")] private GameObject m_prefabRight = null;
@@ -146,33 +147,8 @@ public class HumanSubPuzzle : MonoBehaviour {
 
         //Visual representation
         if (m_debugMode) {
-        
-            for (int i = 0; i < m_maze.GetLength(0); i++) {
-                for (int j = 0; j < m_maze.GetLength(1); j++) {
-
-                    GameObject instance = Instantiate(m_prefabBG, new Vector3(transform.position.x, transform.position.y, transform.position.z + 0.5f), transform.rotation, gameObject.transform);
-                    SetRectPosition(instance,j,i);
-                    instance.transform.SetSiblingIndex(0);
-
-                    if (m_maze[i, j].HasFlag(Directions.Up)) {
-                        instance = Instantiate(m_prefabUp, transform.position, transform.rotation, gameObject.transform);
-                        SetRectPosition(instance,j,i);
-                    }
-                    if (m_maze[i, j].HasFlag(Directions.Down)) {
-                        instance = Instantiate(m_prefabDown, transform.position, transform.rotation, gameObject.transform);
-                        SetRectPosition(instance,j,i);
-                    }
-                    if (m_maze[i, j].HasFlag(Directions.Left)) {
-                        instance = Instantiate(m_prefabLeft, transform.position, transform.rotation, gameObject.transform);
-                        SetRectPosition(instance,j,i);
-                    }
-                    if (m_maze[i, j].HasFlag(Directions.Right)) {
-                        instance = Instantiate(m_prefabRight, transform.position, transform.rotation, gameObject.transform);
-                        SetRectPosition(instance,j,i);
-                    }
-                
-                }
-            }
+            
+            GenerateVisualRepresentation();
         }
         else { // If we're not in debug mode, we just display the background
         
@@ -387,6 +363,38 @@ public class HumanSubPuzzle : MonoBehaviour {
         return possibleOutcome[Random.Range(0,possibleOutcome.Count)];
     }
 
+    /// <summary>
+    /// Will display the walls on the maze
+    /// </summary>
+    void GenerateVisualRepresentation() {
+        for (int i = 0; i < m_maze.GetLength(0); i++) {
+            for (int j = 0; j < m_maze.GetLength(1); j++) {
+
+                GameObject instance = Instantiate(m_prefabBG, new Vector3(transform.position.x, transform.position.y, transform.position.z + 0.5f), transform.rotation, gameObject.transform);
+                SetRectPosition(instance,j,i);
+                instance.transform.SetSiblingIndex(0);
+
+                if (m_maze[i, j].HasFlag(Directions.Up)) {
+                    instance = Instantiate(m_prefabUp, transform.position, transform.rotation, gameObject.transform);
+                    SetRectPosition(instance,j,i);
+                }
+                if (m_maze[i, j].HasFlag(Directions.Down)) {
+                    instance = Instantiate(m_prefabDown, transform.position, transform.rotation, gameObject.transform);
+                    SetRectPosition(instance,j,i);
+                }
+                if (m_maze[i, j].HasFlag(Directions.Left)) {
+                    instance = Instantiate(m_prefabLeft, transform.position, transform.rotation, gameObject.transform);
+                    SetRectPosition(instance,j,i);
+                }
+                if (m_maze[i, j].HasFlag(Directions.Right)) {
+                    instance = Instantiate(m_prefabRight, transform.position, transform.rotation, gameObject.transform);
+                    SetRectPosition(instance,j,i);
+                }
+                
+            }
+        }
+    }
+
     // Update is called once per frame
     void Update() {
         
@@ -485,6 +493,7 @@ public class HumanSubPuzzle : MonoBehaviour {
         
         m_interactDetection.m_achieved = true;  //le joueur est arrivé au bout
         m_interactDetection.m_canMove = false; //le joueur ne peut plus bouger le sélecteur
+        if(m_halfDebugMode && !m_debugMode) GenerateVisualRepresentation();
         if(m_interactDetection.enabled) m_interactDetection.PuzzleDeactivation();
     }
 	
