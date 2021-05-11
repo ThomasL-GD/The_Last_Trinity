@@ -55,7 +55,7 @@ public class HumanSubPuzzle : MonoBehaviour {
     /// </summary>
     void OnEnable() {
         
-        SquarePanelToScreen();
+        m_interactDetection.SquarePanelToScreen();
         
 
         if (m_mazeHeight < 2 || m_mazeWidth < 2) {
@@ -442,7 +442,6 @@ public class HumanSubPuzzle : MonoBehaviour {
                 SetRectPosition(m_player, m_selector.x, m_selector.y);
             }
 
-            Debug.Log($"X : {m_selector.x}        Y : {m_selector.y}");
         }
         
         //Joystick se recentre sur la manette
@@ -479,32 +478,6 @@ public class HumanSubPuzzle : MonoBehaviour {
             goRect.localPosition = Vector3.zero;
 
             goRect.anchoredPosition = Vector2.zero;
-        }
-    }
-    
-    /// <summary>
-    /// Resize the current GameObject (must be a panel) in order to be a square without going out of the screen
-    /// </summary>
-    private void SquarePanelToScreen()
-    {
-        if (gameObject.TryGetComponent(out RectTransform thisRect)) 
-        {
-            thisRect.anchorMax = new Vector2(0.5f, 0.5f);
-            thisRect.anchorMin = new Vector2(0.5f, 0.5f);
-			
-            if (Screen.width >= Screen.height) {
-                thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Screen.height);
-                thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Screen.height);
-            } 
-            else {
-                Debug.Log("Dang it, that's a weird monitor you got there");
-                thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Screen.width);
-                thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Screen.width);
-            }
-            //Debug.Log(Screen.height);
-        } 
-        else {
-            Debug.LogError ("JEEZ ! THIS SCRIPT IS MEANT TO BE ON A PANEL NOT A RANDOM GAMEOBJECT ! GAME DESIGNER DO YOUR JOB !");
         }
     }
 

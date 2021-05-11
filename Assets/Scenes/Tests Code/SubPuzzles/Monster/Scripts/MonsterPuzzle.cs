@@ -53,7 +53,7 @@ public class MonsterPuzzle : MonoBehaviour
     
     // OnEnable is called before the first frame update
     void OnEnable() {
-        SquarePanelToScreen();
+        m_interactDetection.SquarePanelToScreen();
         
         //We calculate the size of each cell
         m_offset = 0f;
@@ -285,34 +285,6 @@ public class MonsterPuzzle : MonoBehaviour
         {
             if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
             gameObject.SetActive(false);
-        }
-    }
-    
-    /// <summary>
-    /// Resize the current GameObject (must be a panel) in order to be a square without going out of the screen
-    /// </summary>
-    private void SquarePanelToScreen()
-    {
-        if (gameObject.TryGetComponent(out RectTransform thisRect)) 
-        {
-            thisRect.anchorMax = new Vector2(0.5f, 0.5f);
-            thisRect.anchorMin = new Vector2(0.5f, 0.5f);
-			
-            if (Screen.width >= Screen.height) {
-                thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Screen.height);
-                thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Screen.height);
-            } 
-            else {
-                Debug.Log("Dang it, that's a weird monitor you got there");
-                thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Screen.width);
-                thisRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Screen.width);
-            }
-            thisRect.localPosition = Vector3.zero;
-            thisRect.anchoredPosition = Vector2.zero;
-            //Debug.Log(Screen.height);
-        } 
-        else {
-            Debug.LogError ("JEEZ ! THIS SCRIPT IS MEANT TO BE ON A PANEL NOT A RANDOM GAMEOBJECT ! GAME DESIGNER DO YOUR JOB !");
         }
     }
 
