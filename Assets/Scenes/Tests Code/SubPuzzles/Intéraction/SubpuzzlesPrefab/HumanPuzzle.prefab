@@ -197,7 +197,10 @@ MonoBehaviour:
   m_wallsToRemoveAfterBreaking: 15
   m_prefabPlayer: {fileID: 7763611416509085909, guid: a5a99614b26a1ab41a02d5f452e8136a, type: 3}
   m_prefabBG: {fileID: 7763611416509085909, guid: 8f0d2bfcce7368d44b7c7417a0ce171c, type: 3}
+  m_prefabpathVisualition: {fileID: 7763611416509085909, guid: 3030cbeefe9cceb4ca9251aa43ded6dd, type: 3}
+  m_playerPath: []
   m_debugMode: 0
+  m_halfDebugMode: 1
   m_prefabUp: {fileID: 7763611416509085909, guid: 34d2ad3be33eb5e4e9e67565b6fbc521, type: 3}
   m_prefabLeft: {fileID: 7763611416509085909, guid: 78927ac03efd61f43855b6b9460eaa48, type: 3}
   m_prefabRight: {fileID: 7763611416509085909, guid: 1371b9d4dbe9d2b4b94059e205f173bc, type: 3}
@@ -509,7 +512,10 @@ MonoBehaviour:
   m_puzzle: {fileID: 4398357675146883271}
   m_isInSubPuzzle: 0
   m_activationButton: {fileID: 5349885515339508944}
+  m_openDoor: 0
   m_achieved: 0
+  m_canMove: 1
+  m_timer: 1
 --- !u!1 &7368778132753723575
 GameObject:
   m_ObjectHideFlags: 0

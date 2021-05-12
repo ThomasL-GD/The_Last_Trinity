@@ -18,7 +18,8 @@ public class HumanSubPuzzle : MonoBehaviour {
     }
     
     private Selector m_selector = new Selector(0,0); //Contains the coordinates of our selector aka the position of th player
-    private GameObject m_player = null; //Contains the coordinates of our selector aka the position of th player
+    private GameObject m_player = null; //Contains the coordinates of our selector aka the position of the player
+    //private GameObject m_pathVisualisation = null; //Contains the coordinates of our selector aka the position of the player
     [HideInInspector] [Tooltip("Script d'intéraction entre le personnage et l'objet comprenant le subpuzzle")] public Interact_Detection m_interactDetection = null;
     
     [Header("Input Manager")]
@@ -40,6 +41,10 @@ public class HumanSubPuzzle : MonoBehaviour {
     [Header("Prefabs for visual representation")]
     [SerializeField] [Tooltip("The visual representation of the player")] private GameObject m_prefabPlayer = null;
     [SerializeField] [Tooltip("The prefab of the background")] private GameObject m_prefabBG = null;
+    [SerializeField] [Tooltip("The visual representation of the path of the player")] private GameObject m_prefabPathVisualition = null;
+    [SerializeField] [Tooltip("List that shows the path of the player")] private List<RectTransform> m_playerPath = new List<RectTransform>();
+    //[SerializeField] [Tooltip("List that shows the path of the player")] private List<GameObject> m_playerPath = new List<GameObject>();
+    
     
     [Header("Debug")]
     [SerializeField] [Tooltip("If on, the walls will be displayed for debug")] private bool m_debugMode = false;
@@ -55,6 +60,8 @@ public class HumanSubPuzzle : MonoBehaviour {
     /// In our case, it will initialize the maze
     /// </summary>
     void OnEnable() {
+        
+
         
         m_interactDetection.SquarePanelToScreen();
         
@@ -119,7 +126,7 @@ public class HumanSubPuzzle : MonoBehaviour {
             //Now it's time to break random walls again
             for (int i = 0; i < m_wallsToRemoveAfterBreaking; i++) {
             
-                //The selector has its x and y reversed becaus eof the EraseRandomWall function
+                //The selector has its x and y reversed because of the EraseRandomWall function
                 Selector select = new Selector(Random.Range(0, m_maze.GetLength(1)), Random.Range(0, m_maze.GetLength(0)));
                 EraseRandomWall(select);
             
@@ -163,17 +170,35 @@ public class HumanSubPuzzle : MonoBehaviour {
         }
         
         //Player sprite instantiate
-        if (m_prefabPlayer != null) {
+        if (m_prefabPlayer != null)
+        {
             m_player = Instantiate(m_prefabPlayer, new Vector3(0, 0, 0), transform.rotation, gameObject.transform);
-            SetRectPosition(m_player, 0, m_mazeHeight - 1);
+            SetRectPosition(m_player, 0, m_mazeHeight - 1); //base position of the selector
             m_player.transform.SetSiblingIndex(m_mazeHeight*m_mazeWidth+1);
             m_selector.x = 0;
             m_selector.y = m_mazeHeight - 1;
+
+            GameObject instance = Instantiate(m_prefabPathVisualition, transform.position, transform.rotation, gameObject.transform);
+            RectTransform rt = instance.GetComponent<RectTransform>();
+            SetRectPosition(rt, m_selector.x, m_selector.y);
+            instance.SetActive(false);
+            m_playerPath.Add(rt);
         }
         else {
             Debug.LogError("Missing prefab for the player in the Human SubPuzzle script");
         }
 
+        AddToPath();
+    }
+
+    private void AddToPath()
+    {
+        //instanciation de la première prefab dans la liste de m_playerPath
+        GameObject instance = Instantiate(m_prefabPathVisualition, transform.position, transform.rotation, gameObject.transform);
+        RectTransform rt = instance.GetComponent<RectTransform>();
+        SetRectPosition(rt, m_selector.x, m_selector.y);
+        instance.SetActive(false);
+        m_playerPath.Add(rt);
     }
 
     /// <summary>
@@ -374,6 +399,7 @@ public class HumanSubPuzzle : MonoBehaviour {
                 SetRectPosition(instance,j,i);
                 instance.transform.SetSiblingIndex(0);
 
+                
                 if (m_maze[i, j].HasFlag(Directions.Up)) {
                     instance = Instantiate(m_prefabUp, transform.position, transform.rotation, gameObject.transform);
                     SetRectPosition(instance,j,i);
@@ -393,20 +419,30 @@ public class HumanSubPuzzle : MonoBehaviour {
                 
             }
         }
+
+
+       // while (m_playerPath.Count > 0) m_playerPath.Dequeue().SetActive(true);
+       foreach (var rt in m_playerPath)
+           rt.gameObject.SetActive(true);
+
     }
 
+
+    
     // Update is called once per frame
     void Update() {
         
         float horizontalAxis = Input.GetAxis("Horizontal");
         float verticalAxis = Input.GetAxis("Vertical");
 
-        if (!m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis >m_limitPosition || verticalAxis < -m_limitPosition) {
-            
-            Directions attemptedMovement = Directions.None;
+        if ( !m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis >m_limitPosition || verticalAxis < -m_limitPosition)
+        {
+            Directions attemptedMovement = Directions.None; //No directions at start
             
             //We first stocks the way the player wants to go if he's not blocked by the limits of the maze
             if (m_interactDetection.m_canMove && !m_hasMoved && horizontalAxis < -m_limitPosition && m_selector.x > 0) {
+                
+                //attempting left movement
                 attemptedMovement = Directions.Left;
                 m_hasMoved = true;
             }
@@ -434,19 +470,51 @@ public class HumanSubPuzzle : MonoBehaviour {
                     case Directions.Left:
                         m_selector.x--;
                         break;
+                    
                     case Directions.Right:
                         m_selector.x++;
                         break;
+                    
                     case Directions.Up:
                         m_selector.y++;
                         break;
+                    
                     case Directions.Down:
                         m_selector.y--;
                         break;
                 }
 
+
+                
+                //variable qui indique si une case a déja été visité ou non
+                bool alreadyPassed = false;
+                
+                Vector2 currentAnchorMin = new Vector2(m_offset * m_selector.x, m_offset * m_selector.y);
+                Vector2 currentAnchorMax = new Vector2(m_offset * (m_selector.x + 1), m_offset * (m_selector.y + 1));
+                
+                // Recherche dans la liste PlayerPath
+                foreach (var rt in m_playerPath)
+                {
+                    //vérification si la case a déjà été visité
+                    if (rt.anchorMin == currentAnchorMin && rt.anchorMax == currentAnchorMax) alreadyPassed = true;
+                }
+                
+                // Si cette case a deja ete visité
+                if (alreadyPassed){
+                    // on enlève de la liste PlayerPath le dernier prefab intégré
+                    for (int i = m_playerPath.Count - 1; i >= 0; i--) {
+                        if (m_playerPath[i].anchorMin == currentAnchorMin && m_playerPath[i].anchorMax == currentAnchorMax) break;
+                        m_playerPath.RemoveAt(i);
+                    }
+                }
+                else
+                {
+                    //Sinon ajout d'une nouvelle position, elle devient maintenant déjà visité
+                    AddToPath();
+                }
+
                 //Then, we update the visual representation for the player
-                SetRectPosition(m_player, m_selector.x, m_selector.y);
+                SetRectPosition(m_player,  m_selector.x, m_selector.y);
             }
 
         }
@@ -468,7 +536,10 @@ public class HumanSubPuzzle : MonoBehaviour {
             if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
         }
         
+        
+        
     }
+    
 
     /// <summary>
     /// Place correctly an element with its rect transform
@@ -476,15 +547,32 @@ public class HumanSubPuzzle : MonoBehaviour {
     /// <param name="p_o">The game object you want to move</param>
     /// <param name="p_x">Its X coordinate</param>
     /// <param name="p_y">Its Y coordinate</param>
-    private void SetRectPosition(GameObject p_o, int p_x, int p_y) {
-        if (p_o.TryGetComponent(out RectTransform goRect)) {
-            goRect.anchorMin = new Vector2(m_offset * p_x, m_offset * p_y);
-            goRect.anchorMax = new Vector2(m_offset * (p_x+1), m_offset * (p_y+1));
+    private void SetRectPosition(RectTransform p_rt, int p_x, int p_y)
+    {
+        p_rt.anchorMin = new Vector2(m_offset * p_x, m_offset * p_y);
+        p_rt.anchorMax =  new Vector2(m_offset * (p_x+1), m_offset * (p_y+1));
 
-            goRect.localPosition = Vector3.zero;
+        p_rt.localPosition = Vector3.zero;
+        p_rt.anchoredPosition = Vector2.zero;
+    }
+    
+    /// <summary>
+    /// Place correctly an element with its rect transform
+    /// </summary>
+    /// <param name="p_o">The game object you want to move</param>
+    /// <param name="p_x">Its X coordinate</param>
+    /// <param name="p_y">Its Y coordinate</param>
+    private void SetRectPosition(GameObject p_go, int p_x, int p_y) {
 
-            goRect.anchoredPosition = Vector2.zero;
+        if (p_go.TryGetComponent<RectTransform>(out RectTransform rt))
+        {
+            rt.anchorMin = new Vector2(m_offset * p_x, m_offset * p_y);
+            rt.anchorMax = new Vector2(m_offset * (p_x + 1), m_offset * (p_y + 1));
+
+            rt.localPosition = Vector3.zero;
+            rt.anchoredPosition = Vector2.zero;
         }
+
     }
 
 

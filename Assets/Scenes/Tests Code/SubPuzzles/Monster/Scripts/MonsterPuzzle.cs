@@ -128,6 +128,7 @@ public class MonsterPuzzle : MonoBehaviour
                 //récupération de la position de la première prefab instanciée
                 if (x == 0 && y == 0) m_initialPos = transform.position;
             }
+            
         }
         
         
