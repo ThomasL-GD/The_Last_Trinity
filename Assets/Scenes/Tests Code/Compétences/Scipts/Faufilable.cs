@@ -5,10 +5,11 @@ using UnityEngine;
 public class Faufilable : MonoBehaviour
 {
     [SerializeField] [Tooltip("The input used to select this character")] private SOInputMultiChara m_selector = null;
-    private bool m_isOpenToFaufilage = false; //Possibilité d'activer le Faufilage avec la touche de compétence du Humain
-    private bool m_isIntoWall= false; //Est en standby dans l'autre mur
-    
-    [SerializeField] private Transform m_exit = null;
+    [SerializeField] [Tooltip("For Debug Only")] private bool m_isOpenToFaufilage = false; //Possibilité d'activer le Faufilage avec la touche de compétence du Humain
+    [SerializeField] [Tooltip("For Debug Only")] public bool m_isIntoWall= false; //Est en standby dans l'autre mur
+    //[SerializeField] [Tooltip("For Debug Only")] private bool m_isExiting= false; //Bloquage de la sortie
+
+    [SerializeField] private GameObject m_exit = null;
 
     [Header("Travel Timing")]
     [SerializeField] [Tooltip("Time of animation")] [Range(0.1f, 3f)] private float m_animTime = 1f; //Temps pour l'éxécution de l'animation de faufilage
@@ -33,8 +34,9 @@ public class Faufilable : MonoBehaviour
 
     private void Update()
     {
+        //When the human is in the trigger zone
         if (m_isOpenToFaufilage)
-        { ;
+        {
             if (!m_isIntoWall && m_humanScript.m_isActive && Input.GetKeyDown(m_selector.inputHuman))
             {
                 Debug.Log("Begin");
@@ -69,8 +71,8 @@ public class Faufilable : MonoBehaviour
     {
         Debug.Log("Teleport");
         yield return new WaitForSeconds(m_travelTime);
-        m_human.transform.position = m_exit.transform.position;
         m_isIntoWall = true;
+        m_human.transform.position = m_exit.transform.position;
     }
     
     /// <summary>
@@ -98,7 +100,7 @@ public class Faufilable : MonoBehaviour
     {
         if (p_other.gameObject.TryGetComponent(out PlayerController player))
         {
-            if (player.m_chara == Charas.Human)
+            if (player.m_chara == Charas.Human && !m_exit.GetComponent<Faufilable>().m_isIntoWall)
             {
                 m_isOpenToFaufilage = true;
                 m_human = p_other.gameObject.transform;

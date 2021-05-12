@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Player Controller")]
     
-    [SerializeField] [Tooltip("Vitesse du joueur")] private float m_speed = 5f;
+    [SerializeField] [Tooltip("Vitesse du joueur")] public float m_speed = 5f;
     [SerializeField] [Tooltip("Vitesse de Rotation du Quaternion")] private float m_rotationSpeed = 700f;
     [SerializeField] [Tooltip("The input used to select this character")] private SOInputMultiChara m_selector = null;
     [SerializeField] [Tooltip("The character whom this script is on, SELECT ONLY ONE !")] public Charas m_chara = 0;
