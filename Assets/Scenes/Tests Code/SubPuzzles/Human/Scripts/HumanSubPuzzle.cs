@@ -177,12 +177,6 @@ public class HumanSubPuzzle : MonoBehaviour {
             m_player.transform.SetSiblingIndex(m_mazeHeight*m_mazeWidth+1);
             m_selector.x = 0;
             m_selector.y = m_mazeHeight - 1;
-
-            GameObject instance = Instantiate(m_prefabPathVisualition, transform.position, transform.rotation, gameObject.transform);
-            RectTransform rt = instance.GetComponent<RectTransform>();
-            SetRectPosition(rt, m_selector.x, m_selector.y);
-            instance.SetActive(false);
-            m_playerPath.Add(rt);
         }
         else {
             Debug.LogError("Missing prefab for the player in the Human SubPuzzle script");
@@ -535,9 +529,6 @@ public class HumanSubPuzzle : MonoBehaviour {
         {
             if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
         }
-        
-        
-        
     }
     
 
@@ -556,6 +547,7 @@ public class HumanSubPuzzle : MonoBehaviour {
         p_rt.anchoredPosition = Vector2.zero;
     }
     
+    
     /// <summary>
     /// Place correctly an element with its rect transform
     /// </summary>
@@ -572,7 +564,6 @@ public class HumanSubPuzzle : MonoBehaviour {
             rt.localPosition = Vector3.zero;
             rt.anchoredPosition = Vector2.zero;
         }
-
     }
 
 
