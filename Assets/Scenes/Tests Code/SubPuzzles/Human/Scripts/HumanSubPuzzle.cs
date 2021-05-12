@@ -19,7 +19,6 @@ public class HumanSubPuzzle : MonoBehaviour {
     
     private Selector m_selector = new Selector(0,0); //Contains the coordinates of our selector aka the position of th player
     private GameObject m_player = null; //Contains the coordinates of our selector aka the position of the player
-    //private GameObject m_pathVisualisation = null; //Contains the coordinates of our selector aka the position of the player
     [HideInInspector] [Tooltip("Script d'intéraction entre le personnage et l'objet comprenant le subpuzzle")] public Interact_Detection m_interactDetection = null;
     
     [Header("Input Manager")]
@@ -43,7 +42,6 @@ public class HumanSubPuzzle : MonoBehaviour {
     [SerializeField] [Tooltip("The prefab of the background")] private GameObject m_prefabBG = null;
     [SerializeField] [Tooltip("The visual representation of the path of the player")] private GameObject m_prefabPathVisualition = null;
     [SerializeField] [Tooltip("List that shows the path of the player")] private List<RectTransform> m_playerPath = new List<RectTransform>();
-    //[SerializeField] [Tooltip("List that shows the path of the player")] private List<GameObject> m_playerPath = new List<GameObject>();
     
     
     [Header("Debug")]
@@ -182,9 +180,13 @@ public class HumanSubPuzzle : MonoBehaviour {
             Debug.LogError("Missing prefab for the player in the Human SubPuzzle script");
         }
 
+        //ajout à la première position du premier prefab de pathPlayer
         AddToPath();
     }
 
+    /// <summary>
+    /// Ajout de prefab de path à la list PathPlayer
+    /// </summary>
     private void AddToPath()
     {
         //instanciation de la première prefab dans la liste de m_playerPath
@@ -421,7 +423,6 @@ public class HumanSubPuzzle : MonoBehaviour {
 
     }
 
-
     
     // Update is called once per frame
     void Update() {
@@ -510,7 +511,6 @@ public class HumanSubPuzzle : MonoBehaviour {
                 //Then, we update the visual representation for the player
                 SetRectPosition(m_player,  m_selector.x, m_selector.y);
             }
-
         }
         
         //Joystick se recentre sur la manette
@@ -538,8 +538,8 @@ public class HumanSubPuzzle : MonoBehaviour {
     /// <param name="p_o">The game object you want to move</param>
     /// <param name="p_x">Its X coordinate</param>
     /// <param name="p_y">Its Y coordinate</param>
-    private void SetRectPosition(RectTransform p_rt, int p_x, int p_y)
-    {
+    private void SetRectPosition(RectTransform p_rt, int p_x, int p_y) {
+        
         p_rt.anchorMin = new Vector2(m_offset * p_x, m_offset * p_y);
         p_rt.anchorMax =  new Vector2(m_offset * (p_x+1), m_offset * (p_y+1));
 
@@ -556,8 +556,8 @@ public class HumanSubPuzzle : MonoBehaviour {
     /// <param name="p_y">Its Y coordinate</param>
     private void SetRectPosition(GameObject p_go, int p_x, int p_y) {
 
-        if (p_go.TryGetComponent<RectTransform>(out RectTransform rt))
-        {
+        if (p_go.TryGetComponent<RectTransform>(out RectTransform rt)) {
+            
             rt.anchorMin = new Vector2(m_offset * p_x, m_offset * p_y);
             rt.anchorMax = new Vector2(m_offset * (p_x + 1), m_offset * (p_y + 1));
 
