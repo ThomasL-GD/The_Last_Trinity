@@ -5,106 +5,66 @@ using UnityEngine;
 public class Faufilable : MonoBehaviour
 {
     [SerializeField] [Tooltip("The input used to select this character")] private SOInputMultiChara m_selector = null;
-    [SerializeField] [Tooltip("For Debug Only")] private bool m_isOpenToFaufilage = false; //Possibilité d'activer le Faufilage avec la touche de compétence du Humain
+    [SerializeField] [Tooltip("For Debug Only")] private bool m_isSneaky = false; //Possibilité d'activer le Faufilage avec la touche de compétence du Humain
     [SerializeField] [Tooltip("For Debug Only")] public bool m_isIntoWall= false; //Est en standby dans l'autre mur
-    //[SerializeField] [Tooltip("For Debug Only")] private bool m_isExiting= false; //Bloquage de la sortie
+    [SerializeField] [Tooltip("For Debug Only")] private bool m_isTeleporting= false; //Bloquage du teleport si deja un en cours
 
     [SerializeField] private GameObject m_exit = null;
 
-    [Header("Travel Timing")]
-    [SerializeField] [Tooltip("Time of animation")] [Range(0.1f, 3f)] private float m_animTime = 1f; //Temps pour l'éxécution de l'animation de faufilage
+    [Header("Travel")]
     [SerializeField] [Tooltip("Time of travel between the two exits")] [Range(0.1f, 3f)] private float m_travelTime = 1f; //Temps avant que le joueur se téléporte vers la sortie
-    [SerializeField] [Tooltip("Offset for getting out of the exit")] [Range(0.1f, 3f)] private float m_offset = 0.2f; //Offset du joueur pour le placer dans la fissure
 
-    [SerializeField] [Tooltip("For Debug Only")] private Transform m_human = null;
+    [SerializeField] [Tooltip("For Debug Only")] public Transform m_human = null;
     [SerializeField] [Tooltip("For Debug Only")] private PlayerController m_humanScript = null;//Script de l'humain, obtenir la touche d'activation de la compétence
 
     void Start()
     {
-        if (m_selector == null)
-        {
+        if (m_selector == null) {
             Debug.LogError("Manque le scriptable object d'input");
         }
 
-        if (m_exit == null)
-        {
+        if (m_exit == null) {
             Debug.LogError("Le Transform n'est pas sérialisé");
         }
     }
 
-    private void Update()
-    {
-        //When the human is in the trigger zone
-        if (m_isOpenToFaufilage)
-        {
-            if (!m_isIntoWall && m_humanScript.m_isActive && Input.GetKeyDown(m_selector.inputHuman))
-            {
-                Debug.Log("Begin");
-                m_humanScript.m_isForbiddenToMove = true;
-                StartCoroutine(AnimationEntree());
-            }
-        }
+    private void Update() {
 
-        if (m_isIntoWall && Input.GetKeyDown(m_selector.inputHuman))
-        {
-            StartCoroutine(AnimationSortie());
+        if (!m_isTeleporting && m_isIntoWall && Input.GetKeyDown(m_selector.inputHuman)) {
+            StartCoroutine(Teleport());
         }
-    }
-
-    /// <summary>
-    /// Laisse le temps à l'animation de se jouer pour passer dans le mur
-    /// </summary>
-    /// <returns></returns>
-    IEnumerator AnimationEntree()
-    {
-        Debug.Log("Animation Enter");
-        //Animation Play()
-        yield return new WaitForSeconds(m_animTime);
-        StartCoroutine(Teleport());
     }
 
     /// <summary>
     /// Teleporte le joueur sur la sortie sérialisé
     /// </summary>
     /// <returns></returns>
-    IEnumerator Teleport()
-    {
-        Debug.Log("Teleport");
+    IEnumerator Teleport() {
+        m_isTeleporting = true;
+        m_humanScript.m_isForbiddenToMove = true;
+        
         yield return new WaitForSeconds(m_travelTime);
-        m_isIntoWall = true;
+        
+        Faufilable exitScript = m_exit.GetComponent<Faufilable>();
+        if (exitScript.m_human == null) exitScript.m_human = m_human;
         m_human.transform.position = m_exit.transform.position;
+        m_humanScript.m_isForbiddenToMove = false;
+        m_isTeleporting = false;
+        //RemoveSneakiness();
     }
     
-    /// <summary>
-    /// Laisse le temps à l'animation de se jouer pour sortir du mur
-    /// </summary>
-    /// <returns></returns>
-    IEnumerator AnimationSortie()
-    {
-        Debug.Log("Animation Sortie");
-        //Animation Play()
-        yield return new WaitForSeconds(m_animTime);
-        m_humanScript.m_isForbiddenToMove = false;
-        m_isIntoWall = false;
-        
-        //Reset des valeurs
-        m_human = null;
-        m_humanScript = null;
-    }
-
     /// <summary>
     /// Au contact de la zone, donne la possibilité au joueur humain (p_other) d'appuyer sur la touche de compétences
     /// </summary>
     /// <param name="p_other"></param>
-    private void OnTriggerEnter(Collider p_other)
-    {
-        if (p_other.gameObject.TryGetComponent(out PlayerController player))
-        {
-            if (player.m_chara == Charas.Human && !m_exit.GetComponent<Faufilable>().m_isIntoWall)
-            {
-                m_isOpenToFaufilage = true;
+    private void OnTriggerEnter(Collider p_other) {
+        
+        if (p_other.gameObject.TryGetComponent(out PlayerController player)) {
+            if (player.m_chara == Charas.Human && !m_exit.GetComponent<Faufilable>().m_isIntoWall) {
+                m_isSneaky = true;
                 m_human = p_other.gameObject.transform;
                 m_humanScript = player;
+                m_humanScript.m_speed /= 2;
             }
         }
     }
@@ -115,14 +75,18 @@ public class Faufilable : MonoBehaviour
     /// <param name="p_other"></param>
     private void OnTriggerExit(Collider p_other)
     {
-        if (p_other.gameObject.TryGetComponent(out PlayerController player))
-        {
-            Debug.Log("Prout");
-            if (player.m_chara == Charas.Human)
-            {
-                m_isOpenToFaufilage = false;
-                //Debug.Log(m_telekinesieOpen);
+        if (p_other.gameObject.TryGetComponent(out PlayerController player)) {
+            if (player.m_chara == Charas.Human) {
+                RemoveSneakiness();
             }
         }
+    }
+
+    /// <summary>
+    /// Will remove the sneaky effect on the human and reset a few values
+    /// </summary>
+    private void RemoveSneakiness() {
+        m_isSneaky = false;
+        m_humanScript.m_speed *= 2;
     }
 }
