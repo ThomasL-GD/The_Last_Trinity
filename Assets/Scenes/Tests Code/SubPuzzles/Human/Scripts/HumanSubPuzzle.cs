@@ -19,6 +19,7 @@ public class HumanSubPuzzle : MonoBehaviour {
     
     private Selector m_selector = new Selector(0,0); //Contains the coordinates of our selector aka the position of th player
     private GameObject m_player = null; //Contains the coordinates of our selector aka the position of the player
+    private GameObject m_pathVisualisation = null; //Contains the coordinates of our
     [HideInInspector] [Tooltip("Script d'intéraction entre le personnage et l'objet comprenant le subpuzzle")] public Interact_Detection m_interactDetection = null;
     
     [Header("Input Manager")]
@@ -167,6 +168,8 @@ public class HumanSubPuzzle : MonoBehaviour {
             }
         }
         
+        
+        
         //Player sprite instantiate
         if (m_prefabPlayer != null)
         {
@@ -180,8 +183,16 @@ public class HumanSubPuzzle : MonoBehaviour {
             Debug.LogError("Missing prefab for the player in the Human SubPuzzle script");
         }
 
-        //ajout à la première position du premier prefab de pathPlayer
-        AddToPath();
+        //PathVisualisation instantiate
+        if (m_prefabPathVisualition != null)
+        {
+            //ajout à la première position du premier prefab de pathPlayer
+            AddToPath();
+        }
+        else {
+            Debug.LogError("Missing prefab for the path visualisation in the Human SubPuzzle script");
+        }
+        
     }
 
     /// <summary>
@@ -191,12 +202,17 @@ public class HumanSubPuzzle : MonoBehaviour {
     {
         //instanciation de la première prefab dans la liste de m_playerPath
         GameObject instance = Instantiate(m_prefabPathVisualition, transform.position, transform.rotation, gameObject.transform);
+        //Récupération du rect transform de la prefab instanciée
         RectTransform rt = instance.GetComponent<RectTransform>();
-        SetRectPosition(rt, m_selector.x, m_selector.y);
+        //positionnement du rect transform à l'emplacement du sélecteur
+        SetRectPosition(instance, m_selector.x, m_selector.y);
+        //désactivation du prefab qui ne doit être montré qu'à la fin
         instance.SetActive(false);
+        //Ajout à la list du rect transform de la prefab instanciée
         m_playerPath.Add(rt);
     }
 
+    
     /// <summary>
     /// Will erase a random wall and make sure its opposite wall gets destroyed as well
     /// </summary>
@@ -415,11 +431,9 @@ public class HumanSubPuzzle : MonoBehaviour {
                 
             }
         }
-
-
-       // while (m_playerPath.Count > 0) m_playerPath.Dequeue().SetActive(true);
-       foreach (var rt in m_playerPath)
-           rt.gameObject.SetActive(true);
+        
+        //on montre tous les objets de la liste
+        foreach (var rt in m_playerPath)    rt.gameObject.SetActive(true);
 
     }
 
@@ -480,34 +494,9 @@ public class HumanSubPuzzle : MonoBehaviour {
                 }
 
 
+                //ajout de chemin pour la visualisation finale du chemin pris
+                Path();
                 
-                //variable qui indique si une case a déja été visité ou non
-                bool alreadyPassed = false;
-                
-                Vector2 currentAnchorMin = new Vector2(m_offset * m_selector.x, m_offset * m_selector.y);
-                Vector2 currentAnchorMax = new Vector2(m_offset * (m_selector.x + 1), m_offset * (m_selector.y + 1));
-                
-                // Recherche dans la liste PlayerPath
-                foreach (var rt in m_playerPath)
-                {
-                    //vérification si la case a déjà été visité
-                    if (rt.anchorMin == currentAnchorMin && rt.anchorMax == currentAnchorMax) alreadyPassed = true;
-                }
-                
-                // Si cette case a deja ete visité
-                if (alreadyPassed){
-                    // on enlève de la liste PlayerPath le dernier prefab intégré
-                    for (int i = m_playerPath.Count - 1; i >= 0; i--) {
-                        if (m_playerPath[i].anchorMin == currentAnchorMin && m_playerPath[i].anchorMax == currentAnchorMax) break;
-                        m_playerPath.RemoveAt(i);
-                    }
-                }
-                else
-                {
-                    //Sinon ajout d'une nouvelle position, elle devient maintenant déjà visité
-                    AddToPath();
-                }
-
                 //Then, we update the visual representation for the player
                 SetRectPosition(m_player,  m_selector.x, m_selector.y);
             }
@@ -530,21 +519,40 @@ public class HumanSubPuzzle : MonoBehaviour {
             if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
         }
     }
-    
 
     /// <summary>
-    /// Place correctly an element with its rect transform
+    /// Fonction d'ajout ou d'enlèvement de case déjà traversée
     /// </summary>
-    /// <param name="p_o">The game object you want to move</param>
-    /// <param name="p_x">Its X coordinate</param>
-    /// <param name="p_y">Its Y coordinate</param>
-    private void SetRectPosition(RectTransform p_rt, int p_x, int p_y) {
+    private void Path()
+    {
         
-        p_rt.anchorMin = new Vector2(m_offset * p_x, m_offset * p_y);
-        p_rt.anchorMax =  new Vector2(m_offset * (p_x+1), m_offset * (p_y+1));
+        //variable qui indique si une case a déja été visité ou non
+        bool alreadyPassed = false;
+                
+        Vector2 currentAnchorMin = new Vector2(m_offset * m_selector.x, m_offset * m_selector.y);
+        Vector2 currentAnchorMax = new Vector2(m_offset * (m_selector.x + 1), m_offset * (m_selector.y + 1));
 
-        p_rt.localPosition = Vector3.zero;
-        p_rt.anchoredPosition = Vector2.zero;
+        foreach (var rt in m_playerPath)
+        {
+            //vérification si la case a déjà été visité
+            if (rt.anchorMin == currentAnchorMin && rt.anchorMax == currentAnchorMax) alreadyPassed = true;
+            Debug.Log($"{alreadyPassed}");
+        }
+                
+        // Si cette case a deja ete visité
+        if (alreadyPassed){
+            // on enlève de la liste PlayerPath le dernier prefab intégré
+            for (int i = m_playerPath.Count - 1; i >= 0; i--) {
+                if (m_playerPath[i].anchorMin == currentAnchorMin && m_playerPath[i].anchorMax == currentAnchorMax) break;
+                m_playerPath.RemoveAt(i);
+            }
+        }
+        else
+        {
+            //Sinon ajout d'une nouvelle position, elle devient maintenant déjà visité
+            AddToPath();
+        }
+
     }
     
     
@@ -556,7 +564,7 @@ public class HumanSubPuzzle : MonoBehaviour {
     /// <param name="p_y">Its Y coordinate</param>
     private void SetRectPosition(GameObject p_go, int p_x, int p_y) {
 
-        if (p_go.TryGetComponent<RectTransform>(out RectTransform rt)) {
+        if (p_go.TryGetComponent<RectTransform>(out RectTransform rt)){
             
             rt.anchorMin = new Vector2(m_offset * p_x, m_offset * p_y);
             rt.anchorMax = new Vector2(m_offset * (p_x + 1), m_offset * (p_y + 1));
@@ -565,6 +573,7 @@ public class HumanSubPuzzle : MonoBehaviour {
             rt.anchoredPosition = Vector2.zero;
         }
     }
+
 
 
     private void Win() {
@@ -584,6 +593,8 @@ public class HumanSubPuzzle : MonoBehaviour {
     void OnDisable()
     {
 
+        m_playerPath.Clear();
+        
         // https://memegenerator.net/instance/44816816/plotracoon-we-shall-destroy-them-all
         //As all the gameobjects we instantiated are child of this gameobject, we just have to erase all the children of this
         foreach(Transform child in gameObject.transform) {
