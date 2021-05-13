@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,16 +6,17 @@ using Cinemachine;
 
 public class CameraMovement : MonoBehaviour
 {
-    //Keycode des deux gachettes gauche et droite
-    private KeyCode[] m_keyCodes = new[] {KeyCode.Joystick1Button6, KeyCode.Joystick1Button7};
+    private KeyCode[] m_keyCodes = new[] {KeyCode.Joystick1Button6, KeyCode.Joystick1Button7}; //Keycode des deux gachettes gauche et droite
     
     private CinemachineVirtualCamera m_vCam; //Camera cinemachine
     private CinemachineTrackedDolly m_dolly; //Famille Dolly de la caméra cinemachine
-    private float m_offsetValue = 0f;
+    private float m_offsetValue = 0f; //Value de l'offset de la caméra sur le rail de la dolly
     
-    [SerializeField] [Range(-5, 5)]private float m_clamp = 2.5f; //Clamp de la caméra sur le rail de dolly
-    [SerializeField] [Range(0, 3)] private float m_lookSpeed = 0f; //Vitesse de déplacement du look sur le côté
-    [SerializeField] [Range(0, 6)] private float m_returnSpeed = 0f; //Vitesse de déplacement du retour de la caméra
+    [Header("Caméra Clamp & Value")]
+    
+    [SerializeField][Range(-5, 5)]private float m_clamp = 2.5f; //Clamp de la caméra sur le rail de dolly
+    [SerializeField][Range(0, 3)] private float m_lookSpeed = 0f; //Vitesse de déplacement du look sur le côté
+    [SerializeField][Range(0, 6)] private float m_returnSpeed = 0f; //Vitesse de déplacement du retour de la caméra
     private float m_incertitude = 0.1f; //Valeur d'incertitude de la distance de l'offset
 
     void Start()

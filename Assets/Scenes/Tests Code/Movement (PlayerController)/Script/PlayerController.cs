@@ -35,9 +35,9 @@ public class PlayerController : MonoBehaviour
     [HideInInspector] public Vector3 m_spawnPoint = Vector3.zero;
 
     //Cinemachine cameras des trois personnages
-    private CinemachineVirtualCamera m_vCamH;
-    private CinemachineVirtualCamera m_vCamM;
-    private CinemachineVirtualCamera m_vCamR;
+    [HideInInspector] public CinemachineVirtualCamera m_vCamH;
+    [HideInInspector] public CinemachineVirtualCamera m_vCamM;
+    [HideInInspector] public CinemachineVirtualCamera m_vCamR;
 
     private void Start()
     {
