@@ -12,6 +12,15 @@ public class Vision : MonoBehaviour
     [SerializeField] [Tooltip("The radius of the detection area")] private float m_radius = 5.0f;
     [SerializeField] [Tooltip("The possible angle of detection")] private float m_angleUncertainty = 9.0f;
 
+    [Header("Offset")] 
+    [SerializeField] [Tooltip("décalage du cône de vision par rapport à l'ennemi")] private Vector3 m_size = new Vector3();
+    [SerializeField] [Tooltip("décalage du cône de vision par rapport à l'ennemi")] private Vector3 m_offsetTranslation = new Vector3();
+    
+    //[Header("Gizmo Manager")]
+    //[SerializeField] [Tooltip("angle qui part du joueur")] private float m_angle = 30.0f;
+    //[SerializeField] [Tooltip("portée de détection")] private float m_rayRange = 10.0f;
+    //[SerializeField] [Tooltip("direction de pointage du cone")] private float m_coneDirection = 180;
+    
     
     /// <summary>
     /// This delegate will be called each time someone or something detects the player
@@ -26,7 +35,40 @@ public class Vision : MonoBehaviour
         //We adapt the collider to the Serialized value we have
         m_sphereCol = gameObject.GetComponent<SphereCollider>();
         m_sphereCol.radius = m_radius;
-        m_sphereCol.isTrigger = true;        
+        m_sphereCol.isTrigger = true;
+
+        OnDrawGizmos();
+    }
+    
+
+    /// <summary>
+    /// Fonction qui affiche une zone de détection
+    /// </summary>
+    void OnDrawGizmos()
+    {
+        //valeur de la moitié de l'angle de départ
+        float halfFOV = m_angle / 2.0f;
+    
+        // Draw a semitransparent blue cube at the transforms position
+        Gizmos.color = new Color(50, 200, 255, 0.7f);
+        //Cube 1
+        Gizmos.DrawCube(transform.position + m_offsetTranslation, m_size);
+        Quaternion upRayRotation = Quaternion.AngleAxis(-halfFOV + m_coneDirection, Vector3.up);
+        //Cube 2
+        //Gizmos.DrawCube(transform.position + m_offsetTranslation, m_size);
+        //Gizmos.DrawCube( m_rotation, m_size);
+        
+        /*
+        Quaternion upRayRotation = Quaternion.AngleAxis(-halfFOV + m_coneDirection, Vector3.left);
+        Quaternion downRayRotation = Quaternion.AngleAxis(halfFOV + m_coneDirection, Vector3.left);
+
+        Vector3 upRayDirection = upRayRotation * transform.right * m_rayRange;
+        Vector3 downRayDirection = downRayRotation * transform.right * m_rayRange;
+
+        Gizmos.DrawRay(transform.position, upRayDirection);
+        Gizmos.DrawRay(transform.position, downRayDirection);
+        Gizmos.DrawLine(transform.position + downRayDirection, transform.position + upRayDirection);
+        */
     }
     
     /// <summary>
