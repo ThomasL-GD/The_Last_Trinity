@@ -6,10 +6,15 @@ using UnityEngine;
 [RequireComponent(typeof(SphereCollider))]
 public class Vision : MonoBehaviour
 {
+    [Header("Characters")]
+    [SerializeField] [Tooltip("tableau qui contient les 3 personnages controlables")] private GameObject[] m_characters ;
+    
     private SphereCollider m_sphereCol = null;
+    [Header("Difficulty")]
     [SerializeField] [Tooltip("The radius of the detection area")] private float m_radius = 5.0f;
     [SerializeField] [Tooltip("The possible angle of detection")] private float m_angleUncertainty = 9.0f;
 
+    
     /// <summary>
     /// This delegate will be called each time someone or something detects the player
     /// </summary>
@@ -17,14 +22,19 @@ public class Vision : MonoBehaviour
     public delegate void GoTo(Vector3 p_vector3);
     public static event GoTo AlarmDelegator;
 
-    public GameObject m_player;
-    
     // Start is called before the first frame update
     void Start() {
+
+        if (m_characters == null)
+        {
+            Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE CHARACTERS IN THE VISION SCRIPT !");
+        }
         //We adapt the collider to the Serialized value we have
         m_sphereCol = gameObject.GetComponent<SphereCollider>();
         m_sphereCol.radius = m_radius;
         m_sphereCol.isTrigger = true;
+        
+        
     }
     
     /// <summary>
