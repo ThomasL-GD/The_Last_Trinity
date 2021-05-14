@@ -54,6 +54,7 @@ public class GuardBehavior : MonoBehaviour {
         }
     }
 
+    
     /// <summary>
     /// This function is called by the Delegator each time someone or something detect the player
     /// it is only called if m_isaPCGuard is true
