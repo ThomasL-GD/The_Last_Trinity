@@ -50,7 +50,7 @@ public class Vision : MonoBehaviour
         //float halfFOV = m_angle / 2.0f;
     
         // Draw a semitransparent blue cube at the transforms position
-        //Gizmos.color = new Color(50, 200, 255, 0.7f);
+        Gizmos.color = new Color(50, 200, 255, 0.7f);
         //Cube 1
         //Gizmos.DrawCube(transform.position + m_offsetTranslation, m_size);
         //Quaternion upRayRotation = Quaternion.AngleAxis(-halfFOV + m_coneDirection, Vector3.up);
