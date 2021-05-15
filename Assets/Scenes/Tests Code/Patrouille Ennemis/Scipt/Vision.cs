@@ -12,9 +12,9 @@ public class Vision : MonoBehaviour
     [SerializeField] [Tooltip("The radius of the detection area")] private float m_radius = 5.0f;
     [SerializeField] [Tooltip("The possible angle of detection")] private float m_angleUncertainty = 9.0f;
 
-    [Header("Offset")] 
-    [SerializeField] [Tooltip("décalage du cône de vision par rapport à l'ennemi")] private Vector3 m_size = new Vector3();
-    [SerializeField] [Tooltip("décalage du cône de vision par rapport à l'ennemi")] private Vector3 m_offsetTranslation = new Vector3();
+    //[Header("Offset")] 
+    //[SerializeField] [Tooltip("décalage du cône de vision par rapport à l'ennemi")] private Vector3 m_size = new Vector3();
+    //[SerializeField] [Tooltip("décalage du cône de vision par rapport à l'ennemi")] private Vector3 m_offsetTranslation = new Vector3();
     
     //[Header("Gizmo Manager")]
     //[SerializeField] [Tooltip("angle qui part du joueur")] private float m_angle = 30.0f;
@@ -46,30 +46,42 @@ public class Vision : MonoBehaviour
     /// </summary>
     void OnDrawGizmos()
     {
-        //valeur de la moitié de l'angle de départ
-        //float halfFOV = m_angle / 2.0f;
-    
+
         // Draw a semitransparent blue cube at the transforms position
         Gizmos.color = new Color(50, 200, 255, 0.7f);
         //Cube 1
         //Gizmos.DrawCube(transform.position + m_offsetTranslation, m_size);
         //Quaternion upRayRotation = Quaternion.AngleAxis(-halfFOV + m_coneDirection, Vector3.up);
-        //Cube 2
-        //Gizmos.DrawCube(transform.position + m_offsetTranslation, m_size);
-        //Gizmos.DrawCube( m_rotation, m_size);
         
-        /*
-        Quaternion upRayRotation = Quaternion.AngleAxis(-halfFOV + m_coneDirection, Vector3.left);
-        Quaternion downRayRotation = Quaternion.AngleAxis(halfFOV + m_coneDirection, Vector3.left);
+        //Angle de la zone de détection
+        float angle = 30.0f;
+        
+        //Distance de raycast
+        float rayRange = 10.0f;
+        
+        //on coupe en deux l'angle pour créer deux directions de ligne opposées
+        float halfFOV = angle / 2.0f;
+        
+        //direction du cone
+        float coneDirection = 180;
 
-        Vector3 upRayDirection = upRayRotation * transform.right * m_rayRange;
-        Vector3 downRayDirection = downRayRotation * transform.right * m_rayRange;
+        //Création des directions de départ pour les rayons
+        Quaternion leftRayRotation = Quaternion.AngleAxis(-halfFOV + coneDirection, Vector3.up);
+        Quaternion rightRayRotation = Quaternion.AngleAxis(halfFOV + coneDirection, Vector3.up);
 
-        Gizmos.DrawRay(transform.position, upRayDirection);
-        Gizmos.DrawRay(transform.position, downRayDirection);
-        Gizmos.DrawLine(transform.position + downRayDirection, transform.position + upRayDirection);
-        */
+        //ajout d'une longueur de ray par rapport à la précédente direction
+        Vector3 leftRayDirection = leftRayRotation * -transform.forward * rayRange;
+        Vector3 rightRayDirection = rightRayRotation * -transform.forward * rayRange;
+
+        //création du rayon
+        Gizmos.DrawRay(transform.position, leftRayDirection);
+        Gizmos.DrawRay(transform.position, rightRayDirection);
+        
+        //fermeture du cone avec la tangente des deux lignes crées précédemment
+        Gizmos.DrawLine(transform.position + rightRayDirection, transform.position + leftRayDirection);
+
     }
+    
     
     /// <summary>
     /// Called each frame as long as the collider is colliding a collider that is isTrigger
