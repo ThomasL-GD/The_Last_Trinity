@@ -27,13 +27,14 @@ public class CameraMovement : MonoBehaviour
     
     void Update()
     {
-        //Déplacement de la caméra vers la gauche par la gachette de gauche
+        //Déplacement de la caméra vers la gauche en utilisant la gachette gauche
         if (Input.GetKey(m_keyCodes[0]))
         {
             if (m_offsetValue >= -m_clamp)
             {
                 m_offsetValue -= m_lookSpeed * Time.deltaTime;
-            } else if (m_offsetValue < -m_clamp)
+            } 
+            else if (m_offsetValue < -m_clamp)
             {
                 m_offsetValue = -m_clamp;
             }
@@ -42,12 +43,13 @@ public class CameraMovement : MonoBehaviour
             if (m_offsetValue <= m_clamp)
             {
                 m_offsetValue += m_lookSpeed * Time.deltaTime;
-            } else if (m_offsetValue > m_clamp)
+            } 
+            else if (m_offsetValue > m_clamp)
             {
                 m_offsetValue = m_clamp;
             }
         }
-        //Déplacement de la caméra vers la droite par la gachette de droite
+        //Déplacement de la caméra vers la droite en utilisant la gachette droite
         else
         {
             if (m_offsetValue != 0f && Mathf.Abs(m_offsetValue) < m_incertitude )

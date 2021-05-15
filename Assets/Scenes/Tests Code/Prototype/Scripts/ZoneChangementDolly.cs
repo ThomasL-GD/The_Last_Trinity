@@ -6,12 +6,16 @@ using UnityEngine;
 
 public class ZoneChangementDolly : MonoBehaviour
 {
-    [Header("Dolly")] 
-    [SerializeField][Tooltip("Main Cart de Dolly")] private CinemachineSmoothPath m_mainPath;
-    [SerializeField][Tooltip("Sub Cart de Dolly")] private CinemachineSmoothPath m_subPath;
-    private CinemachineVirtualCamera m_virtualCamera = null;
-    private CinemachineTrackedDolly m_trackedDolly = null;
+    //Cinemachine cameras des trois personnages zoomées sur un rail auxiliaire
+    //Effectuer un blend dans la "Main Camera" avant de régler les priorités
+    [SerializeField][Tooltip("Virtual Caméra Zoomée")] private CinemachineVirtualCamera m_vCamHZ;
+    [SerializeField][Tooltip("Virtual Caméra Zoomée")] private CinemachineVirtualCamera m_vCamMZ;
+    [SerializeField][Tooltip("Virtual Caméra Zoomée")] private CinemachineVirtualCamera m_vCamRZ;
 
+    /// <summary>
+    /// Tigger enter de la zone à zoomer avec le changement de priorité à 3 pour avoir la priorité
+    /// </summary>
+    /// <param name="p_other">Collider du joueur entrant dans la zone</param>
     private void OnTriggerEnter(Collider p_other)
     {
         Debug.Log("Ok");
@@ -21,18 +25,22 @@ public class ZoneChangementDolly : MonoBehaviour
             switch (charaScript.m_chara)
             {
                 case Charas.Human :
-                    m_virtualCamera = charaScript.m_vCamH;
-                    m_trackedDolly = m_virtualCamera.GetCinemachineComponent<CinemachineTrackedDolly>();
-                    m_trackedDolly.m_Path = m_subPath;
+                    m_vCamHZ.Priority = 3;
                     break;
                 case Charas.Monster :
+                    m_vCamMZ.Priority = 3;
                     break;
                 case Charas.Robot :
+                    m_vCamRZ.Priority = 3;
                     break;
             }   
         }
     }
     
+    /// <summary>
+    /// Tigger exit de la zone à zoomer avec le changement de priorité à 1 pour enlever la priorité
+    /// </summary>
+    /// <param name="p_other">Collider du joueur entrant dans la zone</param>
     private void OnTriggerExit(Collider p_other)
     {
         Debug.Log("Ko");
@@ -42,13 +50,13 @@ public class ZoneChangementDolly : MonoBehaviour
             switch (charaScript.m_chara)
             {
                 case Charas.Human :
-                    m_virtualCamera = charaScript.m_vCamH;
-                    m_trackedDolly = m_virtualCamera.GetCinemachineComponent<CinemachineTrackedDolly>();
-                    m_trackedDolly.m_Path = m_mainPath;
+                    m_vCamHZ.Priority = 1;
                     break;
                 case Charas.Monster :
+                    m_vCamMZ.Priority = 1;
                     break;
                 case Charas.Robot :
+                    m_vCamRZ.Priority = 1;
                     break;
             }   
         }
