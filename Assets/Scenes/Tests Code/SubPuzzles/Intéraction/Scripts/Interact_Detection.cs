@@ -21,7 +21,10 @@ public class Interact_Detection : MonoBehaviour
     [SerializeField] [Tooltip("Bouton qui apparait afin de déclencher le puzzle")] private GameObject m_activationButton;
     [HideInInspector] [Tooltip("contrôle d'état du trigger du bouton permettant d'activer le sub puzzle")] private bool m_buttonActivate = false;
     
+    [Header("Open Door")]
     public bool m_openDoor = false;
+    [SerializeField] [Tooltip("List of Door to open")] private GameObject[] m_doorSub; //Liste de portes à ouvrir lorsque le puzzle est réussi
+    private float m_speed = 4f; //Vitesse d'ouverture des portes
     [HideInInspector] [Tooltip("indicateur de réussite de subPuzzle")] public bool m_achieved = false;
     [HideInInspector] [Tooltip("variable qui autorise le déplacement dans le subPuzzle")] public bool m_canMove = true;
     [SerializeField] [Tooltip("Temps que l'écran de fin reste activé quand le subpuzzle est réussit")] [Range(0f,500f)] private float m_timer = 1f;
@@ -98,7 +101,16 @@ public class Interact_Detection : MonoBehaviour
             else m_activationButton.SetActive(false);
             
         }
-
+        
+        if (m_openDoor)
+        {
+            for (int i = 0; i < m_doorSub.Length; i++)
+            {
+                Vector3 movementDirection = new Vector3(0, m_doorSub[i].transform.position.y - 20, 0);
+                movementDirection.Normalize();
+                m_doorSub[i].transform.Translate(movementDirection * (m_speed * Time.deltaTime), Space.World);
+            }
+        }
     }
 
     
@@ -107,7 +119,9 @@ public class Interact_Detection : MonoBehaviour
     /// </summary>
     public void PuzzleDeactivation()
     {
-        if (m_achieved == true) {
+        if (m_achieved == true)
+        {
+            m_openDoor = true;
             StartCoroutine(EndLook());
         }
         else {
