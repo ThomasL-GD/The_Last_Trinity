@@ -21,7 +21,8 @@ public class GuardBehavior : MonoBehaviour {
     [SerializeField] [Tooltip("The list of points the guard will travel to, in order from up to down and cycling")] private List<Transform> m_destinationsTransforms = new List<Transform>();
     private List<Vector3> m_destinations = new List<Vector3>();
 
-
+    //[SerializeField] [Tooltip("Zone de détection")] private GameObject m_zoneDetection;
+   
     // Start is called before the first frame update
     void Start() {
         
@@ -37,7 +38,12 @@ public class GuardBehavior : MonoBehaviour {
         m_nma = gameObject.GetComponent<NavMeshAgent>();
         //The first position where the guard will aim at
         m_nma.SetDestination(m_destinations[m_currentDestination]);
-       
+
+        /*
+        m_zoneDetection.AddComponent<GuardBehavior>();
+        m_zoneDetection.GetComponent<GuardBehavior>().enabled = false;
+        */
+        
     }
     
 
@@ -92,7 +98,7 @@ public class GuardBehavior : MonoBehaviour {
     private void OnTriggerStay(Collider p_other) {
         
         
-        //If the thing we are colliding is a playable character
+        //If the thing we are colliding is a playable character and only him
         if (p_other.gameObject.TryGetComponent(out PlayerController charaScript)){
             
             Debug.Log("Character detection");
@@ -107,6 +113,7 @@ public class GuardBehavior : MonoBehaviour {
                     p_script.CheckOutSomewhere(charaScript.gameObject.transform.position);
                 }
             }
+            
         }
     }
 
