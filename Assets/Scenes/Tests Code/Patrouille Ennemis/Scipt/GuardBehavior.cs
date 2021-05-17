@@ -20,7 +20,8 @@ public class GuardBehavior : MonoBehaviour {
     [SerializeField] [Tooltip("Vitesse de déplacement normale")] private float m_attackSpeed = 15.0f;
     [SerializeField] [Tooltip("Vitesse de déplacement normale")] private float m_normalAcceleration = 5.0f;
     [SerializeField] [Tooltip("Vitesse de déplacement normale")] private float m_attackAcceleration = 15.0f;
-    [SerializeField] [Tooltip("Vitesse de déplacement normale")] private float m_rotationSpeed = 200.0f;
+    [SerializeField] [Tooltip("Vitesse de déplacement normale")] private float m_normalRotationSpeed = 300.0f;
+    [SerializeField] [Tooltip("Vitesse de déplacement normale")] private float m_attackRotationSpeed = 900.0f;
     
     [Header("Difficulty")]
     [Header("SphereManager")]
@@ -74,14 +75,9 @@ public class GuardBehavior : MonoBehaviour {
                 //If he reached the end of his path, we make him start over
                 if (m_currentDestination >= m_destinations.Count) m_currentDestination = 0;
                 m_nma.SetDestination(m_destinations[m_currentDestination]);
-                
-                //accélération de l'ennemi une fois qu'il prend en chasse un character
-                m_nma.speed = m_normalSpeed;
-                m_nma.acceleration = m_normalAcceleration;
             }
         }
         
-        Debug.Log($"{m_nma.speed}");
     }
 
     
@@ -113,10 +109,7 @@ public class GuardBehavior : MonoBehaviour {
         
         //If the thing we are colliding is a playable character and only him
         if (p_other.gameObject.TryGetComponent(out PlayerController charaScript)){
-            
-            //regarde en direction du joueur dès que le joueur entre dans la zone
-            //m_nma.transform.LookAt(charaScript.transform);
-            
+
             //We calculate the angle between the target and the vision
             Vector3 targetDir =  (charaScript.gameObject.transform.position - transform.position).normalized;
             float angle = Mathf.Abs( Vector3.Angle(transform.forward, targetDir));
@@ -125,15 +118,17 @@ public class GuardBehavior : MonoBehaviour {
             if (angle > m_angleUncertainty)
             {
                 m_nma.speed = 0.5f;
-                m_nma.transform.Rotate(Vector3.up, m_rotationSpeed * Time.deltaTime);
+                m_nma.transform.Rotate(Vector3.up, m_normalRotationSpeed * Time.deltaTime);
             }
             else if (angle <= m_angleUncertainty) {
 
                 //If the gameObject is a guard we ask him to follow the player
-                if (gameObject.TryGetComponent(out GuardBehavior p_script)){
+                if (gameObject.TryGetComponent(out GuardBehavior p_script))
+                {
                     p_script.CheckOutSomewhere(charaScript.gameObject.transform.position);
                     m_nma.speed = m_attackSpeed;
                     m_nma.acceleration = m_attackAcceleration;
+                    m_nma.angularSpeed = m_attackRotationSpeed;
                 }
             }
             
@@ -141,7 +136,7 @@ public class GuardBehavior : MonoBehaviour {
     }
 
     /// <summary>
-    /// Retour à la normal dès qu'un character n'est plus trigger
+    /// Retour à vitesse normale dès qu'un character n'est plus trigger
     /// </summary>
     /// <param name="p_other">collision avec un character</param>
     private void OnTriggerExit(Collider p_other)
@@ -151,7 +146,23 @@ public class GuardBehavior : MonoBehaviour {
         {
             m_nma.speed = m_normalSpeed;
             m_nma.acceleration = m_normalAcceleration;
+            m_nma.angularSpeed = m_normalRotationSpeed;
         }
     }
-    
+
+
+    /// <summary>
+    /// Fonction de connexion au corps à corps entre ennemi et joueur
+    /// applique le respawn après la mort
+    /// </summary>
+    /// <param name="other"></param>
+    private void OnCollisionEnter(Collision p_other)
+    {
+        if (p_other.gameObject.TryGetComponent(out PlayerController charaScript)) {
+            
+            Debug.Log("T'es mourru.");
+            DeathManager.DeathDelegator?.Invoke();
+        }
+    }
+
 }
