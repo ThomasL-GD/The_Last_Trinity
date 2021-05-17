@@ -7,11 +7,9 @@ using UnityEngine.AI;
 [RequireComponent(typeof(SphereCollider))]
 public class GuardBehavior : MonoBehaviour {
 
-    //Collider présents sur notre ennemi
+    //Collider présent sur notre ennemi
     private SphereCollider m_sphereCol = null;
-    private BoxCollider m_boxCol = null;
-    private MeshCollider m_meshCol = null;
-    
+
     //variables d'IA
     private NavMeshAgent m_nma = null;
     private int m_currentDestination = 0;
@@ -22,14 +20,13 @@ public class GuardBehavior : MonoBehaviour {
     [SerializeField] [Tooltip("Vitesse de déplacement normale")] private float m_attackSpeed = 15.0f;
     [SerializeField] [Tooltip("Vitesse de déplacement normale")] private float m_normalAcceleration = 5.0f;
     [SerializeField] [Tooltip("Vitesse de déplacement normale")] private float m_attackAcceleration = 15.0f;
+    [SerializeField] [Tooltip("Vitesse de déplacement normale")] private float m_rotationSpeed = 200.0f;
     
     [Header("Difficulty")]
     [Header("SphereManager")]
     [SerializeField] [Tooltip("The radius of the detection area")] private float m_sphereRadius = 2.0f;
     [SerializeField] [Tooltip("The possible angle of detection")] private float m_angleUncertainty = 9.0f;
     [SerializeField] [Tooltip("The maximum authorized difference between the position to reach and the current position (unit : Unity meters)")] private float m_uncertainty = 0.1f;
-    
-    //[SerializeField] [Tooltip("Modification de taille du cone de vision")] private Vector3 m_meshScale = new Vector3(1.0f,1.0f,1.0f);
 
     [Header("Waypoints Manager")]
     [SerializeField] [Tooltip("The list of points the guard will travel to, in order from up to down and cycling")] private List<Transform> m_destinationsTransforms = new List<Transform>();
@@ -44,17 +41,6 @@ public class GuardBehavior : MonoBehaviour {
         m_sphereCol.radius = m_sphereRadius;
         m_sphereCol.isTrigger = true;
         
-        //We adapt the collider to the Serialized value we have
-        m_boxCol = gameObject.GetComponent<BoxCollider>();
-        m_boxCol.enabled = false;
-        //m_boxCol.transform.localScale = m_boxScale;
-        
-        /*
-        //We adapt the collider to the Serialized value we have
-        m_meshCol = gameObject.GetComponent<MeshCollider>();
-        m_meshCol.transform.localScale = m_meshScale;
-        m_meshCol.enabled = false;
-        */
 
         //We transform the list of Transforms (easier to serialize) into a list of Vector3 (easier to manipulate)
         for (int i = 0; i < m_destinationsTransforms.Count; i++) {
@@ -88,10 +74,14 @@ public class GuardBehavior : MonoBehaviour {
                 //If he reached the end of his path, we make him start over
                 if (m_currentDestination >= m_destinations.Count) m_currentDestination = 0;
                 m_nma.SetDestination(m_destinations[m_currentDestination]);
+                
+                //accélération de l'ennemi une fois qu'il prend en chasse un character
                 m_nma.speed = m_normalSpeed;
+                m_nma.acceleration = m_normalAcceleration;
             }
         }
         
+        Debug.Log($"{m_nma.speed}");
     }
 
     
@@ -124,19 +114,26 @@ public class GuardBehavior : MonoBehaviour {
         //If the thing we are colliding is a playable character and only him
         if (p_other.gameObject.TryGetComponent(out PlayerController charaScript)){
             
-            //Debug.Log("Character detection");
-            m_nma.speed = 0.5f;
-            m_nma.transform.LookAt(charaScript.transform);
+            //regarde en direction du joueur dès que le joueur entre dans la zone
+            //m_nma.transform.LookAt(charaScript.transform);
             
             //We calculate the angle between the target and the vision
             Vector3 targetDir =  (charaScript.gameObject.transform.position - transform.position).normalized;
             float angle = Mathf.Abs( Vector3.Angle(transform.forward, targetDir));
-            
-            if (angle <= m_angleUncertainty) {
+
+            //Si le joueur est dans l'angle mort de l'ennemi
+            if (angle > m_angleUncertainty)
+            {
+                m_nma.speed = 0.5f;
+                m_nma.transform.Rotate(Vector3.up, m_rotationSpeed * Time.deltaTime);
+            }
+            else if (angle <= m_angleUncertainty) {
+
                 //If the gameObject is a guard we ask him to follow the player
                 if (gameObject.TryGetComponent(out GuardBehavior p_script)){
                     p_script.CheckOutSomewhere(charaScript.gameObject.transform.position);
                     m_nma.speed = m_attackSpeed;
+                    m_nma.acceleration = m_attackAcceleration;
                 }
             }
             
@@ -153,6 +150,7 @@ public class GuardBehavior : MonoBehaviour {
         if (p_other.gameObject.TryGetComponent(out PlayerController charaScript))
         {
             m_nma.speed = m_normalSpeed;
+            m_nma.acceleration = m_normalAcceleration;
         }
     }
     
