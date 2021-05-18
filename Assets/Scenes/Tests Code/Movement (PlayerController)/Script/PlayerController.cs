@@ -16,11 +16,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] [Tooltip("Vitesse de Rotation du Quaternion")] private float m_rotationSpeed = 700f;
     [SerializeField] [Tooltip("The input used to select this character")] private SOInputMultiChara m_selector = null;
     [SerializeField] [Tooltip("The character whom this script is on, SELECT ONLY ONE !")] public Charas m_chara = 0;
-    private KeyCode[] m_keyCodes = new[] {KeyCode.Joystick1Button0, KeyCode.Joystick1Button3, KeyCode.Joystick1Button1};
-    public bool m_isActive = false;
+    [HideInInspector] public KeyCode[] m_keyCodes = new[] {KeyCode.Joystick1Button0, KeyCode.Joystick1Button3, KeyCode.Joystick1Button1};
+    [Tooltip("For Debug Only")] public bool m_isActive = false;
     private static bool s_inBetweenSwitching = false; //is Active when someone is switching character
-    public bool m_isForbiddenToMove = false;
-    [SerializeField] private bool m_isSwitchingChara = false;
+    
+    [Tooltip("For Debug Only")] public bool m_isForbiddenToMove = false; 
+    [Tooltip("For Debug Only")] public bool m_isSwitchingChara = false;
     
     [Header("Soul")]
 
@@ -35,9 +36,9 @@ public class PlayerController : MonoBehaviour
     [HideInInspector] public Vector3 m_spawnPoint = Vector3.zero;
 
     //Cinemachine cameras des trois personnages
-    [HideInInspector] public CinemachineVirtualCamera m_vCamH;
-    [HideInInspector] public CinemachineVirtualCamera m_vCamM;
-    [HideInInspector] public CinemachineVirtualCamera m_vCamR;
+    [HideInInspector] private static CinemachineVirtualCamera m_vCamH;
+    [HideInInspector] private static CinemachineVirtualCamera m_vCamM;
+    [HideInInspector] private static CinemachineVirtualCamera m_vCamR;
 
     private void Start()
     {
@@ -202,5 +203,55 @@ public class PlayerController : MonoBehaviour
         m_deathCounter = 0.0f;
 
         transform.position = m_spawnPoint;
+    }
+
+
+    /// <summary>
+    /// Sets a new camera focusing this character, will focus only if this character is selected
+    /// </summary>
+    /// <param name="p_newCamera">The new camera you want to have focus from</param>
+    public void SetNewCamera(CinemachineVirtualCamera p_newCamera)
+    {
+        int oldPriority = 0;
+        switch (m_chara)
+        {
+            case Charas.Human:
+                oldPriority = m_vCamH.Priority;
+                m_vCamH.Priority = 0;
+                m_vCamH = p_newCamera;
+                m_vCamH.Priority = oldPriority;
+                break;
+            case Charas.Monster:
+                oldPriority = m_vCamM.Priority;
+                m_vCamM.Priority = 0;
+                m_vCamM = p_newCamera;
+                m_vCamM.Priority = oldPriority;
+                break;
+            case Charas.Robot:
+                oldPriority = m_vCamR.Priority;
+                m_vCamR.Priority = 0;
+                m_vCamR = p_newCamera;
+                m_vCamR.Priority = oldPriority;
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Returns the camera focusing this character
+    /// </summary>
+    /// <returns>Returns the camera focusing this character</returns>
+    public CinemachineVirtualCamera GetCurrentCamera()
+    {
+        switch (m_chara)
+        {
+            case Charas.Human:
+                return m_vCamH;
+            case Charas.Monster:
+                return m_vCamM;
+            case Charas.Robot:
+                return m_vCamR;
+            default:
+                return null;
+        }
     }
 }
