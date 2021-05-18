@@ -343,7 +343,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 205744751}
-  m_LocalRotation: {x: 0.46872506, y: -0.002163086, z: 0.0011477933, w: 0.8833408}
+  m_LocalRotation: {x: 0.46872497, y: -0.0021630859, z: 0.001147793, w: 0.8833408}
   m_LocalPosition: {x: 1.2169789, y: 15.41, z: -9.476203}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -470,8 +470,28 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 89996859199575062, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
+      propertyPath: m_attackSpeed
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 89996859199575062, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
+      propertyPath: m_normalSpeed
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 89996859199575062, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
       propertyPath: m_zoneDetection
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 89996859199575062, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
+      propertyPath: m_angleUncertainty
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 89996859199575062, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
+      propertyPath: m_attackAcceleration
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 89996859199575062, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
+      propertyPath: m_normalAcceleration
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 89996859199575062, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
       propertyPath: m_destinationsTransforms.Array.data[0]
@@ -485,6 +505,18 @@ PrefabInstance:
       propertyPath: m_destinationsTransforms.Array.data[2]
       value: 
       objectReference: {fileID: 1316913234}
+    - target: {fileID: 1690642161687880120, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2174152978469191037, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
+      propertyPath: m_Speed
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2174152978469191037, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
+      propertyPath: m_Acceleration
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2488827173228433682, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
       propertyPath: m_Enabled
       value: 1
