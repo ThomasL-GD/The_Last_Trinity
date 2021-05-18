@@ -33,6 +33,10 @@ public class GuardBehavior : MonoBehaviour {
     [SerializeField] [Tooltip("The list of points the guard will travel to, in order from up to down and cycling")] private List<Transform> m_destinationsTransforms = new List<Transform>();
     private List<Vector3> m_destinations = new List<Vector3>();
 
+    private PlayerController m_charaScript;
+    private bool m_enterZone = false;
+    //For Debug Only
+    [SerializeField] [Tooltip("Liste des character qui entrent et sortent de la zone de l'ennemi")] private List<GameObject> m_charactersInDanger = new List<GameObject>();
     
     // Start is called before the first frame update
     void Start() {
@@ -48,9 +52,9 @@ public class GuardBehavior : MonoBehaviour {
             m_destinations.Add(m_destinationsTransforms[i].position);
         }
         m_nma = gameObject.GetComponent<NavMeshAgent>();
+        
         //The first position where the guard will aim at
         m_nma.SetDestination(m_destinations[m_currentDestination]);
-        
     }
     
 
@@ -77,7 +81,34 @@ public class GuardBehavior : MonoBehaviour {
                 m_nma.SetDestination(m_destinations[m_currentDestination]);
             }
         }
-        
+
+        if (m_enterZone) {
+
+            //We calculate the angle between the target and the vision
+            Vector3 targetDir = (m_charaScript.gameObject.transform.position - transform.position).normalized;
+            float angleForward = Vector3.Angle(transform.forward, targetDir);
+
+            //Si le joueur est dans l'angle mort de l'ennemi
+            if (Mathf.Abs(angleForward) > m_angleUncertainty){
+                
+                m_nma.speed = 0.5f;
+                float angleRight = Vector3.Angle(transform.right, targetDir);
+
+                if (Mathf.Abs(angleRight) < 90) m_nma.transform.Rotate(Vector3.up, m_normalRotationSpeed * Time.deltaTime);
+                else if (Mathf.Abs(angleRight) > 90) m_nma.transform.Rotate(Vector3.up, -m_normalRotationSpeed * Time.deltaTime);
+            }
+            //si le joueur est visible par l'ennemi
+            else if (angleForward <= m_angleUncertainty){
+                //If the gameObject is a guard we ask him to follow the player
+                if (gameObject.TryGetComponent(out GuardBehavior p_script))
+                {
+                    p_script.CheckOutSomewhere(m_charaScript.gameObject.transform.position);
+                    m_nma.speed = m_attackSpeed;
+                    m_nma.acceleration = m_attackAcceleration;
+                    m_nma.angularSpeed = m_attackRotationSpeed;
+                }
+            }
+        }
     }
 
     
@@ -104,34 +135,16 @@ public class GuardBehavior : MonoBehaviour {
     /// Called each frame as long as the collider is colliding a collider that is isTrigger
     /// </summary>
     /// <param name="p_other">The collider that we are colliding with</param>
-    private void OnTriggerStay(Collider p_other) {
+    private void OnTriggerEnter(Collider p_other) {
         
+        Debug.Log($"{m_charaScript}");
         
         //If the thing we are colliding is a playable character and only him
-        if (p_other.gameObject.TryGetComponent(out PlayerController charaScript)){
-
-            //We calculate the angle between the target and the vision
-            Vector3 targetDir =  (charaScript.gameObject.transform.position - transform.position).normalized;
-            float angle = Mathf.Abs( Vector3.Angle(transform.forward, targetDir));
-
-            //Si le joueur est dans l'angle mort de l'ennemi
-            if (angle > m_angleUncertainty)
-            {
-                m_nma.speed = 0.5f;
-                m_nma.transform.Rotate(Vector3.up, m_normalRotationSpeed * Time.deltaTime);
-            }
-            else if (angle <= m_angleUncertainty) {
-
-                //If the gameObject is a guard we ask him to follow the player
-                if (gameObject.TryGetComponent(out GuardBehavior p_script))
-                {
-                    p_script.CheckOutSomewhere(charaScript.gameObject.transform.position);
-                    m_nma.speed = m_attackSpeed;
-                    m_nma.acceleration = m_attackAcceleration;
-                    m_nma.angularSpeed = m_attackRotationSpeed;
-                }
-            }
-            
+        if (p_other.gameObject.TryGetComponent(out PlayerController charaScript))
+        {
+            m_charaScript = charaScript;
+            m_charactersInDanger.Add(m_charaScript.gameObject);
+            m_enterZone = true;
         }
     }
 
@@ -147,6 +160,11 @@ public class GuardBehavior : MonoBehaviour {
             m_nma.speed = m_normalSpeed;
             m_nma.acceleration = m_normalAcceleration;
             m_nma.angularSpeed = m_normalRotationSpeed;
+
+            m_charaScript = charaScript;
+            m_enterZone = false;
+            m_charactersInDanger.Remove(m_charaScript.gameObject);
+            
         }
     }
 
@@ -160,7 +178,6 @@ public class GuardBehavior : MonoBehaviour {
     {
         if (p_other.gameObject.TryGetComponent(out PlayerController charaScript)) {
             
-            Debug.Log("T'es mourru.");
             DeathManager.DeathDelegator?.Invoke();
         }
     }
