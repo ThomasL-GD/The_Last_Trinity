@@ -36,6 +36,7 @@ public class GuardBehavior : MonoBehaviour {
 
     private PlayerController m_charaScript;
     private bool m_enterZone = false;
+    private bool m_hasRepeared = false;
     //For Debug Only
     [SerializeField] [Tooltip("Liste des character qui entrent et sortent de la zone de l'ennemi")] private List<GameObject> m_charactersInDanger = new List<GameObject>();
 
@@ -89,37 +90,75 @@ public class GuardBehavior : MonoBehaviour {
             }
         }
 
+        
         if (m_enterZone) {
-
+            
             m_presenceCheck.color = Color.Lerp(Color.Lerp(Color.black,Color.red, m_attackTeintModifier), Color.red, Mathf.PingPong(Time.time, 0.5f));
             
+            int layerMask = 1 << 7;
+            layerMask = ~layerMask;
+            
+            RaycastHit hit;
+            Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, Mathf.Infinity);
+            Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * hit.distance, Color.magenta);
+
+            if (hit.collider != null) {
+                
+                if (hit.collider != m_charaScript.gameObject)
+                {
+                    //Debug.Log("Je ne te vois pas");
+                }
+                else if (hit.collider == m_charaScript.gameObject)
+                {
+                    //Debug.Log("Je te vois");
+                }
+            }
+
             //We calculate the angle between the target and the vision
-            Vector3 targetDir = (m_charaScript.gameObject.transform.position - transform.position).normalized;
+            Vector3 targetDir = (m_charactersInDanger[0].gameObject.transform.position - transform.position).normalized;
+            Vector3 otherObject = (hit.transform.position - transform.position).normalized;
             float angleForward = Vector3.Angle(transform.forward, targetDir);
 
-            //Si le joueur est dans l'angle mort de l'ennemi
-            if (Mathf.Abs(angleForward) > m_angleUncertainty){
-                
-                //m_presenceCheck.color = Color.Lerp(Color.yellow, Color.red, Mathf.PingPong(Time.time, 1));
-                m_nma.speed = 0.5f;
-                float angleRight = Vector3.Angle(transform.right, targetDir);
-
-                if (Mathf.Abs(angleRight) < 90) m_nma.transform.Rotate(Vector3.up, m_normalRotationSpeed * Time.deltaTime);
-                else if (Mathf.Abs(angleRight) > 90) m_nma.transform.Rotate(Vector3.up, -m_normalRotationSpeed * Time.deltaTime);
+            Debug.Log($"otherObject position in x : {Mathf.Abs(otherObject.x)}");
+            Debug.Log($"character position in x : {Mathf.Abs(targetDir.x)}");
+            Debug.Log($"otherObject position in z : {Mathf.Abs(otherObject.z)}");
+            Debug.Log($"character position in z : {Mathf.Abs(targetDir.z)}");
+            
+            
+            if (Mathf.Abs(targetDir.x) > Mathf.Abs(otherObject.x) || Mathf.Abs(targetDir.x) < Mathf.Abs(otherObject.x) || Mathf.Abs(targetDir.z) > Mathf.Abs(otherObject.z) || Mathf.Abs(targetDir.z) < Mathf.Abs(otherObject.z))
+            {
+                Debug.Log("Wtfffffffffff");
             }
-            //si le joueur est visible par l'ennemi
-            else if (angleForward <= m_angleUncertainty){
-                //If the gameObject is a guard we ask him to follow the player
-                if (gameObject.TryGetComponent(out GuardBehavior p_script))
+
+            //Si le joueur est dans l'angle mort de l'ennemi
+            if (Mathf.Abs(angleForward) > m_angleUncertainty)
+            {
+                if (m_hasRepeared)
                 {
-                    p_script.CheckOutSomewhere(m_charaScript.gameObject.transform.position);
-                    Debug.Log($"{m_charaScript}");
                     m_nma.speed = m_attackSpeed;
                     m_nma.acceleration = m_attackAcceleration;
                     m_nma.angularSpeed = m_attackRotationSpeed;
                 }
+                else m_nma.speed = 0.5f;
+
+                float angleRight = Vector3.Angle(transform.right, targetDir);
+                if (Mathf.Abs(angleRight) < 90) m_nma.transform.Rotate(Vector3.up, m_normalRotationSpeed * Time.deltaTime);
+                else if (Mathf.Abs(angleRight) > 90) m_nma.transform.Rotate(Vector3.up, -m_normalRotationSpeed * Time.deltaTime);
+                
+                m_hasRepeared = false;
             }
+            //si le joueur est visible par l'ennemi
+            else if (angleForward <= m_angleUncertainty)
+            {
+                bool hasRepeared = true;
+                CheckOutSomewhere(m_charaScript.gameObject.transform.position);
+                m_nma.speed = m_attackSpeed;
+                m_nma.acceleration = m_attackAcceleration;
+                m_nma.angularSpeed = m_attackRotationSpeed;
+            }
+            
         }
+        
     }
 
     
@@ -128,7 +167,7 @@ public class GuardBehavior : MonoBehaviour {
     /// it is only called if m_isaPCGuard is true
     /// </summary>
     /// <param name="p_playerPos">The last detected position of the player</param>
-    public void CheckOutSomewhere(Vector3 p_playerPos) {
+    private void CheckOutSomewhere(Vector3 p_playerPos) {
         
         //If the guard was already off his path, we cancel his last destination
         if (m_isGoingTowardsPlayer) {
@@ -158,7 +197,6 @@ public class GuardBehavior : MonoBehaviour {
     }
     
     
-
     /// <summary>
     /// Retour à vitesse normale dès qu'un character n'est plus trigger
     /// </summary>
@@ -171,23 +209,16 @@ public class GuardBehavior : MonoBehaviour {
             m_nma.speed = m_normalSpeed;
             m_nma.acceleration = m_normalAcceleration;
             m_nma.angularSpeed = m_normalRotationSpeed;
-
-            for (int i = 0; i < m_charactersInDanger.Count; i++)
-            {
-                //enlèvement du personnage qui est sorti
-                m_charaScript = charaScript;
-                m_charactersInDanger.Remove(m_charaScript.gameObject);
-                
-                //ennemi follow la personne suivante encore dans la zone
-                m_charactersInDanger[0] = charaScript.gameObject;
-                m_charaScript = charaScript;
-            }
-
-            //si personne n'est dans la zone, alors l'ennemi fait sa patrouille normalement
-            if (m_charactersInDanger.Count < 1)
-            {
-                m_enterZone = false;
-            }
+            
+            //enlèvement du personnage qui est sorti
+            m_charaScript = charaScript;
+            m_charactersInDanger.Remove(m_charaScript.gameObject);
+        }
+        
+        //si personne n'est dans la zone, alors l'ennemi fait sa patrouille normalement
+        if (m_charactersInDanger.Count < 1)
+        {
+            m_enterZone = false;
         }
     }
 
