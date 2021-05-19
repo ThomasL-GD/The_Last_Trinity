@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.SocialPlatforms;
 
 [RequireComponent(typeof(SphereCollider))]
 public class GuardBehavior : MonoBehaviour {
@@ -23,7 +24,7 @@ public class GuardBehavior : MonoBehaviour {
     [SerializeField] [Tooltip("Vitesse de déplacement normale")] private float m_normalRotationSpeed = 300.0f;
     [SerializeField] [Tooltip("Vitesse de déplacement normale")] private float m_attackRotationSpeed = 900.0f;
     
-    [Header("Difficulty")]
+    //[Header("Difficulty")]
     [Header("SphereManager")]
     [SerializeField] [Tooltip("The radius of the detection area")] private float m_sphereRadius = 2.0f;
     [SerializeField] [Tooltip("The possible angle of detection")] private float m_angleUncertainty = 9.0f;
@@ -37,6 +38,11 @@ public class GuardBehavior : MonoBehaviour {
     private bool m_enterZone = false;
     //For Debug Only
     [SerializeField] [Tooltip("Liste des character qui entrent et sortent de la zone de l'ennemi")] private List<GameObject> m_charactersInDanger = new List<GameObject>();
+
+    [Header("Character Detection")]
+    [SerializeField] [Tooltip("material associée à la sphère de détection de joueur au-dessus de l'ennemi")] private Material m_presenceCheck;
+    [SerializeField] [Tooltip("variation de la teinte de la sphère de détection")] [Range(0f,1f)] private float m_normalTeintModifier = 0.8f;
+    [SerializeField] [Tooltip("variation de la teinte de la sphère de détection")] [Range(0f,1f)] private float m_attackTeintModifier = 0.8f;
     
     // Start is called before the first frame update
     void Start() {
@@ -46,7 +52,6 @@ public class GuardBehavior : MonoBehaviour {
         m_sphereCol.radius = m_sphereRadius;
         m_sphereCol.isTrigger = true;
         
-
         //We transform the list of Transforms (easier to serialize) into a list of Vector3 (easier to manipulate)
         for (int i = 0; i < m_destinationsTransforms.Count; i++) {
             m_destinations.Add(m_destinationsTransforms[i].position);
@@ -61,6 +66,8 @@ public class GuardBehavior : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
+        m_presenceCheck.color = Color.Lerp(Color.Lerp(Color.black, Color.yellow, m_normalTeintModifier), Color.yellow, Mathf.PingPong(Time.time, 1));
+        
         //If the guard is close enough to the point he was trying to reach
         if (transform.position.x <= m_destinations[m_currentDestination].x + m_uncertainty &&
             transform.position.x >= m_destinations[m_currentDestination].x - m_uncertainty &&
@@ -84,6 +91,8 @@ public class GuardBehavior : MonoBehaviour {
 
         if (m_enterZone) {
 
+            m_presenceCheck.color = Color.Lerp(Color.Lerp(Color.black,Color.red, m_attackTeintModifier), Color.red, Mathf.PingPong(Time.time, 0.5f));
+            
             //We calculate the angle between the target and the vision
             Vector3 targetDir = (m_charaScript.gameObject.transform.position - transform.position).normalized;
             float angleForward = Vector3.Angle(transform.forward, targetDir);
@@ -91,6 +100,7 @@ public class GuardBehavior : MonoBehaviour {
             //Si le joueur est dans l'angle mort de l'ennemi
             if (Mathf.Abs(angleForward) > m_angleUncertainty){
                 
+                //m_presenceCheck.color = Color.Lerp(Color.yellow, Color.red, Mathf.PingPong(Time.time, 1));
                 m_nma.speed = 0.5f;
                 float angleRight = Vector3.Angle(transform.right, targetDir);
 
@@ -103,6 +113,7 @@ public class GuardBehavior : MonoBehaviour {
                 if (gameObject.TryGetComponent(out GuardBehavior p_script))
                 {
                     p_script.CheckOutSomewhere(m_charaScript.gameObject.transform.position);
+                    Debug.Log($"{m_charaScript}");
                     m_nma.speed = m_attackSpeed;
                     m_nma.acceleration = m_attackAcceleration;
                     m_nma.angularSpeed = m_attackRotationSpeed;
@@ -136,9 +147,7 @@ public class GuardBehavior : MonoBehaviour {
     /// </summary>
     /// <param name="p_other">The collider that we are colliding with</param>
     private void OnTriggerEnter(Collider p_other) {
-        
-        Debug.Log($"{m_charaScript}");
-        
+
         //If the thing we are colliding is a playable character and only him
         if (p_other.gameObject.TryGetComponent(out PlayerController charaScript))
         {
@@ -147,6 +156,8 @@ public class GuardBehavior : MonoBehaviour {
             m_enterZone = true;
         }
     }
+    
+    
 
     /// <summary>
     /// Retour à vitesse normale dès qu'un character n'est plus trigger
@@ -161,10 +172,22 @@ public class GuardBehavior : MonoBehaviour {
             m_nma.acceleration = m_normalAcceleration;
             m_nma.angularSpeed = m_normalRotationSpeed;
 
-            m_charaScript = charaScript;
-            m_enterZone = false;
-            m_charactersInDanger.Remove(m_charaScript.gameObject);
-            
+            for (int i = 0; i < m_charactersInDanger.Count; i++)
+            {
+                //enlèvement du personnage qui est sorti
+                m_charaScript = charaScript;
+                m_charactersInDanger.Remove(m_charaScript.gameObject);
+                
+                //ennemi follow la personne suivante encore dans la zone
+                m_charactersInDanger[0] = charaScript.gameObject;
+                m_charaScript = charaScript;
+            }
+
+            //si personne n'est dans la zone, alors l'ennemi fait sa patrouille normalement
+            if (m_charactersInDanger.Count < 1)
+            {
+                m_enterZone = false;
+            }
         }
     }
 
