@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.VFX;
 
 public class Telekinesable : MonoBehaviour
 {
@@ -26,6 +27,8 @@ public class Telekinesable : MonoBehaviour
    
     private Vector3 m_velocity = Vector3.zero; //Vélocité 0 pour le smoothDamp
     private PlayerController m_robotScript = null; //Récupération du script du plauerController pour obtenir le Robot
+
+    private VisualEffect m_cube; //Visual effect en enfant de l'objet Telekinesable
     
     void Start()
     {
@@ -36,7 +39,15 @@ public class Telekinesable : MonoBehaviour
         if (m_selector == null)
         {
             Debug.LogError("Manque le scriptable object d'input");
-        }    
+        }
+        
+        m_cube = GetComponentInChildren<VisualEffect>();
+        m_cube.Stop();
+        
+        if (m_cube == null)
+        {
+            Debug.LogError("Manque l'effet sur le cube telekinesable");
+        }
     }
     
     private void Update()
@@ -55,6 +66,9 @@ public class Telekinesable : MonoBehaviour
             m_isInBetweenTravel = false;
             m_activeTelekinesie = false;
         }
+        
+        //Stop l'effet des cubes
+        //m_cube.Stop();
         
         if (m_telekinesieOpen)
         {
@@ -84,6 +98,7 @@ public class Telekinesable : MonoBehaviour
         {
             if (player.m_chara == Charas.Robot)
             {
+                m_cube.Play();
                 m_telekinesieOpen = true;
                 m_robotScript = player;
             }
@@ -100,6 +115,7 @@ public class Telekinesable : MonoBehaviour
         {
             if (player.m_chara == Charas.Robot)
             {
+                m_cube.Stop();
                 m_telekinesieOpen = false;
                 m_activeTelekinesie = false;
                 m_robotScript = null;
