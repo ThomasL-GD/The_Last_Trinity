@@ -158,13 +158,10 @@ public class GuardBehavior : MonoBehaviour {
 
     IEnumerator DeathCoroutine() {
 
-        AudioSource audio = GetComponent<AudioSource>();
-        audio.Play();
-        
         m_nma.isStopped = true;
         m_charactersInDangerScript[0].m_speed = 0;
         
-        yield return new WaitForSeconds(audio.clip.length); //temps d'animation de mort du monstre
+        yield return new WaitForSeconds(9f); //temps d'animation de mort du monstre
 
         DeathManager.DeathDelegator?.Invoke();  //mort
         m_nma.isStopped = false;

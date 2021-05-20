@@ -150,18 +150,16 @@ MonoBehaviour:
   m_attackSpeed: 7
   m_normalAcceleration: 6
   m_attackAcceleration: 32
-  m_normalRotationSpeed: 360
+  m_normalRotationSpeed: 300
   m_attackRotationSpeed: 3600
-  m_sphereRadius: 2
-  m_angleUncertainty: 10
+  m_deathPos: 20
+  m_sphereRadius: 2.63
+  m_angleUncertainty: 40
   m_uncertainty: 0.01
   m_destinationsTransforms:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  m_presenceCheck: {fileID: 2100000, guid: 7428db842c60cce42b087e9bb7850293, type: 2}
-  m_normalTeintModifier: 0.8
-  m_attackTeintModifier: 0.7
 --- !u!64 &1690642161687880120
 MeshCollider:
   m_ObjectHideFlags: 0
