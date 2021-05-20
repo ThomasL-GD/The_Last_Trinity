@@ -164,6 +164,10 @@ public class PlayerController : MonoBehaviour
         }
         else if (m_isDying) {
             m_deathCounter += Time.deltaTime;
+            if (m_deathCounter > m_timeBeforeDying) {
+                //The line below means that if the delegator is NOT empty, we invoke it.
+                DeathManager.DeathDelegator?.Invoke();
+            }
         }
     }
 
@@ -183,15 +187,11 @@ public class PlayerController : MonoBehaviour
     /// It is detecting the trigger with every death zone to be able to kill itself if it stays too long in there
     /// </summary>
     /// <param name="p_other">The Collider of the object we're triggering with</param>
-    private void OnTriggerStay(Collider p_other)
+    private void OnTriggerEnter(Collider p_other)
     {
         //We can detect if it is a player or not by checking if it has a PlayerController script
         if (!p_other.gameObject.TryGetComponent(out DeathZone pScript)) return;
         m_isDying = true;
-        if (m_deathCounter > m_timeBeforeDying) {
-            //The line below means that if the delegator is NOT empty, we invoke it.
-            DeathManager.DeathDelegator?.Invoke();
-        }
     }
 
     /// <summary>
