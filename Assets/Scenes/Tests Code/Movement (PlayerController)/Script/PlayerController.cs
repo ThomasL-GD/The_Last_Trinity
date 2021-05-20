@@ -27,6 +27,7 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField]
     [Tooltip("The prefab of what represents the soul, it will be driven from a character to another when a switch occurs")] private GameObject m_soulPrefab = null;
+    [Tooltip("Offset for the instantiate of the Soul")][SerializeField] public Vector3 m_soulOffset = Vector3.zero;
     
     [Header("Death Manager")]
     
@@ -136,13 +137,22 @@ public class PlayerController : MonoBehaviour
             else if (Input.GetKeyDown(m_keyCodes[0]) || Input.GetKeyDown(m_keyCodes[1]) || Input.GetKeyDown(m_keyCodes[2])){
                 //If this character was active, we create a soul and send it to the next selected character
                 if (m_isActive) {
-                    GameObject soul = Instantiate(m_soulPrefab, transform.position, transform.rotation);
-                    if (Input.GetKeyDown(m_keyCodes[(int) Charas.Human]))
-                        soul.GetComponent<AutoRotation>().m_target = m_vCamH.LookAt;
-                    if (Input.GetKeyDown(m_keyCodes[(int) Charas.Monster]))
-                        soul.GetComponent<AutoRotation>().m_target = m_vCamM.LookAt;
-                    if (Input.GetKeyDown(m_keyCodes[(int) Charas.Robot]))
-                        soul.GetComponent<AutoRotation>().m_target = m_vCamR.LookAt;
+                    GameObject soul = Instantiate(m_soulPrefab, transform.position + m_soulOffset, transform.rotation);
+                    if (Input.GetKeyDown(m_keyCodes[(int) Charas.Human])) {
+                        AutoRotation soulScript = soul.GetComponent<AutoRotation>();
+                        soulScript.m_target = m_vCamH.LookAt;
+                        soulScript.m_offsetTarget = m_vCamH.LookAt.gameObject.GetComponent<PlayerController>().m_soulOffset;
+                    }
+                    if (Input.GetKeyDown(m_keyCodes[(int) Charas.Monster])) {
+                        AutoRotation soulScript = soul.GetComponent<AutoRotation>();
+                        soulScript.m_target = m_vCamM.LookAt;
+                        soulScript.m_offsetTarget = m_vCamM.LookAt.gameObject.GetComponent<PlayerController>().m_soulOffset;
+                    }
+                    if (Input.GetKeyDown(m_keyCodes[(int) Charas.Robot])) {
+                        AutoRotation soulScript = soul.GetComponent<AutoRotation>();
+                        soulScript.m_target = m_vCamR.LookAt;
+                        soulScript.m_offsetTarget = m_vCamR.LookAt.gameObject.GetComponent<PlayerController>().m_soulOffset;
+                    }
                 }
                 m_isActive = false;
             }
@@ -154,6 +164,10 @@ public class PlayerController : MonoBehaviour
         }
         else if (m_isDying) {
             m_deathCounter += Time.deltaTime;
+            if (m_deathCounter > m_timeBeforeDying) {
+                //The line below means that if the delegator is NOT empty, we invoke it.
+                DeathManager.DeathDelegator?.Invoke();
+            }
         }
     }
 
@@ -173,15 +187,11 @@ public class PlayerController : MonoBehaviour
     /// It is detecting the trigger with every death zone to be able to kill itself if it stays too long in there
     /// </summary>
     /// <param name="p_other">The Collider of the object we're triggering with</param>
-    private void OnTriggerStay(Collider p_other)
+    private void OnTriggerEnter(Collider p_other)
     {
         //We can detect if it is a player or not by checking if it has a PlayerController script
         if (!p_other.gameObject.TryGetComponent(out DeathZone pScript)) return;
         m_isDying = true;
-        if (m_deathCounter > m_timeBeforeDying) {
-            //The line below means that if the delegator is NOT empty, we invoke it.
-            DeathManager.DeathDelegator?.Invoke();
-        }
     }
 
     /// <summary>
