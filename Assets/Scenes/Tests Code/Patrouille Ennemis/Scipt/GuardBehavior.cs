@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Rendering.UI;
+using UnityEngine.Serialization;
 using UnityEngine.SocialPlatforms;
 
 [RequireComponent(typeof(SphereCollider))]
@@ -14,15 +16,15 @@ public class GuardBehavior : MonoBehaviour {
     //variables d'IA
     private NavMeshAgent m_nma = null;
     private int m_currentDestination = 0;
-    private bool m_isGoingTowardsPlayer = false;
 
     [Header("Metrics")] 
-    [SerializeField] [Tooltip("Vitesse de déplacement normale")] private float m_normalSpeed = 5.0f;
-    [SerializeField] [Tooltip("Vitesse de déplacement normale")] private float m_attackSpeed = 15.0f;
-    [SerializeField] [Tooltip("Vitesse de déplacement normale")] private float m_normalAcceleration = 5.0f;
-    [SerializeField] [Tooltip("Vitesse de déplacement normale")] private float m_attackAcceleration = 15.0f;
-    [SerializeField] [Tooltip("Vitesse de déplacement normale")] private float m_normalRotationSpeed = 300.0f;
-    [SerializeField] [Tooltip("Vitesse de déplacement normale")] private float m_attackRotationSpeed = 900.0f;
+    [SerializeField] [Tooltip("Vitesse de déplacement normale")] [Range(0,50)] private float m_normalSpeed = 5.0f;
+    [SerializeField] [Tooltip("Vitesse de déplacement normale")] [Range(0,50)] private float m_attackSpeed = 15.0f;
+    [SerializeField] [Tooltip("Vitesse de déplacement normale")] [Range(0,50)] private float m_normalAcceleration = 5.0f;
+    [SerializeField] [Tooltip("Vitesse de déplacement normale")] [Range(0,50)] private float m_attackAcceleration = 15.0f;
+    [SerializeField] [Tooltip("Vitesse de déplacement normale")] [Range(0,10000)] private float m_normalRotationSpeed = 300.0f;
+    [SerializeField] [Tooltip("Vitesse de déplacement normale")] [Range(0,10000)] private float m_attackRotationSpeed = 900.0f;
+    [SerializeField] [Tooltip("Vitesse de déplacement normale")] [Range(0,100)] private float m_deathPos = 1.0f;
     
     //[Header("Difficulty")]
     [Header("SphereManager")]
@@ -34,21 +36,19 @@ public class GuardBehavior : MonoBehaviour {
     [SerializeField] [Tooltip("The list of points the guard will travel to, in order from up to down and cycling")] private List<Transform> m_destinationsTransforms = new List<Transform>();
     private List<Vector3> m_destinations = new List<Vector3>();
 
-    private PlayerController m_charaScript;
-    private bool m_enterZone = false;
-    private bool m_hasRepeared = false;
-    //For Debug Only
-    [SerializeField] [Tooltip("Liste des character qui entrent et sortent de la zone de l'ennemi")] private List<GameObject> m_charactersInDanger = new List<GameObject>();
-    [SerializeField] [Tooltip("objet de décors subissant un raycast")] private float m_randomObject;
-    [SerializeField] [Tooltip("chara subissant un raycast")] private float m_charaObject;
     
-    [Header("Character Detection")]
-    [SerializeField] [Tooltip("material associée à la sphère de détection de joueur au-dessus de l'ennemi")] private Material m_presenceCheck;
-    [SerializeField] [Tooltip("variation de la teinte de la sphère de détection")] [Range(0f,1f)] private float m_normalTeintModifier = 0.8f;
-    [SerializeField] [Tooltip("variation de la teinte de la sphère de détection")] [Range(0f,1f)] private float m_attackTeintModifier = 0.8f;
+    private bool m_enterZone = false;
+    private bool m_hasSeenPlayer = false;
+    private bool m_isGoingTowardsPlayer = false;
+    private List<PlayerController> m_charactersInDangerScript = new List<PlayerController>(); //Liste des scripts sur les character qui entrent et sortent de la zone de l'ennemi
+
+    private AudioClip m_audioClip;
     
     // Start is called before the first frame update
-    void Start() {
+    void Start()
+    {
+
+        m_audioClip = GetComponent<AudioClip>();
         
         //We adapt the collider to the Serialized value we have
         m_sphereCol = gameObject.GetComponent<SphereCollider>();
@@ -67,9 +67,7 @@ public class GuardBehavior : MonoBehaviour {
     
 
     // Update is called once per frame
-    void Update()
-    {
-        m_presenceCheck.color = Color.Lerp(Color.Lerp(Color.black, Color.yellow, m_normalTeintModifier), Color.yellow, Mathf.PingPong(Time.time, 1));
+    void Update() {
         
         //If the guard is close enough to the point he was trying to reach
         if (transform.position.x <= m_destinations[m_currentDestination].x + m_uncertainty &&
@@ -92,73 +90,86 @@ public class GuardBehavior : MonoBehaviour {
             }
         }
 
-        
+
         if (m_enterZone) {
             
-            m_presenceCheck.color = Color.Lerp(Color.Lerp(Color.black,Color.red, m_attackTeintModifier), Color.red, Mathf.PingPong(Time.time, 0.5f));
-            
+            //calcul de la position du premier chara entré dans la zone
+            Vector3 targetDir = (m_charactersInDangerScript[0].gameObject.transform.position - transform.position).normalized;
+            //angle de détection lorsque l'ennemi est à peu près en face du joueur
+            float angleForward = Vector3.Angle(transform.forward, targetDir);
+
             //Layer
-            int layerMask = 1 << 7;
-            layerMask = ~layerMask;
-            
+            int layerMask = 1 << 8; //0b1000_0000
+            layerMask = ~layerMask; //0b0111_1111
+
             //création de la variable du  raycast
             RaycastHit hit;
             //création physique du raycast
-            Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, Mathf.Infinity);
+            bool raycastHasHit = Physics.Raycast(transform.position, targetDir, out hit, m_sphereRadius * 5);
+            
             //Debug du raycast dans la scène
-            Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * hit.distance, Color.magenta);
-            
-            
-            //calcul de la position du premier chara entré dans la zone
-            Vector3 targetDir = (m_charactersInDanger[0].gameObject.transform.position - transform.position).normalized;
-            //angle de détection lorsque l'ennemi est à peu près en face du joueur
-            float angleForward = Vector3.Angle(transform.forward, targetDir);
-            
-            //Distance entre l'ennemi et le joueur
-            m_charaObject = Vector3.Distance(transform.position, m_charactersInDanger[0].transform.position);
-            //Distance entre l'ennemi et un quelconque obstacle
-            m_randomObject = Vector3.Distance(transform.position, hit.transform.position);
-
-            
-            if (m_charaObject > m_randomObject) //le chara se trouve derrière un obstacle et n'est pas visible par l'ennemi
+            if (raycastHasHit)
             {
-                Debug.Log("Oulala on ne voit pas le character derrière");
-            }
-            else if (m_charaObject <= m_randomObject) //le chara est visible par l'ennemi
-            {
-                Debug.Log("CHOPEZ-LE !!!");
+                //Debug.DrawRay(transform.position, targetDir * hit.distance, Color.magenta, 10f);
                 
-                //Si le joueur est dans l'angle mort de l'ennemi
-                if (Mathf.Abs(angleForward) > m_angleUncertainty)
+                if (m_charactersInDangerScript[0].gameObject.transform.position != hit.transform.position) //le chara se trouve derrière un obstacle et n'est pas visible par l'ennemi
                 {
-                    if (m_hasRepeared)
+                    Debug.Log("Oulala on ne voit pas le character derrière");
+                }
+                else //le chara est visible par l'ennemi
+                {
+                    //Si le joueur est dans l'angle mort de l'ennemi
+                    if (Mathf.Abs(angleForward) > m_angleUncertainty)
                     {
+                        if (m_hasSeenPlayer)
+                        {
+                            m_nma.speed = m_attackSpeed;
+                            m_nma.acceleration = m_attackAcceleration;
+                            m_nma.angularSpeed = m_attackRotationSpeed;
+                        }
+                        else m_nma.speed = 0f;
+
+                        //sens de rotation en fonction de la position du joueur qui est dans la zone mais pas encore repéré
+                        float angleRight = Vector3.Angle(transform.right, targetDir);
+                        if (Mathf.Abs(angleRight) < 90) m_nma.transform.Rotate(Vector3.up, m_normalRotationSpeed * Time.deltaTime);
+                        else if (Mathf.Abs(angleRight) > 90) m_nma.transform.Rotate(Vector3.up, -m_normalRotationSpeed * Time.deltaTime);
+
+                    }
+                    //si le joueur est visible par l'ennemi
+                    else if (angleForward <= m_angleUncertainty)
+                    {
+                        m_hasSeenPlayer = true;
+                        CheckOutSomewhere(m_charactersInDangerScript[0].gameObject.transform.position);
                         m_nma.speed = m_attackSpeed;
                         m_nma.acceleration = m_attackAcceleration;
                         m_nma.angularSpeed = m_attackRotationSpeed;
+                        
+                        //mort du joueur dès qu'il est assez proche
+                        if (Vector3.Distance(m_charactersInDangerScript[0].transform.position, transform.position) < m_deathPos) StartCoroutine("DeathCoroutine");
                     }
-                    else m_nma.speed = 0.5f;
-
-                    float angleRight = Vector3.Angle(transform.right, targetDir);
-                    if (Mathf.Abs(angleRight) < 90) m_nma.transform.Rotate(Vector3.up, m_normalRotationSpeed * Time.deltaTime);
-                    else if (Mathf.Abs(angleRight) > 90) m_nma.transform.Rotate(Vector3.up, -m_normalRotationSpeed * Time.deltaTime);
-                
-                    m_hasRepeared = false;
-                }
-                //si le joueur est visible par l'ennemi
-                else if (angleForward <= m_angleUncertainty)
-                {
-                    bool hasRepeared = true;
-                    CheckOutSomewhere(m_charaScript.gameObject.transform.position);
-                    m_nma.speed = m_attackSpeed;
-                    m_nma.acceleration = m_attackAcceleration;
-                    m_nma.angularSpeed = m_attackRotationSpeed;
                 }
             }
+            else
+            {
+                //Debug.LogWarning("The raycast hit nothing nowhere");
+            }
         }
-        
     }
 
+    IEnumerator DeathCoroutine() {
+
+        AudioSource audio = GetComponent<AudioSource>();
+        audio.Play();
+        
+        m_nma.isStopped = true;
+        m_charactersInDangerScript[0].m_speed = 0;
+        
+        yield return new WaitForSeconds(audio.clip.length); //temps d'animation de mort du monstre
+
+        DeathManager.DeathDelegator?.Invoke();  //mort
+        m_nma.isStopped = false;
+    }
+    
     
     /// <summary>
     /// This function is called by the Delegator each time someone or something detect the player
@@ -176,9 +187,8 @@ public class GuardBehavior : MonoBehaviour {
         m_destinations.Insert(m_currentDestination, p_playerPos);
         m_nma.SetDestination(m_destinations[m_currentDestination]);
     }
-    
-    
-    
+
+
     /// <summary>
     /// Called each frame as long as the collider is colliding a collider that is isTrigger
     /// </summary>
@@ -188,8 +198,16 @@ public class GuardBehavior : MonoBehaviour {
         //If the thing we are colliding is a playable character and only him
         if (p_other.gameObject.TryGetComponent(out PlayerController charaScript))
         {
-            m_charaScript = charaScript;
-            m_charactersInDanger.Add(m_charaScript.gameObject);
+            
+            bool isAlreadyInList = false;
+            for(int i = 0; i<m_charactersInDangerScript.Count; i++) {
+                if (m_charactersInDangerScript[i] == charaScript) {
+                    isAlreadyInList = true;
+                    i = m_charactersInDangerScript.Count;
+                }
+            }
+            if(!isAlreadyInList) m_charactersInDangerScript.Add(charaScript);
+            
             m_enterZone = true;
         }
     }
@@ -204,33 +222,21 @@ public class GuardBehavior : MonoBehaviour {
         //If the thing we are colliding is a playable character and only him
         if (p_other.gameObject.TryGetComponent(out PlayerController charaScript))
         {
+            m_hasSeenPlayer = false;
             m_nma.speed = m_normalSpeed;
             m_nma.acceleration = m_normalAcceleration;
             m_nma.angularSpeed = m_normalRotationSpeed;
             
+            charaScript.m_speed = 5;
+            
             //enlèvement du personnage qui est sorti
-            m_charaScript = charaScript;
-            m_charactersInDanger.Remove(m_charaScript.gameObject);
+            m_charactersInDangerScript.Remove(charaScript);
         }
         
         //si personne n'est dans la zone, alors l'ennemi fait sa patrouille normalement
-        if (m_charactersInDanger.Count < 1)
+        if (m_charactersInDangerScript.Count < 1)
         {
             m_enterZone = false;
-        }
-    }
-
-
-    /// <summary>
-    /// Fonction de connexion au corps à corps entre ennemi et joueur
-    /// applique le respawn après la mort
-    /// </summary>
-    /// <param name="other"></param>
-    private void OnCollisionEnter(Collision p_other)
-    {
-        if (p_other.gameObject.TryGetComponent(out PlayerController charaScript)) {
-            
-            DeathManager.DeathDelegator?.Invoke();
         }
     }
 
