@@ -1,17 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Start_Manager : MonoBehaviour
 {
     [Header("Waypoints Manager")]
     [SerializeField] [Tooltip("The list of points the guard will travel to, in order from up to down and cycling")] private List<GameObject> m_destinationsTransforms = new List<GameObject>();
     private List<Vector3> m_destinations = new List<Vector3>();
+    
+    [Header("Camera")]
     [SerializeField] [Tooltip("camera principale")] private GameObject m_camera;
-    //[SerializeField] [Tooltip("camera principale")] private GameObject m_endview;
     [SerializeField] [Tooltip("vitesse de déplacement de la camera")] [Range(0,10)]private float m_speedCamera = 1.0f;
     [SerializeField] [Tooltip("vitesse de déplacement de la camera")] [Range(0,5)] private float m_speedRotationCamera = 100.0f;
-    
+
+    [Header("Canvas")] [SerializeField] 
+    [Tooltip("Bouton de démarrage")] private Button m_startButton;
     
     // Start is called before the first frame update
     void Start()
@@ -27,6 +31,8 @@ public class Start_Manager : MonoBehaviour
         
         //La camera se positionne au même emplacement que le premier GameObject de la liste créée au-dessus
         m_camera.transform.position = m_destinationsTransforms[0].transform.position;
+
+        m_startButton.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
@@ -39,6 +45,17 @@ public class Start_Manager : MonoBehaviour
         if (m_camera.transform.rotation.x >= m_destinationsTransforms[1].transform.rotation.x)
         {
             m_camera.transform.Rotate(Vector3.left * (m_speedRotationCamera * Time.deltaTime));
+        }
+        else
+        {
+            m_startButton.gameObject.SetActive(true);
+
+            bool start = true;
+
+            if (start)
+            {
+                //load game scene
+            }
         }
         
         
