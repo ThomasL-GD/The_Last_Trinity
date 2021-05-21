@@ -19,14 +19,16 @@ public class GuardBehavior : MonoBehaviour {
 
     [Header("Metrics")] 
     [SerializeField] [Tooltip("Vitesse de déplacement normale")] [Range(0,50)] private float m_normalSpeed = 5.0f;
-    [SerializeField] [Tooltip("Vitesse de déplacement normale")] [Range(0,50)] private float m_attackSpeed = 15.0f;
-    [SerializeField] [Tooltip("Vitesse de déplacement normale")] [Range(0,50)] private float m_normalAcceleration = 5.0f;
-    [SerializeField] [Tooltip("Vitesse de déplacement normale")] [Range(0,50)] private float m_attackAcceleration = 15.0f;
-    [SerializeField] [Tooltip("Vitesse de déplacement normale")] [Range(0,10000)] private float m_normalRotationSpeed = 300.0f;
-    [SerializeField] [Tooltip("Vitesse de déplacement normale")] [Range(0,10000)] private float m_attackRotationSpeed = 900.0f;
-    [SerializeField] [Tooltip("Vitesse de déplacement normale")] [Range(0,100)] private float m_deathPos = 1.0f;
+    [SerializeField] [Tooltip("Vitesse de déplacement aggressive")] [Range(0,50)] private float m_attackSpeed = 15.0f;
+    [SerializeField] [Tooltip("Vitesse d'accélération normale")] [Range(0,50)] private float m_normalAcceleration = 5.0f;
+    [SerializeField] [Tooltip("Vitesse d'accélération aggressive")] [Range(0,50)] private float m_attackAcceleration = 15.0f;
+    [SerializeField] [Tooltip("Vitesse de rotation normale")] [Range(0,10000)] private float m_normalRotationSpeed = 300.0f;
+    [SerializeField] [Tooltip("Vitesse de rotation aggressive")] [Range(0,10000)] private float m_attackRotationSpeed = 900.0f;
     
-    //[Header("Difficulty")]
+    [Header("Death")]
+    [SerializeField] [Tooltip("distance d'élimination")] [Range(0,100)] private float m_deathPos = 1.0f;
+    [SerializeField] [Tooltip("temps d'animation de mort")] [Range(0,10)] private float m_deathTime = 3.0f;
+    
     [Header("SphereManager")]
     [SerializeField] [Tooltip("The radius of the detection area")] private float m_sphereRadius = 2.0f;
     [SerializeField] [Tooltip("The possible angle of detection")] private float m_angleUncertainty = 9.0f;
@@ -41,15 +43,12 @@ public class GuardBehavior : MonoBehaviour {
     private bool m_hasSeenPlayer = false;
     private bool m_isGoingTowardsPlayer = false;
     private List<PlayerController> m_charactersInDangerScript = new List<PlayerController>(); //Liste des scripts sur les character qui entrent et sortent de la zone de l'ennemi
-
-    private AudioClip m_audioClip;
+    
     
     // Start is called before the first frame update
     void Start()
     {
 
-        m_audioClip = GetComponent<AudioClip>();
-        
         //We adapt the collider to the Serialized value we have
         m_sphereCol = gameObject.GetComponent<SphereCollider>();
         m_sphereCol.radius = m_sphereRadius;
@@ -149,20 +148,19 @@ public class GuardBehavior : MonoBehaviour {
                     }
                 }
             }
-            else
-            {
-                //Debug.LogWarning("The raycast hit nothing nowhere");
-            }
+            else {}//Debug.LogWarning("The raycast hit nothing nowhere");
         }
+        
+        if(m_charactersInDangerScript.Count>=1) Debug.Log($"{m_charactersInDangerScript[0].m_isForbiddenToMove}");
     }
 
+    
     IEnumerator DeathCoroutine() {
 
         m_nma.isStopped = true;
-        m_charactersInDangerScript[0].m_speed = 0;
-        
-        yield return new WaitForSeconds(9f); //temps d'animation de mort du monstre
-
+        m_charactersInDangerScript[0].m_isForbiddenToMove = true;
+        yield return new WaitForSeconds(m_deathTime); //temps d'animation de mort du monstre
+        //m_charactersInDangerScript[0].m_isForbiddenToMove = false;
         DeathManager.DeathDelegator?.Invoke();  //mort
         m_nma.isStopped = false;
     }
@@ -220,12 +218,11 @@ public class GuardBehavior : MonoBehaviour {
         if (p_other.gameObject.TryGetComponent(out PlayerController charaScript))
         {
             m_hasSeenPlayer = false;
+            if(charaScript.m_isForbiddenToMove = true) charaScript.m_isForbiddenToMove = false;
             m_nma.speed = m_normalSpeed;
             m_nma.acceleration = m_normalAcceleration;
             m_nma.angularSpeed = m_normalRotationSpeed;
-            
-            charaScript.m_speed = 5;
-            
+
             //enlèvement du personnage qui est sorti
             m_charactersInDangerScript.Remove(charaScript);
         }
