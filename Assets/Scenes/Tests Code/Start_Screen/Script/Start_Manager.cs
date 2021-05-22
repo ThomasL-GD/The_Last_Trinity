@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class Start_Manager : MonoBehaviour
 {
@@ -49,12 +50,13 @@ public class Start_Manager : MonoBehaviour
         else
         {
             m_startButton.gameObject.SetActive(true);
-
             bool start = true;
 
             if (start)
             {
+                Debug.Log("Passage à la nouvelle scène");
                 //load game scene
+                //SceneManager.LoadScene("Intéractions_subpuzzle 1", LoadSceneMode.Additive);
             }
         }
         
