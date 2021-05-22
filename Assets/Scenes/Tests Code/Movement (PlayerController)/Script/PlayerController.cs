@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour
     
     [SerializeField] [Tooltip("Vitesse du joueur")] public float m_speed = 5f;
     [SerializeField] [Tooltip("Vitesse de Rotation du Quaternion")] private float m_rotationSpeed = 700f;
-    [SerializeField] [Tooltip("The input used to select this character")] private SOInputMultiChara m_selector = null;
+    [SerializeField] [Tooltip("The input used to select this character")] public SOInputMultiChara m_selector = null;
     [SerializeField] [Tooltip("The character whom this script is on, SELECT ONLY ONE !")] public Charas m_chara = 0;
     [HideInInspector] public KeyCode[] m_keyCodes = new[] {KeyCode.Joystick1Button0, KeyCode.Joystick1Button3, KeyCode.Joystick1Button1};
     [Tooltip("For Debug Only")] public bool m_isActive = false;

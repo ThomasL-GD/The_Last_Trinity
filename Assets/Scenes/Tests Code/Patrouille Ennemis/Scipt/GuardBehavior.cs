@@ -24,11 +24,7 @@ public class GuardBehavior : MonoBehaviour {
     [SerializeField] [Tooltip("Vitesse d'accélération aggressive")] [Range(0,50)] private float m_attackAcceleration = 15.0f;
     [SerializeField] [Tooltip("Vitesse de rotation normale")] [Range(0,10000)] private float m_normalRotationSpeed = 300.0f;
     [SerializeField] [Tooltip("Vitesse de rotation aggressive")] [Range(0,10000)] private float m_attackRotationSpeed = 900.0f;
-    
-    [Header("Death")]
-    [SerializeField] [Tooltip("distance d'élimination")] [Range(0,100)] private float m_deathPos = 1.0f;
-    [SerializeField] [Tooltip("temps d'animation de mort")] [Range(0,10)] private float m_deathTime = 3.0f;
-    
+
     [Header("SphereManager")]
     [SerializeField] [Tooltip("The radius of the detection area")] private float m_sphereRadius = 2.0f;
     [SerializeField] [Tooltip("The possible angle of detection")] private float m_angleUncertainty = 9.0f;
@@ -38,6 +34,13 @@ public class GuardBehavior : MonoBehaviour {
     [SerializeField] [Tooltip("The list of points the guard will travel to, in order from up to down and cycling")] private List<Transform> m_destinationsTransforms = new List<Transform>();
     private List<Vector3> m_destinations = new List<Vector3>();
 
+    [Header("Death")]
+    [SerializeField] [Tooltip("distance d'élimination")] [Range(0,100)] private float m_deathPos = 1.0f;
+    [SerializeField] [Tooltip("temps d'animation de mort")] [Range(0,10)] private float m_deathTime = 3.0f;
+    
+    [Header("Monster Ability")]
+    [SerializeField] [Tooltip("temps de capacité de monstre")] [Range(0,100)] private float m_intimidationTime = 1.0f;
+    [SerializeField] [Tooltip("temps de stun qu'est l'ennemi")] [Range(0,100)] private float m_stunTime = 1.0f;
     
      [Tooltip("For Debug Only")] private bool m_enterZone = false;
     private bool m_hasSeenPlayer = false;
@@ -93,7 +96,11 @@ public class GuardBehavior : MonoBehaviour {
 
 
         if (m_enterZone && !m_isKillingSomeone) {
-            
+
+            if (Input.GetKeyDown(m_charactersInDangerScript[0].m_selector.inputMonster))
+            {
+                StartCoroutine("Intimidate");
+            }
             //calcul de la position du premier chara entré dans la zone
             Vector3 targetDir = (m_charactersInDangerScript[0].gameObject.transform.position - transform.position).normalized;
             //angle de détection lorsque l'ennemi est à peu près en face du joueur
@@ -154,6 +161,24 @@ public class GuardBehavior : MonoBehaviour {
         }
     }
 
+    IEnumerator Intimidate()
+    {
+        m_nma.isStopped = true;
+        PlayerController scriptCharaWhoIsDying = m_charactersInDangerScript[0];
+        scriptCharaWhoIsDying.m_isForbiddenToMove = true;
+        
+        yield return new WaitForSeconds(m_intimidationTime); //temps d'animation d'intimidation
+        
+        scriptCharaWhoIsDying.m_isForbiddenToMove = false;
+        StartCoroutine("Stun");
+    }
+
+    IEnumerator Stun()
+    {
+        yield return new WaitForSeconds(m_stunTime); //durée de stun
+        m_nma.isStopped = false;
+    }
+    
     
     IEnumerator DeathCoroutine()
     {
@@ -163,7 +188,7 @@ public class GuardBehavior : MonoBehaviour {
         scriptCharaWhoIsDying.m_isForbiddenToMove = true;
         
         yield return new WaitForSeconds(m_deathTime); //temps d'animation de mort du monstre
-        
+
         scriptCharaWhoIsDying.m_isForbiddenToMove = false;
         DeathManager.DeathDelegator?.Invoke();  //mort
         m_nma.isStopped = false;
