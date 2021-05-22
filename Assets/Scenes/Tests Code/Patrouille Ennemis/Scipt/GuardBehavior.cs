@@ -14,7 +14,7 @@ public class GuardBehavior : MonoBehaviour {
     private SphereCollider m_sphereCol = null;
 
     //variables d'IA
-    private NavMeshAgent m_nma = null;
+    public NavMeshAgent m_nma = null;
     private int m_currentDestination = 0;
 
     [Header("Metrics")] 
@@ -39,12 +39,14 @@ public class GuardBehavior : MonoBehaviour {
     private List<Vector3> m_destinations = new List<Vector3>();
 
     
-    private bool m_enterZone = false;
+     [Tooltip("For Debug Only")] private bool m_enterZone = false;
     private bool m_hasSeenPlayer = false;
     private bool m_isGoingTowardsPlayer = false;
-    private List<PlayerController> m_charactersInDangerScript = new List<PlayerController>(); //Liste des scripts sur les character qui entrent et sortent de la zone de l'ennemi
-    
-    
+    public static bool m_isKillingSomeone = false;  //tous les script de l'ennemi possèdent la même valeur de la variable au même moment
+     [Tooltip("For Debug Only")] private List<PlayerController> m_charactersInDangerScript = new List<PlayerController>(); //Liste des scripts sur les character qui entrent et sortent de la zone de l'ennemi
+
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -90,16 +92,13 @@ public class GuardBehavior : MonoBehaviour {
         }
 
 
-        if (m_enterZone) {
+        if (m_enterZone && !m_isKillingSomeone) {
             
             //calcul de la position du premier chara entré dans la zone
             Vector3 targetDir = (m_charactersInDangerScript[0].gameObject.transform.position - transform.position).normalized;
             //angle de détection lorsque l'ennemi est à peu près en face du joueur
             float angleForward = Vector3.Angle(transform.forward, targetDir);
-
-            //Layer
-            int layerMask = 1 << 8; //0b1000_0000
-            layerMask = ~layerMask; //0b0111_1111
+            
 
             //création de la variable du  raycast
             RaycastHit hit;
@@ -142,27 +141,33 @@ public class GuardBehavior : MonoBehaviour {
                         m_nma.speed = m_attackSpeed;
                         m_nma.acceleration = m_attackAcceleration;
                         m_nma.angularSpeed = m_attackRotationSpeed;
-                        
+
                         //mort du joueur dès qu'il est assez proche
-                        if (Vector3.Distance(m_charactersInDangerScript[0].transform.position, transform.position) < m_deathPos) StartCoroutine("DeathCoroutine");
+                        if (Vector3.Distance(m_charactersInDangerScript[0].transform.position, transform.position) < m_deathPos)
+                        {
+                            StartCoroutine("DeathCoroutine");
+                        }
                     }
                 }
             }
             else {}//Debug.LogWarning("The raycast hit nothing nowhere");
         }
-        
-        if(m_charactersInDangerScript.Count>=1) Debug.Log($"{m_charactersInDangerScript[0].m_isForbiddenToMove}");
     }
 
     
-    IEnumerator DeathCoroutine() {
-
+    IEnumerator DeathCoroutine()
+    {
+        m_isKillingSomeone = true;
+        PlayerController scriptCharaWhoIsDying = m_charactersInDangerScript[0];
         m_nma.isStopped = true;
-        m_charactersInDangerScript[0].m_isForbiddenToMove = true;
+        scriptCharaWhoIsDying.m_isForbiddenToMove = true;
+        
         yield return new WaitForSeconds(m_deathTime); //temps d'animation de mort du monstre
-        //m_charactersInDangerScript[0].m_isForbiddenToMove = false;
+        
+        scriptCharaWhoIsDying.m_isForbiddenToMove = false;
         DeathManager.DeathDelegator?.Invoke();  //mort
         m_nma.isStopped = false;
+        m_isKillingSomeone = false;
     }
     
     
@@ -214,23 +219,23 @@ public class GuardBehavior : MonoBehaviour {
     /// <param name="p_other">collision avec un character</param>
     private void OnTriggerExit(Collider p_other)
     {
+        
         //If the thing we are colliding is a playable character and only him
         if (p_other.gameObject.TryGetComponent(out PlayerController charaScript))
         {
-            m_hasSeenPlayer = false;
-            if(charaScript.m_isForbiddenToMove = true) charaScript.m_isForbiddenToMove = false;
-            m_nma.speed = m_normalSpeed;
-            m_nma.acceleration = m_normalAcceleration;
-            m_nma.angularSpeed = m_normalRotationSpeed;
-
             //enlèvement du personnage qui est sorti
             m_charactersInDangerScript.Remove(charaScript);
-        }
-        
-        //si personne n'est dans la zone, alors l'ennemi fait sa patrouille normalement
-        if (m_charactersInDangerScript.Count < 1)
-        {
-            m_enterZone = false;
+
+            //si personne n'est dans la zone, alors l'ennemi fait sa patrouille normalement
+            if (m_charactersInDangerScript.Count < 1)
+            {
+                m_hasSeenPlayer = false;
+                m_nma.speed = m_normalSpeed;
+                m_nma.acceleration = m_normalAcceleration;
+                m_nma.angularSpeed = m_normalRotationSpeed;
+                m_enterZone = false;
+            }
+            
         }
     }
 

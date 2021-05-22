@@ -29,6 +29,7 @@ public class Interact_Detection : MonoBehaviour
     [HideInInspector] [Tooltip("variable qui autorise le déplacement dans le subPuzzle")] public bool m_canMove = true;
     [SerializeField] [Tooltip("Temps que l'écran de fin reste activé quand le subpuzzle est réussit")] [Range(0f,500f)] private float m_timer = 1f;
     
+    
     private void Start()
     {
         if (m_puzzle == null) {
@@ -51,20 +52,22 @@ public class Interact_Detection : MonoBehaviour
             }
         }
 
-        if (m_camera == null) {
-            Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE CAMERA IN INTERACT_DETECTION !");
-        }
-        if (m_inputs == null) {
-            Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO ADD THE INPUTS IN INTERACT_DETECTION !");
-        }
+        if (m_camera == null) Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE CAMERA IN INTERACT_DETECTION !");
+        if (m_inputs == null) Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO ADD THE INPUTS IN INTERACT_DETECTION !");
         
         
     }
 
     private void Update()
     {
+        if (GuardBehavior.m_isKillingSomeone)
+        {
+            Debug.Log("Je suis dans interact detection");
+            this.PuzzleDeactivation();
+        }
+        
         if (m_buttonActivate || m_isInSubPuzzle) {
-            
+
             bool input = false;
 
             //input des différents character
@@ -125,7 +128,7 @@ public class Interact_Detection : MonoBehaviour
             StartCoroutine(EndLook());
         }
         else {
-            m_playerController.m_isForbiddenToMove = false;
+            if(!GuardBehavior.m_isKillingSomeone) m_playerController.m_isForbiddenToMove = false;
             m_activationButton.SetActive(true);
             m_buttonActivate = true;
             m_isInSubPuzzle = false;
