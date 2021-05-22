@@ -62,7 +62,6 @@ public class Interact_Detection : MonoBehaviour
     {
         if (GuardBehavior.m_isKillingSomeone)
         {
-            Debug.Log("Je suis dans interact detection");
             this.PuzzleDeactivation();
         }
         
@@ -74,8 +73,8 @@ public class Interact_Detection : MonoBehaviour
             if (m_chara == Charas.Human) input = Input.GetKeyDown(m_inputs.inputHuman);
             else if (m_chara == Charas.Monster) input = Input.GetKeyDown(m_inputs.inputMonster);
             else if (m_chara == Charas.Robot) input = Input.GetKeyDown(m_inputs.inputRobot);
-
-            if (m_playerController.m_isActive) {
+            
+            if (!m_playerController.m_isForbiddenToMove) {
 
                 m_activationButton.SetActive(true);
 
@@ -127,8 +126,8 @@ public class Interact_Detection : MonoBehaviour
             m_openDoor = true;
             StartCoroutine(EndLook());
         }
-        else {
-            if(!GuardBehavior.m_isKillingSomeone) m_playerController.m_isForbiddenToMove = false;
+        else if(!GuardBehavior.m_isKillingSomeone){ m_playerController.m_isForbiddenToMove = false;}
+        else if(m_isInSubPuzzle){
             m_activationButton.SetActive(true);
             m_buttonActivate = true;
             m_isInSubPuzzle = false;
