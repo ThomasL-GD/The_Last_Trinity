@@ -133,7 +133,7 @@ public class Start_Manager : MonoBehaviour
                 }
             }
 
-            /*
+            
             if (selectorValidation) {
 
                 switch (m_selectorIndex) {
@@ -152,8 +152,7 @@ public class Start_Manager : MonoBehaviour
                 }
                 
             }
-            */
-            
+
             if (m_selectorIndex == 2 && selectorValidation)
             {
                 m_mainMenuIsActive = false;
