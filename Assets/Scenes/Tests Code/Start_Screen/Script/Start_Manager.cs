@@ -5,50 +5,17 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class Start_Manager : MonoBehaviour
-{
-    /*
-    [Serializable]
-    public class ButtonsMenu
-    {
-        //Anglais
-        [SerializeField] [Tooltip("bouton anglais de continuation")] public GameObject m_continue =null;
-        [SerializeField] [Tooltip("bouton anglais de nouvelle partie")] public GameObject m_newGame =null;
-        [SerializeField] [Tooltip("bouton anglais de changement de langue")] public GameObject m_language =null;
-        [SerializeField] [Tooltip("bouton anglais de quitter le jeu")] public GameObject m_quit =null;
-        
-        //Français
-        [SerializeField] [Tooltip("bouton français de continuation")] public GameObject m_continuer =null;
-        [SerializeField] [Tooltip("bouton français de nouvelle partie")] public GameObject m_nouvellePartie =null;
-        [SerializeField] [Tooltip("bouton français de changement de langue")] public GameObject m_langue =null;
-        [SerializeField] [Tooltip("bouton français de quitter le jeu")] public GameObject m_quitter =null;
-    }
-    */
-    
-    //[SerializeField] [Tooltip("Tableau des pièces à instancier avec leur nom")] private ButtonsMenu m_buttonsMenu=null;
-    
+public class Start_Manager : MonoBehaviour {
     
     [Header("Canvas")] 
     [Tooltip("image de Titre")] public Image m_title;
     [SerializeField] [Tooltip("Bouton de démarrage")] private Button m_pressStartButton =null;
     [SerializeField] [Tooltip("texte de démarrage")] private TextMeshProUGUI m_pressStartText=null;
-    [SerializeField] [Tooltip("Menu Principal")] private GameObject m_englishMainMenu =null;
-    [SerializeField] [Tooltip("Menu Principal")] private GameObject m_frenchMainMenu=null;
     [SerializeField] [Tooltip("Menu Principal")] private GameObject m_mainMenu=null;
-    //[SerializeField] [Tooltip("Liste des positions sur lesquelles on va se déplacer ")] private GameObject[] m_menuPiecesButton;
-    //[SerializeField] [Tooltip("Liste des positions sur lesquelles on va se déplacer ")] private List<GameObject> m_menuPiecesButton = new List<GameObject>();
     [SerializeField] [Tooltip("Liste des positions sur lesquelles on va se déplacer ")] private List<Transform> m_test = new List<Transform>();
     
-
-    [Header("Buttons Menu")]
-    [SerializeField] [Tooltip("bouton anglais de continuation")] public GameObject m_continue =null;
-    [SerializeField] [Tooltip("bouton anglais de nouvelle partie")] public GameObject m_newGame =null;
-    [SerializeField] [Tooltip("bouton anglais de changement de langue")] public GameObject m_language =null;
-    [SerializeField] [Tooltip("bouton anglais de quitter le jeu")] public GameObject m_quit =null;
     
     [Header("Menu Selector")] 
-    [SerializeField] [Tooltip("Selecteur du menu")] private GameObject m_englishMenuSelector;
-    [SerializeField] [Tooltip("Selecteur du menu")] private GameObject m_frenchMenuSelector;
     [SerializeField] [Tooltip("Selecteur du menu")] private GameObject m_menuSelector;
     
     [Header("Animations")]
@@ -70,34 +37,16 @@ public class Start_Manager : MonoBehaviour
     void Start()
     {
         if (m_title == null) Debug.LogError("OUPS ! U FORGOT TO PUT THE TITLE IMAGE ON THE START MANAGER OBJECT");
-        if (m_pressStartButton == null) Debug.LogError("OUPS ! U FORGOT TO PUT THE BUTTON TO LAUNCH THE GAME ON THE START MANAGER OBJECT");
-        if (m_englishMainMenu == null) Debug.LogError("OUPS ! U FORGOT TO PUT THE ENGLISH MENU ON THE START MANAGER OBJECT");
-        if (m_frenchMainMenu == null) Debug.LogError("OUPS ! U FORGOT TO PUT THE FRENCH MENU ON THE START MANAGER OBJECT");
+        if (m_pressStartButton == null) Debug.LogError("OUPS ! U FORGOT TO PUT THE START BUTTON ON THE START MANAGER OBJECT");
+        if (m_pressStartText == null) Debug.LogError("OUPS ! U FORGOT TO PUT THE TEXT OF THE PRESS START BUTTON ON THE START MANAGER OBJECT");
+        if (m_mainMenu == null) Debug.LogError("OUPS ! U FORGOT TO PUT THE MAIN MENU ON THE START MANAGER OBJECT");
+        if (m_menuSelector == null) Debug.LogError("OUPS ! U FORGOT TO PUT THE SELECTOR MENU ON THE START MANAGER OBJECT");
         
-        //On rend invisible les éléments au départ
-        m_englishMainMenu.SetActive(false);
-        m_frenchMainMenu.SetActive(false);
         m_mainMenu.SetActive(false);
 
         m_pressStartText = m_pressStartButton.GetComponentInChildren<TextMeshProUGUI>();  //Récupération de la couleur du text du bouton de lancement
         m_pressStartText.color = new Color(1, 1, 1, 0);
         m_title.color = new Color(1, 1, 1, 0);  //le titre est mis en transparence 
-
-        /*
-        m_menuPiecesButton = new GameObject[8];
-
-        m_menuPiecesButton[0] = m_buttonsMenu.m_continue;
-        m_menuPiecesButton[1] = m_buttonsMenu.m_newGame;
-        m_menuPiecesButton[2] = m_buttonsMenu.m_language;
-        m_menuPiecesButton[3] = m_buttonsMenu.m_quit;
-        m_menuPiecesButton[4] = m_buttonsMenu.m_continuer;
-        m_menuPiecesButton[5] = m_buttonsMenu.m_nouvellePartie;
-        m_menuPiecesButton[6] = m_buttonsMenu.m_langue;
-        m_menuPiecesButton[7] = m_buttonsMenu.m_quitter;
-        */
-        
-        //m_englishMenuSelector.transform.position = m_menuPiecesButton[4].transform.position; //Le sélecteur anglais est mis à la première position du menu
-        //m_frenchMenuSelector.transform.position = m_menuPiecesButton[6].transform.position; //Le sélecteur français est mis au niveau du changement de langue du menu
 
     }
 
@@ -109,11 +58,10 @@ public class Start_Manager : MonoBehaviour
         bool selectorValidation = Input.GetKeyDown(KeyCode.JoystickButton1);   //Joystick1Button1 est le bouton croix manette PS4
 
         if (m_isFading) m_timer += Time.deltaTime; //récupération du temps qui s'écoule
-        else if(m_timer < m_opacityDuration) m_timer = m_opacityDuration;
+        else if(m_timer < m_opacityDuration) m_timer = m_opacityDuration;   //Arrêt du timer après visibilité totale
 
 
         /////////////////////////////       START ANIMATIONS        /////////////////////////////
-        
         
         
         //animation d'opacité du titre
@@ -158,9 +106,7 @@ public class Start_Manager : MonoBehaviour
         /////////////////////////////       MENU MOVEMENTS        /////////////////////////////
         
         
-        Debug.Log($"{m_selectorIndex}");
-        //Debug.Log($" anglais : {m_englishMenuIsActive}    et francais : {m_frenchMenuIsActive}");
-        
+        //DEPLACEMENT DU CURSEUR
         if (!m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis > m_limitPosition || verticalAxis < -m_limitPosition)
         {
             //déplacement du sélecteur avec le joystick gauche
@@ -178,12 +124,13 @@ public class Start_Manager : MonoBehaviour
             }
         }
 
-        //Joystick se recentre sur la manette, déplacement par à coup
+        //RESET POUR DEPLACEMENT PAR A COUPS
         if (horizontalAxis < m_limitPosition && horizontalAxis > -m_limitPosition && verticalAxis < m_limitPosition && verticalAxis > -m_limitPosition)
         {
             m_hasMoved = false;
         }
 
+        //ALTERNANCE ENTRE LE MENU FRANCAIS ET LE MENU ANGLAIS
         if (m_englishMenuIsActive)
         {
             for (int i = 4; i < m_test.Count; i++)
@@ -202,6 +149,7 @@ public class Start_Manager : MonoBehaviour
             }
         }
         
+        //INPUT D'ACTIVATION A L'ENDROIT OU LE CURSEUR SE SITUE
         if (selectorValidation) {
 
             switch (m_selectorIndex) {
@@ -228,8 +176,11 @@ public class Start_Manager : MonoBehaviour
                     break;
             }
         }
-
     }
+    
+    
+    
+    
     
     
 }
