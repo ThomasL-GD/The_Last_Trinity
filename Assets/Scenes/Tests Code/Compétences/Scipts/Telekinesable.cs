@@ -75,6 +75,7 @@ public class Telekinesable : MonoBehaviour
             if (Input.GetKeyDown(m_selector.inputRobot) && !m_isInBetweenTravel && m_robotScript.m_isActive)
             {
                 m_isInBetweenTravel = true;
+                m_velocity = Vector3.zero;
                 if (m_activeTelekinesie) m_robotScript.m_isForbiddenToMove = true;
             }
         }
