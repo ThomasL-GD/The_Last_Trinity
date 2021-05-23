@@ -267,4 +267,43 @@ public class PlayerController : MonoBehaviour
                 return null;
         }
     }
+    
+    /// <summary>
+    /// Make the current camera look to another object
+    /// </summary>
+    /// <param name="p_newCamera">The new camera you want to have focus from</param>
+    public void LookSomewhere(Transform p_lookAt)
+    {
+        switch (m_chara)
+        {
+            case Charas.Human:
+                m_vCamH.LookAt = p_lookAt;
+                break;
+            case Charas.Monster:
+                m_vCamM.LookAt = p_lookAt;
+                break;
+            case Charas.Robot:
+                m_vCamR.LookAt = p_lookAt;
+                break;
+        }
+    }
+    
+    /// <summary>
+    /// Make the current camera look back to the current character
+    /// </summary>
+    public void Refocus()
+    {
+        switch (m_chara)
+        {
+            case Charas.Human:
+                m_vCamH.LookAt = gameObject.transform;
+                break;
+            case Charas.Monster:
+                m_vCamM.LookAt = gameObject.transform;
+                break;
+            case Charas.Robot:
+                m_vCamR.LookAt = gameObject.transform;
+                break;
+        }
+    }
 }

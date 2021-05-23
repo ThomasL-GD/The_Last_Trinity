@@ -5,17 +5,18 @@ using UnityEngine;
 public class Faufilable : MonoBehaviour
 {
     [SerializeField] [Tooltip("The input used to select this character")] private SOInputMultiChara m_selector = null;
-    [SerializeField] [Tooltip("For Debug Only")] private bool m_isSneaky = false; //Possibilité d'activer le Faufilage avec la touche de compétence du Humain
-    [SerializeField] [Tooltip("For Debug Only")] public bool m_isIntoWall= false; //Est en standby dans l'autre mur
-    [SerializeField] [Tooltip("For Debug Only")] private bool m_isTeleporting= false; //Bloquage du teleport si deja un en cours
+    private bool m_isSneaky = false; //Possibilité d'activer le Faufilage avec la touche de compétence du Humain
+    public bool m_isIntoWall= false; //Est en standby dans l'autre mur
+    private bool m_isTeleporting= false; //Bloquage du teleport si deja un en cours
 
     [SerializeField] private GameObject m_exit = null;
 
     [Header("Travel")]
     [SerializeField] [Tooltip("Time of travel between the two exits")] [Range(0.1f, 3f)] private float m_travelTime = 1f; //Temps avant que le joueur se téléporte vers la sortie
 
-    [SerializeField] [Tooltip("For Debug Only")] public Transform m_human = null;
-    [SerializeField] [Tooltip("For Debug Only")] private PlayerController m_humanScript = null;//Script de l'humain, obtenir la touche d'activation de la compétence
+    public Transform m_human = null;
+    private PlayerController m_humanScript = null;//Script de l'humain, obtenir la touche d'activation de la compétence
+    private Vector3 m_travel = Vector3.zero;
 
     void Start()
     {
@@ -33,6 +34,11 @@ public class Faufilable : MonoBehaviour
         if (!m_isTeleporting && m_isIntoWall && Input.GetKeyDown(m_selector.inputHuman)) {
             StartCoroutine(Teleport());
         }
+
+        //During teleportation, we move the player (who is unable) to let the camera follow their way
+        if (m_isTeleporting) {
+            m_human.position += m_travel * Time.deltaTime / m_travelTime;
+        }
     }
 
     /// <summary>
@@ -41,16 +47,18 @@ public class Faufilable : MonoBehaviour
     /// <returns></returns>
     IEnumerator Teleport() {
         m_isTeleporting = true;
+        m_travel = m_exit.transform.position - m_human.position;
         m_humanScript.m_isForbiddenToMove = true;
+        //m_human.gameObject.SetActive(false);
         
         yield return new WaitForSeconds(m_travelTime);
         
+        //m_human.gameObject.SetActive(true);
         Faufilable exitScript = m_exit.GetComponent<Faufilable>();
         if (exitScript.m_human == null) exitScript.m_human = m_human;
         m_human.transform.position = m_exit.transform.position;
         m_humanScript.m_isForbiddenToMove = false;
         m_isTeleporting = false;
-        //RemoveSneakiness();
     }
     
     /// <summary>
@@ -61,9 +69,10 @@ public class Faufilable : MonoBehaviour
         
         if (p_other.gameObject.TryGetComponent(out PlayerController player)) {
             if (player.m_chara == Charas.Human && !m_exit.GetComponent<Faufilable>().m_isIntoWall) {
-                m_isSneaky = true;
                 m_human = p_other.gameObject.transform;
                 m_humanScript = player;
+                
+                m_isSneaky = true;
                 m_humanScript.m_speed /= 2;
             }
         }
