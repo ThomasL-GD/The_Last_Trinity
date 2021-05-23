@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour
     
     [SerializeField] [Tooltip("Vitesse du joueur")] public float m_speed = 5f;
     [SerializeField] [Tooltip("Vitesse de Rotation du Quaternion")] private float m_rotationSpeed = 700f;
-    [SerializeField] [Tooltip("The input used to select this character")] private SOInputMultiChara m_selector = null;
+    [SerializeField] [Tooltip("The input used to select this character")] public SOInputMultiChara m_selector = null;
     [SerializeField] [Tooltip("The character whom this script is on, SELECT ONLY ONE !")] public Charas m_chara = 0;
     [HideInInspector] public KeyCode[] m_keyCodes = new[] {KeyCode.Joystick1Button0, KeyCode.Joystick1Button3, KeyCode.Joystick1Button1};
     [Tooltip("For Debug Only")] public bool m_isActive = false;
@@ -25,9 +25,9 @@ public class PlayerController : MonoBehaviour
     
     [Header("Soul")]
 
-    [SerializeField]
-    [Tooltip("The prefab of what represents the soul, it will be driven from a character to another when a switch occurs")] private GameObject m_soulPrefab = null;
+    [SerializeField] [Tooltip("The game object of what represents the soul, it will be driven from a character to another when a switch occurs")] public GameObject m_soul = null;
     [Tooltip("Offset for the instantiate of the Soul")][SerializeField] public Vector3 m_soulOffset = Vector3.zero;
+    private AutoRotation m_soulScript = null;
     
     [Header("Death Manager")]
     
@@ -53,8 +53,7 @@ public class PlayerController : MonoBehaviour
         m_vCamH = GameObject.FindGameObjectWithTag("Camera Humain")?.GetComponent<CinemachineVirtualCamera>();
         m_vCamM = GameObject.FindGameObjectWithTag("Camera Monstre")?.GetComponent<CinemachineVirtualCamera>();
         m_vCamR = GameObject.FindGameObjectWithTag("Camera Robot")?.GetComponent<CinemachineVirtualCamera>();
-        
-        if (m_chara == Charas.Human) m_isActive = true;
+
 
         //We set the first spawnpoint at its original position
         m_spawnPoint = transform.position;
@@ -64,7 +63,7 @@ public class PlayerController : MonoBehaviour
         if(m_vCamM == null) Debug.LogError("Aucune caméra avec le tag Camera Monstre");
         if(m_vCamR == null) Debug.LogError("Aucune caméra avec le tag Camera Robot");
 
-        if (m_soulPrefab == null) {
+        if (m_soul == null) {
             Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT A PREFAB FOR THE SOUL ! WHERE DID HE GOT HIS FAKE DIPLOMA ?!");
         }
         
@@ -72,6 +71,13 @@ public class PlayerController : MonoBehaviour
             Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE SCRIPTABLE OBJECT FOR THE INPUTS !");
         }
     #endif
+
+        m_soulScript = m_soul.GetComponent<AutoRotation>();
+        
+        if (m_chara == Charas.Human) {
+            m_isActive = true;
+            m_soulScript.gameObject.transform.position = transform.position;
+        }
     }
 
     void Update()
@@ -137,21 +143,18 @@ public class PlayerController : MonoBehaviour
             else if (Input.GetKeyDown(m_keyCodes[0]) || Input.GetKeyDown(m_keyCodes[1]) || Input.GetKeyDown(m_keyCodes[2])){
                 //If this character was active, we create a soul and send it to the next selected character
                 if (m_isActive) {
-                    GameObject soul = Instantiate(m_soulPrefab, transform.position + m_soulOffset, transform.rotation);
+                    m_soulScript.gameObject.transform.position = transform.position + m_soulOffset;
                     if (Input.GetKeyDown(m_keyCodes[(int) Charas.Human])) {
-                        AutoRotation soulScript = soul.GetComponent<AutoRotation>();
-                        soulScript.m_target = m_vCamH.LookAt;
-                        soulScript.m_offsetTarget = m_vCamH.LookAt.gameObject.GetComponent<PlayerController>().m_soulOffset;
+                        m_soulScript.m_target = m_vCamH.LookAt;
+                        m_soulScript.m_offsetTarget = m_vCamH.LookAt.gameObject.GetComponent<PlayerController>().m_soulOffset;
                     }
                     if (Input.GetKeyDown(m_keyCodes[(int) Charas.Monster])) {
-                        AutoRotation soulScript = soul.GetComponent<AutoRotation>();
-                        soulScript.m_target = m_vCamM.LookAt;
-                        soulScript.m_offsetTarget = m_vCamM.LookAt.gameObject.GetComponent<PlayerController>().m_soulOffset;
+                        m_soulScript.m_target = m_vCamM.LookAt;
+                        m_soulScript.m_offsetTarget = m_vCamM.LookAt.gameObject.GetComponent<PlayerController>().m_soulOffset;
                     }
                     if (Input.GetKeyDown(m_keyCodes[(int) Charas.Robot])) {
-                        AutoRotation soulScript = soul.GetComponent<AutoRotation>();
-                        soulScript.m_target = m_vCamR.LookAt;
-                        soulScript.m_offsetTarget = m_vCamR.LookAt.gameObject.GetComponent<PlayerController>().m_soulOffset;
+                        m_soulScript.m_target = m_vCamR.LookAt;
+                        m_soulScript.m_offsetTarget = m_vCamR.LookAt.gameObject.GetComponent<PlayerController>().m_soulOffset;
                     }
                 }
                 m_isActive = false;
@@ -175,7 +178,7 @@ public class PlayerController : MonoBehaviour
     /// Wait for a duration that depends on the switch duration, once it is done waiting it make m_isSwitchingChara in true, allowing the player to move and switch characters again
     /// </summary>
     IEnumerator SwitchTimer() {
-        yield return new WaitForSeconds(m_soulPrefab.GetComponent<AutoRotation>().m_duration / 1.2f);
+        yield return new WaitForSeconds(m_soul.GetComponent<AutoRotation>().m_duration / 1.2f);
         m_isActive = true;
         m_isSwitchingChara = false;
         s_inBetweenSwitching = false;

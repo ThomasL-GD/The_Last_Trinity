@@ -29,6 +29,7 @@ public class Interact_Detection : MonoBehaviour
     [HideInInspector] [Tooltip("variable qui autorise le déplacement dans le subPuzzle")] public bool m_canMove = true;
     [SerializeField] [Tooltip("Temps que l'écran de fin reste activé quand le subpuzzle est réussit")] [Range(0f,500f)] private float m_timer = 1f;
     
+    
     private void Start()
     {
         if (m_puzzle == null) {
@@ -51,28 +52,29 @@ public class Interact_Detection : MonoBehaviour
             }
         }
 
-        if (m_camera == null) {
-            Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE CAMERA IN INTERACT_DETECTION !");
-        }
-        if (m_inputs == null) {
-            Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO ADD THE INPUTS IN INTERACT_DETECTION !");
-        }
+        if (m_camera == null) Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE CAMERA IN INTERACT_DETECTION !");
+        if (m_inputs == null) Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO ADD THE INPUTS IN INTERACT_DETECTION !");
         
         
     }
 
     private void Update()
     {
+        if (GuardBehavior.m_isKillingSomeone)
+        {
+            this.PuzzleDeactivation();
+        }
+        
         if (m_buttonActivate || m_isInSubPuzzle) {
-            
+
             bool input = false;
 
             //input des différents character
             if (m_chara == Charas.Human) input = Input.GetKeyDown(m_inputs.inputHuman);
             else if (m_chara == Charas.Monster) input = Input.GetKeyDown(m_inputs.inputMonster);
             else if (m_chara == Charas.Robot) input = Input.GetKeyDown(m_inputs.inputRobot);
-
-            if (m_playerController.m_isActive) {
+            
+            if (!m_playerController.m_isForbiddenToMove) {
 
                 m_activationButton.SetActive(true);
 
@@ -124,8 +126,8 @@ public class Interact_Detection : MonoBehaviour
             m_openDoor = true;
             StartCoroutine(EndLook());
         }
-        else {
-            m_playerController.m_isForbiddenToMove = false;
+        else if(!GuardBehavior.m_isKillingSomeone){ m_playerController.m_isForbiddenToMove = false;}
+        else if(m_isInSubPuzzle){
             m_activationButton.SetActive(true);
             m_buttonActivate = true;
             m_isInSubPuzzle = false;

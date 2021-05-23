@@ -14,19 +14,17 @@ public class GuardBehavior : MonoBehaviour {
     private SphereCollider m_sphereCol = null;
 
     //variables d'IA
-    private NavMeshAgent m_nma = null;
+    public NavMeshAgent m_nma = null;
     private int m_currentDestination = 0;
 
     [Header("Metrics")] 
     [SerializeField] [Tooltip("Vitesse de déplacement normale")] [Range(0,50)] private float m_normalSpeed = 5.0f;
-    [SerializeField] [Tooltip("Vitesse de déplacement normale")] [Range(0,50)] private float m_attackSpeed = 15.0f;
-    [SerializeField] [Tooltip("Vitesse de déplacement normale")] [Range(0,50)] private float m_normalAcceleration = 5.0f;
-    [SerializeField] [Tooltip("Vitesse de déplacement normale")] [Range(0,50)] private float m_attackAcceleration = 15.0f;
-    [SerializeField] [Tooltip("Vitesse de déplacement normale")] [Range(0,10000)] private float m_normalRotationSpeed = 300.0f;
-    [SerializeField] [Tooltip("Vitesse de déplacement normale")] [Range(0,10000)] private float m_attackRotationSpeed = 900.0f;
-    [SerializeField] [Tooltip("Vitesse de déplacement normale")] [Range(0,100)] private float m_deathPos = 1.0f;
-    
-    //[Header("Difficulty")]
+    [SerializeField] [Tooltip("Vitesse de déplacement aggressive")] [Range(0,50)] private float m_attackSpeed = 15.0f;
+    [SerializeField] [Tooltip("Vitesse d'accélération normale")] [Range(0,50)] private float m_normalAcceleration = 5.0f;
+    [SerializeField] [Tooltip("Vitesse d'accélération aggressive")] [Range(0,50)] private float m_attackAcceleration = 15.0f;
+    [SerializeField] [Tooltip("Vitesse de rotation normale")] [Range(0,10000)] private float m_normalRotationSpeed = 300.0f;
+    [SerializeField] [Tooltip("Vitesse de rotation aggressive")] [Range(0,10000)] private float m_attackRotationSpeed = 900.0f;
+
     [Header("SphereManager")]
     [SerializeField] [Tooltip("The radius of the detection area")] private float m_sphereRadius = 2.0f;
     [SerializeField] [Tooltip("The possible angle of detection")] private float m_angleUncertainty = 9.0f;
@@ -36,20 +34,26 @@ public class GuardBehavior : MonoBehaviour {
     [SerializeField] [Tooltip("The list of points the guard will travel to, in order from up to down and cycling")] private List<Transform> m_destinationsTransforms = new List<Transform>();
     private List<Vector3> m_destinations = new List<Vector3>();
 
+    [Header("Death")]
+    [SerializeField] [Tooltip("distance d'élimination")] [Range(0,100)] private float m_deathPos = 1.0f;
+    [SerializeField] [Tooltip("temps d'animation de mort")] [Range(0,10)] private float m_deathTime = 3.0f;
     
-    private bool m_enterZone = false;
+    [Header("Monster Ability")]
+    [SerializeField] [Tooltip("temps de capacité de monstre")] [Range(0,100)] private float m_intimidationTime = 1.0f;
+    [SerializeField] [Tooltip("temps de stun qu'est l'ennemi")] [Range(0,100)] private float m_stunTime = 1.0f;
+    
+     [Tooltip("For Debug Only")] private bool m_enterZone = false;
     private bool m_hasSeenPlayer = false;
     private bool m_isGoingTowardsPlayer = false;
-    private List<PlayerController> m_charactersInDangerScript = new List<PlayerController>(); //Liste des scripts sur les character qui entrent et sortent de la zone de l'ennemi
+    public static bool m_isKillingSomeone = false;  //tous les script de l'ennemi possèdent la même valeur de la variable au même moment
+     [Tooltip("For Debug Only")] private List<PlayerController> m_charactersInDangerScript = new List<PlayerController>(); //Liste des scripts sur les character qui entrent et sortent de la zone de l'ennemi
 
-    private AudioClip m_audioClip;
-    
+
+
     // Start is called before the first frame update
     void Start()
     {
 
-        m_audioClip = GetComponent<AudioClip>();
-        
         //We adapt the collider to the Serialized value we have
         m_sphereCol = gameObject.GetComponent<SphereCollider>();
         m_sphereCol.radius = m_sphereRadius;
@@ -91,16 +95,17 @@ public class GuardBehavior : MonoBehaviour {
         }
 
 
-        if (m_enterZone) {
-            
+        if (m_enterZone && !m_isKillingSomeone) {
+
+            if (Input.GetKeyDown(m_charactersInDangerScript[0].m_selector.inputMonster))
+            {
+                StartCoroutine("Intimidate");
+            }
             //calcul de la position du premier chara entré dans la zone
             Vector3 targetDir = (m_charactersInDangerScript[0].gameObject.transform.position - transform.position).normalized;
             //angle de détection lorsque l'ennemi est à peu près en face du joueur
             float angleForward = Vector3.Angle(transform.forward, targetDir);
-
-            //Layer
-            int layerMask = 1 << 8; //0b1000_0000
-            layerMask = ~layerMask; //0b0111_1111
+            
 
             //création de la variable du  raycast
             RaycastHit hit;
@@ -143,28 +148,51 @@ public class GuardBehavior : MonoBehaviour {
                         m_nma.speed = m_attackSpeed;
                         m_nma.acceleration = m_attackAcceleration;
                         m_nma.angularSpeed = m_attackRotationSpeed;
-                        
+
                         //mort du joueur dès qu'il est assez proche
-                        if (Vector3.Distance(m_charactersInDangerScript[0].transform.position, transform.position) < m_deathPos) StartCoroutine("DeathCoroutine");
+                        if (Vector3.Distance(m_charactersInDangerScript[0].transform.position, transform.position) < m_deathPos)
+                        {
+                            StartCoroutine("DeathCoroutine");
+                        }
                     }
                 }
             }
-            else
-            {
-                //Debug.LogWarning("The raycast hit nothing nowhere");
-            }
+            else {}//Debug.LogWarning("The raycast hit nothing nowhere");
         }
     }
 
-    IEnumerator DeathCoroutine() {
-
+    IEnumerator Intimidate()
+    {
         m_nma.isStopped = true;
-        m_charactersInDangerScript[0].m_speed = 0;
+        PlayerController scriptCharaWhoIsDying = m_charactersInDangerScript[0];
+        scriptCharaWhoIsDying.m_isForbiddenToMove = true;
         
-        yield return new WaitForSeconds(9f); //temps d'animation de mort du monstre
+        yield return new WaitForSeconds(m_intimidationTime); //temps d'animation d'intimidation
+        
+        scriptCharaWhoIsDying.m_isForbiddenToMove = false;
+        StartCoroutine("Stun");
+    }
 
+    IEnumerator Stun()
+    {
+        yield return new WaitForSeconds(m_stunTime); //durée de stun
+        m_nma.isStopped = false;
+    }
+    
+    
+    IEnumerator DeathCoroutine()
+    {
+        m_isKillingSomeone = true;
+        PlayerController scriptCharaWhoIsDying = m_charactersInDangerScript[0];
+        m_nma.isStopped = true;
+        scriptCharaWhoIsDying.m_isForbiddenToMove = true;
+        
+        yield return new WaitForSeconds(m_deathTime); //temps d'animation de mort du monstre
+
+        scriptCharaWhoIsDying.m_isForbiddenToMove = false;
         DeathManager.DeathDelegator?.Invoke();  //mort
         m_nma.isStopped = false;
+        m_isKillingSomeone = false;
     }
     
     
@@ -216,24 +244,23 @@ public class GuardBehavior : MonoBehaviour {
     /// <param name="p_other">collision avec un character</param>
     private void OnTriggerExit(Collider p_other)
     {
+        
         //If the thing we are colliding is a playable character and only him
         if (p_other.gameObject.TryGetComponent(out PlayerController charaScript))
         {
-            m_hasSeenPlayer = false;
-            m_nma.speed = m_normalSpeed;
-            m_nma.acceleration = m_normalAcceleration;
-            m_nma.angularSpeed = m_normalRotationSpeed;
-            
-            charaScript.m_speed = 5;
-            
             //enlèvement du personnage qui est sorti
             m_charactersInDangerScript.Remove(charaScript);
-        }
-        
-        //si personne n'est dans la zone, alors l'ennemi fait sa patrouille normalement
-        if (m_charactersInDangerScript.Count < 1)
-        {
-            m_enterZone = false;
+
+            //si personne n'est dans la zone, alors l'ennemi fait sa patrouille normalement
+            if (m_charactersInDangerScript.Count < 1)
+            {
+                m_hasSeenPlayer = false;
+                m_nma.speed = m_normalSpeed;
+                m_nma.acceleration = m_normalAcceleration;
+                m_nma.angularSpeed = m_normalRotationSpeed;
+                m_enterZone = false;
+            }
+            
         }
     }
 

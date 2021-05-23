@@ -6,14 +6,6 @@
     <e p="C:\Users\ferre\OneDrive\Bureau\Projet Last Trinity\Projet Last Trinity" t="IncludeRecursive">
       <e p="Assembly-CSharp.csproj" t="IncludeRecursive" />
       <e p="Assets" t="Include">
-        <e p="OLD_SubPuzzle" t="Include">
-          <e p="RobotPuzzle" t="Include">
-            <e p="OLD" t="Include">
-              <e p="movePiece.cs" t="Include" />
-              <e p="SubPuzzleRobot.cs" t="Include" />
-            </e>
-          </e>
-        </e>
         <e p="Scenes" t="Include">
           <e p="Tests Code" t="Include">
             <e p="Changement entre Personnages (Scriptable Input)" t="Include">
@@ -55,8 +47,6 @@
             <e p="Patrouille Ennemis" t="Include">
               <e p="Scipt" t="Include">
                 <e p="GuardBehavior.cs" t="Include" />
-                <e p="PlayableCharacter.cs" t="Include" />
-                <e p="Vision.cs" t="Include" />
               </e>
             </e>
             <e p="Prototype" t="Include">
@@ -77,6 +67,11 @@
                 </e>
               </e>
             </e>
+            <e p="Start_Screen" t="Include">
+              <e p="Script" t="Include">
+                <e p="Start_Manager.cs" t="Include" />
+              </e>
+            </e>
             <e p="SubPuzzles" t="Include">
               <e p="Human" t="Include">
                 <e p="Scripts" t="Include">
@@ -95,6 +90,14 @@
                   <e p="MonsterPuzzle.cs" t="Include" />
                 </e>
               </e>
+              <e p="OLD_SubPuzzle" t="Include">
+                <e p="RobotPuzzle" t="Include">
+                  <e p="OLD" t="Include">
+                    <e p="movePiece.cs" t="Include" />
+                    <e p="SubPuzzleRobot.cs" t="Include" />
+                  </e>
+                </e>
+              </e>
               <e p="Robot" t="Include">
                 <e p="Scripts" t="Include">
                   <e p="PieceBehaviour.cs" t="Include" />
@@ -105,26 +108,48 @@
             </e>
           </e>
           <e p="Tests Graphiques" t="Include">
-            <e p="Shaders" t="Include">
-              <e p="Pixelation" t="Include">
-                <e p="Core" t="Include">
-                  <e p="GrabBeforePixelation.shader" t="Include" />
-                  <e p="PixelationPost.cs" t="Include" />
-                  <e p="PixelationPost.shader" t="Include" />
-                  <e p="SnapToMainCam.cs" t="Include" />
-                </e>
-                <e p="Examples" t="Include">
-                  <e p="PixelSize" t="Include">
-                    <e p="PixelSizeOscillator.cs" t="Include" />
+            <e p="Shaders &amp; Pipeline" t="Include">
+              <e p="Imported Assets Shader" t="Include">
+                <e p="Pixelation" t="Include">
+                  <e p="Core" t="Include">
+                    <e p="GrabBeforePixelation.shader" t="Include" />
+                    <e p="PixelationPost.cs" t="Include" />
+                    <e p="PixelationPost.shader" t="Include" />
+                    <e p="SnapToMainCam.cs" t="Include" />
                   </e>
-                  <e p="PixelTentacle" t="Include">
-                    <e p="Rotate.cs" t="Include" />
+                  <e p="Examples" t="Include">
+                    <e p="PixelSize" t="Include">
+                      <e p="PixelSizeOscillator.cs" t="Include" />
+                    </e>
+                    <e p="PixelTentacle" t="Include">
+                      <e p="Rotate.cs" t="Include" />
+                    </e>
+                    <e p="SimpleOscillator.cs" t="Include" />
                   </e>
-                  <e p="SimpleOscillator.cs" t="Include" />
+                  <e p="Readme.cs" t="Include" />
+                  <e p="README.txt" t="Include" />
+                  <e p="ReadmeEditor.cs" t="Include" />
                 </e>
-                <e p="Readme.cs" t="Include" />
-                <e p="README.txt" t="Include" />
-                <e p="ReadmeEditor.cs" t="Include" />
+              </e>
+            </e>
+            <e p="VFX" t="Include">
+              <e p="Scripts" t="Include">
+                <e p="SkinnedMeshToMesh.cs" t="Include" />
+              </e>
+              <e p="VFX Corruption" t="Include">
+                <e p="ShaderGlow" t="Include">
+                  <e p="Resources" t="Include">
+                    <e p="Shaders" t="Include">
+                      <e p="Add_CenterGlow.shader" t="Include" />
+                      <e p="Blend_CenterGlow.shader" t="Include" />
+                    </e>
+                  </e>
+                </e>
+                <e p="WaterShader" t="Include">
+                  <e p="BuiltInRenderWater" t="Include">
+                    <e p="ToonWater.shader" t="Include" />
+                  </e>
+                </e>
               </e>
             </e>
           </e>
