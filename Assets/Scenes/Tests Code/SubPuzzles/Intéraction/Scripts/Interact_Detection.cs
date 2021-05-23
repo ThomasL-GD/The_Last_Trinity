@@ -7,6 +7,21 @@ using UnityEngine.SocialPlatforms;
 public class Interact_Detection : MonoBehaviour
 {
 
+    [System.Serializable]
+    public class MovableDoor {
+        public string m_name = "Unnamed adopted door";
+        public GameObject m_door = null;
+        public Vector3 m_positionToGo = Vector3.zero;
+        [HideInInspector] public Vector3 m_velocity = Vector3.zero;
+
+        public MovableDoor(string p_name, GameObject p_door, Vector3 p_pos) {
+            m_name = p_name;
+            m_door = p_door;
+            m_positionToGo = p_pos;
+        }
+    }
+    
+
     [Header("Player")]
     [SerializeField] [Tooltip("personnage qui fait le subpuzzle")] private Charas m_chara = 0;
     [SerializeField] [Tooltip("Main Camera devrait marcher")] private Transform m_camera;
@@ -15,6 +30,8 @@ public class Interact_Detection : MonoBehaviour
 
     [Header("Puzzle")]
     [SerializeField] [Tooltip("subpuzzle qu'on souhaite faire apparaitre")] private GameObject m_puzzle;
+    [HideInInspector] [Tooltip("indicateur de réussite de subPuzzle")] public bool m_achieved = false;
+    [HideInInspector] [Tooltip("variable qui autorise le déplacement dans le subPuzzle")] public bool m_canMove = true;
  
     [Header("Activation Button")]
     [HideInInspector] [Tooltip("variable booléènne qui indique le passage entre le jeu et sub puzzle")] public bool m_isInSubPuzzle = false;
@@ -22,12 +39,10 @@ public class Interact_Detection : MonoBehaviour
     [HideInInspector] [Tooltip("contrôle d'état du trigger du bouton permettant d'activer le sub puzzle")] private bool m_buttonActivate = false;
     
     [Header("Open Door")]
-    public bool m_openDoor = false;
-    [SerializeField] [Tooltip("List of Door to open")] private GameObject[] m_doorSub; //Liste de portes à ouvrir lorsque le puzzle est réussi
-    private float m_speed = 4f; //Vitesse d'ouverture des portes
-    [HideInInspector] [Tooltip("indicateur de réussite de subPuzzle")] public bool m_achieved = false;
-    [HideInInspector] [Tooltip("variable qui autorise le déplacement dans le subPuzzle")] public bool m_canMove = true;
-    [SerializeField] [Tooltip("Temps que l'écran de fin reste activé quand le subpuzzle est réussit")] [Range(0f,500f)] private float m_timer = 1f;
+    [HideInInspector] public bool m_openDoor = false;
+    [SerializeField] [Tooltip("List of Door to open, if empty, won't open any door")] private MovableDoor[] m_doorSub = new MovableDoor[]{}; //Liste de portes à ouvrir lorsque le puzzle est réussi
+    [SerializeField] [Tooltip("The time taken by each door to open (unit : seconds)")] [Range(0f,5f)] private float m_doorOpeningTime = 2f; //Vitesse d'ouverture des portes
+    [SerializeField] [Tooltip("Temps que l'écran de fin reste activé quand le subpuzzle est réussit (unit : seconds)")] [Range(0f,5f)] private float m_timer = 1f;
     
     
     private void Start()
@@ -51,6 +66,8 @@ public class Interact_Detection : MonoBehaviour
                     break;
             }
         }
+        
+        if(m_timer > m_doorOpeningTime) Debug.LogError ($"JEEZ ! THE M_TIMER ({m_timer}) MUST BE SHORTER THAN THE M_DOOROPENINGTIME ({m_doorOpeningTime}) YOU FREAKING RETARDED !");
 
         if (m_camera == null) Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE CAMERA IN INTERACT_DETECTION !");
         if (m_inputs == null) Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO ADD THE INPUTS IN INTERACT_DETECTION !");
@@ -104,13 +121,9 @@ public class Interact_Detection : MonoBehaviour
             
         }
         
-        if (m_openDoor)
-        {
-            for (int i = 0; i < m_doorSub.Length; i++)
-            {
-                Vector3 movementDirection = new Vector3(0, m_doorSub[i].transform.position.y - 20, 0);
-                movementDirection.Normalize();
-                m_doorSub[i].transform.Translate(movementDirection * (m_speed * Time.deltaTime), Space.World);
+        if (m_openDoor) {
+            foreach (MovableDoor door in m_doorSub) {
+                door.m_door.transform.position = Vector3.SmoothDamp(door.m_door.transform.position, door.m_positionToGo, ref door.m_velocity , m_doorOpeningTime);
             }
         }
     }
@@ -123,7 +136,6 @@ public class Interact_Detection : MonoBehaviour
     {
         if (m_achieved == true)
         {
-            m_openDoor = true;
             StartCoroutine(EndLook());
         }
         else if(!GuardBehavior.m_isKillingSomeone){ m_playerController.m_isForbiddenToMove = false;}
@@ -134,19 +146,34 @@ public class Interact_Detection : MonoBehaviour
             m_puzzle.SetActive(false);
         }
     }
-    
+
     /// <summary>
     /// Temps que le puzzle reste encore actif après réussite
     /// </summary>
     IEnumerator EndLook() {
 
         m_playerController.m_isForbiddenToMove = false;
+        
         yield return new WaitForSeconds(m_timer);
 
         m_canMove = false;
         m_puzzle.SetActive(false);
         m_activationButton.SetActive(false);
         m_buttonActivate = false;
+        StartCoroutine(DoorTimer());
+    }
+
+    /// <summary>
+    /// Will let the door opens before disable this script
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator DoorTimer() {
+        m_openDoor = true;
+        m_playerController.LookSomewhere(m_doorSub[0].m_door.transform);
+        
+        yield return new WaitForSeconds(m_doorOpeningTime);
+        
+        m_playerController.Refocus();
         this.enabled = false;
     }
     

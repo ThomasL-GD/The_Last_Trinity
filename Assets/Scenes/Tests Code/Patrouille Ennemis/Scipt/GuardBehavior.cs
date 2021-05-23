@@ -18,17 +18,17 @@ public class GuardBehavior : MonoBehaviour {
     private int m_currentDestination = 0;
 
     [Header("Metrics")] 
-    [SerializeField] [Tooltip("Vitesse de déplacement normale")] [Range(0,50)] private float m_normalSpeed = 5.0f;
-    [SerializeField] [Tooltip("Vitesse de déplacement aggressive")] [Range(0,50)] private float m_attackSpeed = 15.0f;
-    [SerializeField] [Tooltip("Vitesse d'accélération normale")] [Range(0,50)] private float m_normalAcceleration = 5.0f;
-    [SerializeField] [Tooltip("Vitesse d'accélération aggressive")] [Range(0,50)] private float m_attackAcceleration = 15.0f;
-    [SerializeField] [Tooltip("Vitesse de rotation normale")] [Range(0,10000)] private float m_normalRotationSpeed = 300.0f;
-    [SerializeField] [Tooltip("Vitesse de rotation aggressive")] [Range(0,10000)] private float m_attackRotationSpeed = 900.0f;
+    [SerializeField] [Tooltip("Vitesse de déplacement normale")] [Range(0f,50f)] private float m_normalSpeed = 5.0f;
+    [SerializeField] [Tooltip("Vitesse de déplacement aggressive")] [Range(0f,50f)] private float m_attackSpeed = 15.0f;
+    [SerializeField] [Tooltip("Vitesse d'accélération normale")] [Range(0f,50f)] private float m_normalAcceleration = 5.0f;
+    [SerializeField] [Tooltip("Vitesse d'accélération aggressive")] [Range(0f,50f)] private float m_attackAcceleration = 15.0f;
+    [SerializeField] [Tooltip("Vitesse de rotation normale")] [Range(0f,10000f)] private float m_normalRotationSpeed = 300.0f;
+    [SerializeField] [Tooltip("Vitesse de rotation aggressive")] [Range(0f,10000f)] private float m_attackRotationSpeed = 900.0f;
 
     [Header("SphereManager")]
-    [SerializeField] [Tooltip("The radius of the detection area")] private float m_sphereRadius = 2.0f;
-    [SerializeField] [Tooltip("The possible angle of detection")] private float m_angleUncertainty = 9.0f;
-    [SerializeField] [Tooltip("The maximum authorized difference between the position to reach and the current position (unit : Unity meters)")] private float m_uncertainty = 0.1f;
+    [SerializeField] [Tooltip("The radius of the detection area")] [Range(0.01f,10f)] private float m_sphereRadius = 2.0f;
+    [SerializeField] [Tooltip("The possible angle of detection")] [Range(0.1f,180f)] private float m_angleUncertainty = 9.0f;
+    [SerializeField] [Tooltip("The maximum authorized difference between the position to reach and the current position (unit : Unity meters)")] [Range(0.0001f,1f)] private float m_uncertainty = 0.1f;
 
     [Header("Waypoints Manager")]
     [SerializeField] [Tooltip("The list of points the guard will travel to, in order from up to down and cycling")] private List<Transform> m_destinationsTransforms = new List<Transform>();
@@ -51,8 +51,9 @@ public class GuardBehavior : MonoBehaviour {
 
 
     // Start is called before the first frame update
-    void Start()
-    {
+    void Start() {
+        
+        if(m_destinationsTransforms.Count < 1) Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT DESTINATIONS IN THE ENNEMY !");
 
         //We adapt the collider to the Serialized value we have
         m_sphereCol = gameObject.GetComponent<SphereCollider>();
