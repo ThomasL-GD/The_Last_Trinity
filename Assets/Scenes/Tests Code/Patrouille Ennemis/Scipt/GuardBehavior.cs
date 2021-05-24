@@ -184,7 +184,6 @@ public class GuardBehavior : MonoBehaviour {
     IEnumerator DeathCoroutine()
     {
         m_isKillingSomeone = true;
-        Debug.Log($"m_isKillingSomeone : {m_isKillingSomeone}");
         PlayerController scriptCharaWhoIsDying = m_charactersInDangerScript[0];
         m_nma.isStopped = true;
         scriptCharaWhoIsDying.m_isForbiddenToMove = true;
