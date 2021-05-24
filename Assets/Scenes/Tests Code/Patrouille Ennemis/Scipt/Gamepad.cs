@@ -15,7 +15,7 @@ public class Gamepad : InputDevice,IDualMotorRumble, IHaptics
     
     void Start()
     {
-        var allGamepads = Gamepad.all;
+        var allGamepads = InputSystem.devices;
 
         Debug.Log($"{allGamepads}");
         
@@ -24,7 +24,7 @@ public class Gamepad : InputDevice,IDualMotorRumble, IHaptics
     void Update()
     {
         // Show all gamepads in the system.
-        Debug.Log(string.Join("\n", Gamepad.all));
+        Debug.Log(string.Join("\n", InputSystem.devices));
 
         // Check whether the X button on the current gamepad is pressed.
         //if (Gamepad.current.xButton.wasPressedThisFrame) Debug.Log("Pressed");

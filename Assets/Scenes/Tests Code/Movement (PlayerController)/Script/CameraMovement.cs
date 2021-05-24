@@ -6,7 +6,6 @@ using Cinemachine;
 
 public class CameraMovement : MonoBehaviour
 {
-    private KeyCode[] m_keyCodes = new[] {KeyCode.Joystick1Button6, KeyCode.Joystick1Button7}; //Keycode des deux gachettes gauche et droite
     
     private CinemachineVirtualCamera m_vCam; //Camera cinemachine
     private CinemachineTrackedDolly m_dolly; //Famille Dolly de la caméra cinemachine
@@ -17,6 +16,7 @@ public class CameraMovement : MonoBehaviour
     [SerializeField][Range(-5, 5)]private float m_clamp = 2.5f; //Clamp de la caméra sur le rail de dolly
     [SerializeField][Range(0, 3)] private float m_lookSpeed = 0f; //Vitesse de déplacement du look sur le côté
     [SerializeField][Range(0, 6)] private float m_returnSpeed = 0f; //Vitesse de déplacement du retour de la caméra
+    [SerializeField][Range(-1, 1)] private float m_globalOffset = 0f; //Vitesse de déplacement du retour de la caméra
     private float m_incertitude = 0.1f; //Valeur d'incertitude de la distance de l'offset
 
     void Start()
@@ -28,7 +28,7 @@ public class CameraMovement : MonoBehaviour
     void Update()
     {
         //Déplacement de la caméra vers la gauche en utilisant la gachette gauche
-        if (Input.GetKey(m_keyCodes[0]))
+        if (Input.GetKey(KeyCode.JoystickButton6))
         {
             if (m_offsetValue >= -m_clamp)
             {
@@ -38,7 +38,7 @@ public class CameraMovement : MonoBehaviour
             {
                 m_offsetValue = -m_clamp;
             }
-        } else if (Input.GetKey(m_keyCodes[1]))
+        } else if (Input.GetKey(KeyCode.JoystickButton7))
         {
             if (m_offsetValue <= m_clamp)
             {
@@ -52,15 +52,15 @@ public class CameraMovement : MonoBehaviour
         //Déplacement de la caméra vers la droite en utilisant la gachette droite
         else
         {
-            if (m_offsetValue != 0f && Mathf.Abs(m_offsetValue) < m_incertitude )
+            if (m_offsetValue != m_globalOffset && Mathf.Abs(m_offsetValue) < m_incertitude )
             {
-                m_offsetValue = 0f;
+                m_offsetValue = m_globalOffset;
             }
-            else if (m_offsetValue > 0f)
+            else if (m_offsetValue > m_globalOffset)
             {
                 m_offsetValue -= m_returnSpeed * Time.deltaTime;   
             }
-            else if (m_offsetValue < 0f)
+            else if (m_offsetValue < m_globalOffset)
             {
                 m_offsetValue += m_returnSpeed * Time.deltaTime;   
             }

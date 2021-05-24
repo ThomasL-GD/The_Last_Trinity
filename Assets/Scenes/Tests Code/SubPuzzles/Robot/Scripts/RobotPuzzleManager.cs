@@ -279,7 +279,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 	/// </summary>
 	public void SweepPiece(int p_x, int p_y)
 	{
-		Debug.Log("test 2");
+		//Debug.Log("test 2");
 		int difference = -QuickSweep(p_x,p_y);   //valeur de position au départ
 
 		m_puzzle.m_pieces[p_x,p_y].RotatePiece (); //Fonction qui tourne la pièce ainsi que les valeurs qui lui sont attribués
