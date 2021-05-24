@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using Cinemachine;
 using UnityEngine;
 
-public class ZoneChangementDolly : MonoBehaviour
-{
+public class ZoneChangementDolly : MonoBehaviour {
+
+    [SerializeField] [Tooltip("If on, you only need to serialize the robot camera")] private bool m_isTheRobotAlone = false;
+
     //Cinemachine cameras des trois personnages zoomées sur un rail auxiliaire
     //Effectuer un blend dans la "Main Camera" avant de régler les priorités
     [SerializeField][Tooltip("Virtual Caméra Zoomée")] private CinemachineVirtualCamera m_vCamHZ = null;
@@ -19,11 +21,11 @@ public class ZoneChangementDolly : MonoBehaviour
 
     private void Start()
     {
-        if(m_vCamHZ == null)
+        if(m_vCamHZ == null && !m_isTheRobotAlone)
         {
             Debug.LogError("La camera humaine n'est pas serializée");
         }
-        if(m_vCamMZ == null)
+        if(m_vCamMZ == null && !m_isTheRobotAlone)
         {
             Debug.LogError("La camera monstre n'est pas serializée");
         }
@@ -42,21 +44,28 @@ public class ZoneChangementDolly : MonoBehaviour
         Debug.Log("Ok");
         if (p_other.gameObject.TryGetComponent(out PlayerController charaScript))
         {
-            switch (charaScript.m_chara)
-            {
-                case Charas.Human :
-                    m_previousVCamH = charaScript.GetCurrentCamera();
-                    charaScript.SetNewCamera(m_vCamHZ);
-                    break;
-                case Charas.Monster :
-                    m_previousVCamM = charaScript.GetCurrentCamera();
-                    charaScript.SetNewCamera(m_vCamMZ);
-                    break;
-                case Charas.Robot :
-                    m_previousVCamR = charaScript.GetCurrentCamera();
-                    charaScript.SetNewCamera(m_vCamRZ);
-                    break;
-            }   
+            if(!m_isTheRobotAlone){
+                switch (charaScript.m_chara)
+                {
+                    case Charas.Human :
+                        m_previousVCamH = charaScript.GetCurrentCamera();
+                        charaScript.SetNewCamera(m_vCamHZ);
+                        break;
+                    case Charas.Monster :
+                        m_previousVCamM = charaScript.GetCurrentCamera();
+                        charaScript.SetNewCamera(m_vCamMZ);
+                        break;
+                    case Charas.Robot :
+                        m_previousVCamR = charaScript.GetCurrentCamera();
+                        charaScript.SetNewCamera(m_vCamRZ);
+                        break;
+                }   
+            }
+            else {
+                m_previousVCamR = charaScript.GetCurrentCamera();
+                charaScript.SetNewCamera(m_vCamRZ);
+            }
+            
         }
     }
 
@@ -69,22 +78,28 @@ public class ZoneChangementDolly : MonoBehaviour
         Debug.Log("Ko");
         if (p_other.gameObject.TryGetComponent(out PlayerController charaScript))
         {
-            Debug.Log(charaScript.m_chara);
-            switch (charaScript.m_chara)
-            {
-                case Charas.Human :
-                    charaScript.SetNewCamera(m_previousVCamH);
-                    m_previousVCamH = m_vCamHZ;
-                    break;
-                case Charas.Monster :
-                    charaScript.SetNewCamera(m_previousVCamM);
-                    m_previousVCamM = m_vCamMZ;
-                    break;
-                case Charas.Robot :
-                    charaScript.SetNewCamera(m_previousVCamR);
-                    m_previousVCamR = m_vCamRZ;
-                    break;
-            }   
+            if(!m_isTheRobotAlone){
+                switch (charaScript.m_chara)
+                {
+                    case Charas.Human :
+                        charaScript.SetNewCamera(m_previousVCamH);
+                        m_previousVCamH = m_vCamHZ;
+                        break;
+                    case Charas.Monster :
+                        charaScript.SetNewCamera(m_previousVCamM);
+                        m_previousVCamM = m_vCamMZ;
+                        break;
+                    case Charas.Robot :
+                        charaScript.SetNewCamera(m_previousVCamR);
+                        m_previousVCamR = m_vCamRZ;
+                        break;
+                }   
+            }
+            else {
+                charaScript.SetNewCamera(m_previousVCamR);
+                m_previousVCamR = m_vCamRZ;
+            }
+            
         }
     }
     
