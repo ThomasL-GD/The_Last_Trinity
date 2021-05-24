@@ -82,6 +82,7 @@ public class Interact_Detection : MonoBehaviour
             this.PuzzleDeactivation();
         }
         
+        
         if (m_buttonActivate || m_isInSubPuzzle) {
 
             bool input = false;
@@ -98,8 +99,7 @@ public class Interact_Detection : MonoBehaviour
                 m_activationButton.transform.LookAt(m_camera);
 
                 //Input et bouton visible ==> entrée dans subpuzzle 
-                if (input)
-                {
+                if (input) {
 
                     if (m_chara == Charas.Human) { m_puzzle.GetComponent<HumanSubPuzzle>().m_interactDetection = this; }
                     else if (m_chara == Charas.Monster) { m_puzzle.GetComponent<MonsterPuzzle>().m_interactDetection = this; }
@@ -108,15 +108,12 @@ public class Interact_Detection : MonoBehaviour
                     m_puzzle.SetActive(true);
                     m_isInSubPuzzle = true;
                     m_playerController.m_isForbiddenToMove = true; //We forbid the movements for the player
+                    m_buttonActivate = false;
                 }
             }
-            else
-            {
-                m_activationButton.SetActive(false);
-                m_buttonActivate = false;
-            }
-            
+            else m_activationButton.SetActive(false);
         }
+        
         
         if (m_openDoor) {
             foreach (MovableDoor door in m_doorSub) {
@@ -135,14 +132,15 @@ public class Interact_Detection : MonoBehaviour
         {
             StartCoroutine(EndLook());
         }
-        else if (!GuardBehavior.m_isKillingSomeone)
+        else if(m_playerController.m_isForbiddenToMove)
         {
             m_playerController.m_isForbiddenToMove = false;
-            m_activationButton.SetActive(true);
-            m_buttonActivate = true;
             m_isInSubPuzzle = false;
+            m_buttonActivate = true;
+            m_activationButton.SetActive(true);
             m_puzzle.SetActive(false);
         }
+        else if(!GuardBehavior.m_isKillingSomeone){ m_playerController.m_isForbiddenToMove = false;}
     }
 
     /// <summary>
@@ -155,10 +153,9 @@ public class Interact_Detection : MonoBehaviour
         yield return new WaitForSeconds(m_timer);
 
         m_canMove = false;
+        m_puzzle.SetActive(false);
         m_activationButton.SetActive(false);
         m_buttonActivate = false;
-        m_isInSubPuzzle = false;
-        m_puzzle.SetActive(false);
         StartCoroutine(DoorTimer());
     }
 
@@ -200,7 +197,6 @@ public class Interact_Detection : MonoBehaviour
     /// <param name="p_other"></param>
     private void OnTriggerExit(Collider p_other)
     {
-        m_playerController = null;
         m_activationButton.SetActive(false);
         m_buttonActivate = false;
     }

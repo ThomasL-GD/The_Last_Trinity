@@ -241,6 +241,7 @@ public class MonsterPuzzle : MonoBehaviour
             bool isCorrectPiece = false;    //variable booléènne qui indique si le joueur est sur une bonne pièce
             bool isAlreadyFound = false;    //Variable booléènne qui indique si la pièce a déjà été trouvée
             
+            
             /////////////// VERIFICATION SI C'EST UNE PIECE CORRECTE /////////////
             for (int i = 0; i < m_correctPieces.Count; i++) //pour chaque pièce dans les pièces correctes
             {
@@ -279,6 +280,7 @@ public class MonsterPuzzle : MonoBehaviour
                 }
             }
             
+            
             /////////////// VERIFICATION SI C'EST UNE PIECE INCORRECTE /////////////
             for (int i = 0; i < m_potentialPieces.Count; i++) //pour chaque pièce dans les pièces correctes
             {
@@ -307,12 +309,13 @@ public class MonsterPuzzle : MonoBehaviour
                 }
             }
             
+            
             if(isCorrectPiece == false && isAlreadyFound == false) //compteur de défaite s'incrémente de 1
             {
                 m_errorDone++;   //nombre d'erreurs possibles avant défaite diminue
 
                 if(m_errorDone != m_errorAllowed) StartCoroutine("Rumble");   //Vibration
-                else if (m_errorDone == m_errorAllowed)
+                else if (m_errorDone >= m_errorAllowed)
                 {
                     if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
                 }
@@ -324,7 +327,10 @@ public class MonsterPuzzle : MonoBehaviour
         //Sortie du subPuzzle en cas de changement de personnage
         if (m_interactDetection.m_isInSubPuzzle && (m_gamepad.buttonEast.isPressed || m_gamepad.buttonWest.isPressed))    //(m_interactDetection.m_isInSubPuzzle && Input.GetKeyDown(m_inputs.inputHuman) || Input.GetKeyDown(m_inputs.inputRobot))
         {
-            if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
+            if (m_interactDetection.enabled)
+            {
+                m_interactDetection.PuzzleDeactivation();
+            }
         }
     }
 
