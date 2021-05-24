@@ -35,12 +35,12 @@ public class GuardBehavior : MonoBehaviour {
     private List<Vector3> m_destinations = new List<Vector3>();
 
     [Header("Death")]
-    [SerializeField] [Tooltip("distance d'élimination")] [Range(0,100)] private float m_deathPos = 1.0f;
-    [SerializeField] [Tooltip("temps d'animation de mort")] [Range(0,10)] private float m_deathTime = 3.0f;
+    [SerializeField] [Tooltip("distance d'élimination")] [Range(0f,10f)] private float m_deathPos = 1.0f;
+    [SerializeField] [Tooltip("temps d'animation de mort")] [Range(0f,10f)] private float m_deathTime = 3.0f;
     
     [Header("Monster Ability")]
-    [SerializeField] [Tooltip("temps de capacité de monstre")] [Range(0,100)] private float m_intimidationTime = 1.0f;
-    [SerializeField] [Tooltip("temps de stun qu'est l'ennemi")] [Range(0,100)] private float m_stunTime = 1.0f;
+    [SerializeField] [Tooltip("temps de capacité de monstre")] [Range(0f,60f)] private float m_intimidationTime = 1.0f;
+    [SerializeField] [Tooltip("temps de stun qu'est l'ennemi")] [Range(0f,180f)] private float m_stunTime = 1.0f;
     
      [Tooltip("For Debug Only")] private bool m_enterZone = false;
     private bool m_hasSeenPlayer = false;
@@ -120,7 +120,7 @@ public class GuardBehavior : MonoBehaviour {
                 
                 if (m_charactersInDangerScript[0].gameObject.transform.position != hit.transform.position) //le chara se trouve derrière un obstacle et n'est pas visible par l'ennemi
                 {
-                    Debug.Log("Oulala on ne voit pas le character derrière");
+                    //Debug.Log("Oulala on ne voit pas le character derrière");
                 }
                 else //le chara est visible par l'ennemi
                 {
@@ -153,7 +153,7 @@ public class GuardBehavior : MonoBehaviour {
                         //mort du joueur dès qu'il est assez proche
                         if (Vector3.Distance(m_charactersInDangerScript[0].transform.position, transform.position) < m_deathPos)
                         {
-                            StartCoroutine("DeathCoroutine");
+                            StartCoroutine(DeathCoroutine());
                         }
                     }
                 }
@@ -171,7 +171,7 @@ public class GuardBehavior : MonoBehaviour {
         yield return new WaitForSeconds(m_intimidationTime); //temps d'animation d'intimidation
         
         scriptCharaWhoIsDying.m_isForbiddenToMove = false;
-        StartCoroutine("Stun");
+        StartCoroutine(Stun());
     }
 
     IEnumerator Stun()
@@ -184,14 +184,14 @@ public class GuardBehavior : MonoBehaviour {
     IEnumerator DeathCoroutine()
     {
         m_isKillingSomeone = true;
+        Debug.Log($"m_isKillingSomeone : {m_isKillingSomeone}");
         PlayerController scriptCharaWhoIsDying = m_charactersInDangerScript[0];
         m_nma.isStopped = true;
         scriptCharaWhoIsDying.m_isForbiddenToMove = true;
         
         yield return new WaitForSeconds(m_deathTime); //temps d'animation de mort du monstre
 
-        scriptCharaWhoIsDying.m_isForbiddenToMove = false;
-        DeathManager.DeathDelegator?.Invoke();  //mort
+        scriptCharaWhoIsDying.Death();  //mort   // We will reset m_isForbiddenToMove in there
         m_nma.isStopped = false;
         m_isKillingSomeone = false;
     }

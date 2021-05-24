@@ -19,6 +19,8 @@ public class PlayerController : MonoBehaviour
     [HideInInspector] public KeyCode[] m_keyCodes = new[] {KeyCode.Joystick1Button0, KeyCode.Joystick1Button3, KeyCode.Joystick1Button1};
     [Tooltip("For Debug Only")] public bool m_isActive = false;
     private static bool s_inBetweenSwitching = false; //is Active when someone is switching character
+
+    private Animator m_animator = null;
     
     [Tooltip("For Debug Only")] public bool m_isForbiddenToMove = false; 
     [Tooltip("For Debug Only")] public bool m_isSwitchingChara = false;
@@ -32,18 +34,24 @@ public class PlayerController : MonoBehaviour
     [Header("Death Manager")]
     
     [SerializeField] [Range(0.2f, 5f)] [Tooltip("The time the player is allowed to stay in this death zone (unit : seconds)")] private float m_timeBeforeDying = 0.5f;
+    [SerializeField] [Range(0.2f, 5f)] [Tooltip("The time of the death animation (must be longer than the death animation time) (unit : seconds)")] private float m_deathAnimTime = 1.5f;
     private float m_deathCounter = 0.0f;
-    private bool m_isDying = false;
+    private bool m_isDying = false; //If the chara is in a death zone
+    private bool m_isPlayingDead = false; //If the chara is currently playing their death animation
     [HideInInspector] public Vector3 m_spawnPoint = Vector3.zero;
 
     //Cinemachine cameras des trois personnages
     [HideInInspector] private static CinemachineVirtualCamera m_vCamH;
     [HideInInspector] private static CinemachineVirtualCamera m_vCamM;
     [HideInInspector] private static CinemachineVirtualCamera m_vCamR;
+    private static readonly int IsRunning = Animator.StringToHash("isRunning");
+    private static readonly int Death1 = Animator.StringToHash("Death");
+    private static readonly int IsSneaky = Animator.StringToHash("IsSneaky");
+    private static readonly int IsIntimidating = Animator.StringToHash("IsIntimidating");
 
     private void Start()
     {
-        DeathManager.DeathDelegator += Death;
+        DeathManager.DeathDelegator += EndDeath;
 
         //We create an array (because it's easier to manipulate) of all the inputs of the characters
         m_keyCodes[0] = m_selector.inputHuman;
@@ -71,6 +79,9 @@ public class PlayerController : MonoBehaviour
             Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE SCRIPTABLE OBJECT FOR THE INPUTS !");
         }
     #endif
+
+        if (TryGetComponent(out Animator animator)) m_animator = animator;
+        else Debug.LogWarning("JEEZ ! THE GAME DESIGNER FORGOT TO PUT AN ANIMATOR ON THIS CHARA ! (it's still gonna work tought)");
 
         m_soulScript = m_soul.GetComponent<AutoRotation>();
         
@@ -105,8 +116,11 @@ public class PlayerController : MonoBehaviour
                     Quaternion toRotation = Quaternion.LookRotation(movementDirection, Vector3.up);
                     
                     transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, m_rotationSpeed * Time.deltaTime);
+                    
+                    if(m_animator != null) m_animator.SetBool("IsRunning", true);
                 }
-                
+                else if(m_animator != null) m_animator.SetBool("IsRunning", false);
+
             }
 
             //We activate this chara if its corresponding input is pressed
@@ -161,6 +175,8 @@ public class PlayerController : MonoBehaviour
             }
         }
         
+        if(m_animator != null && (m_isForbiddenToMove || m_isSwitchingChara || !m_isActive)) m_animator.SetBool("IsRunning", false);
+        
         //If this character is in a death zone, we increase his death timer, if not, we decrease it
         if (!m_isDying && m_deathCounter > 0f) {
             m_deathCounter -= Time.deltaTime;
@@ -205,17 +221,6 @@ public class PlayerController : MonoBehaviour
         if (p_other.gameObject.TryGetComponent(out DeathZone pScript)) {
             m_isDying = false;
         }
-    }
-    
-    /// <summary>
-    /// For safety, we reset a few values in case of death & respawn
-    /// </summary>
-    private void Death() {
-        //Reset of all death-related values
-        m_isDying = false;
-        m_deathCounter = 0.0f;
-
-        transform.position = m_spawnPoint;
     }
 
 
@@ -304,6 +309,69 @@ public class PlayerController : MonoBehaviour
             case Charas.Robot:
                 m_vCamR.LookAt = gameObject.transform;
                 break;
+        }
+    }
+
+    /// <summary>
+    /// Function called to let the player the time to play its death animation
+    /// </summary>
+    public void Death() {
+        Debug.Log($"m_isPlayingDead : {m_isPlayingDead}");
+        if (!m_isPlayingDead) {
+            DeathAnim(true);
+            m_isForbiddenToMove = true;
+            StartCoroutine(DeathTimer());
+        }
+        else Debug.LogWarning("Multiple Deaths at the same time ? this is hella shady");
+    }
+    
+    /// <summary>
+    /// Is called by the Death() function to wait for the animation to play before respawning
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator DeathTimer() {
+        yield return new WaitForSeconds(m_deathAnimTime);
+        EndDeath();
+    }
+    
+    /// <summary>
+    /// For safety, we reset a few values in case of death & respawn
+    /// </summary>
+    private void EndDeath() {
+        //Reset of all death-related values
+        m_isDying = false;
+        Debug.Log($"m_isDying : {m_isDying}");
+        m_deathCounter = 0.0f;
+        m_isForbiddenToMove = false;
+
+        transform.position = m_spawnPoint;
+        DeathAnim(false);
+    }
+
+    /// <summary>
+    /// A Function to play the death animation and make sure this character can't move during their animation
+    /// </summary>
+    private void DeathAnim(bool p_isOn) {
+        if(m_animator != null) m_animator.SetBool("IsDead", p_isOn);
+        m_isPlayingDead = p_isOn;
+    }
+
+    /// <summary>
+    /// A public function to let other scripts start the ability animation of this character
+    /// </summary>
+    public void AbilityAnim(bool p_isTrue) {
+        if (m_animator != null) {
+            switch (m_chara) {
+                case Charas.Human:
+                    m_animator.SetBool("IsSneaky", p_isTrue);
+                    break;
+                case Charas.Monster:
+                    m_animator.SetBool("IsIntimidating", p_isTrue);
+                    break;
+                case Charas.Robot:
+                    m_animator.SetBool("IsTelekinesing", p_isTrue);
+                    break;
+            }
         }
     }
 }

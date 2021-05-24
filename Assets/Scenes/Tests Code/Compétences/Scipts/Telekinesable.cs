@@ -76,7 +76,11 @@ public class Telekinesable : MonoBehaviour
             {
                 m_isInBetweenTravel = true;
                 m_velocity = Vector3.zero;
-                if (m_activeTelekinesie) m_robotScript.m_isForbiddenToMove = true;
+                if (m_activeTelekinesie) {
+                    m_robotScript.m_isForbiddenToMove = true;
+                    m_robotScript.AbilityAnim(true); //Animation up play
+                }
+                else m_robotScript.AbilityAnim(false); //Animation down play
             }
         }
         
