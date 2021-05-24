@@ -2,9 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Random = UnityEngine.Random;
 
+
 public class HumanSubPuzzle : MonoBehaviour {
+
 
     [Serializable]
     public class Selector {
@@ -47,7 +50,7 @@ public class HumanSubPuzzle : MonoBehaviour {
     [SerializeField] [Tooltip("For debug only")] private GameObject m_prefabLeft = null;
     [SerializeField] [Tooltip("For debug only")] private GameObject m_prefabRight = null;
     [SerializeField] [Tooltip("For debug only")] private GameObject m_prefabDown = null;
-    
+
     
     /// <summary>
     /// OnEnable is called once each time the Game Object is enabled
@@ -389,7 +392,7 @@ public class HumanSubPuzzle : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        
+
         float horizontalAxis = Input.GetAxis("Horizontal");
         float verticalAxis = Input.GetAxis("Vertical");
 
@@ -501,4 +504,5 @@ public class HumanSubPuzzle : MonoBehaviour {
             Destroy(child.gameObject);
         }
     }
+    
 }
