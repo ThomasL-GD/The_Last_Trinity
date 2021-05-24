@@ -11,7 +11,7 @@ using UnityEngine.Scripting;
 public class Gamepad : InputDevice,IDualMotorRumble, IHaptics
 {
     //private Gamepad m_gamepad = ;
-    Gamepad gamepad = Gamepad.current;
+    //Gamepad gamepad = Gamepad.current;
     
     void Start()
     {
