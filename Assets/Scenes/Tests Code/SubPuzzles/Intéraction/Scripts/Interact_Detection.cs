@@ -91,33 +91,30 @@ public class Interact_Detection : MonoBehaviour
             else if (m_chara == Charas.Monster) input = Input.GetKeyDown(m_inputs.inputMonster);
             else if (m_chara == Charas.Robot) input = Input.GetKeyDown(m_inputs.inputRobot);
             
+            
             if (!m_playerController.m_isForbiddenToMove) {
-
-                m_activationButton.SetActive(true);
 
                 //Le bouton d'activation regarde toujours en direction de la caméra de jeu
                 m_activationButton.transform.LookAt(m_camera);
 
                 //Input et bouton visible ==> entrée dans subpuzzle 
-                if (input) {
+                if (input)
+                {
 
-                    if (m_chara == Charas.Human) {
-                        m_puzzle.GetComponent<HumanSubPuzzle>().m_interactDetection = this;
-                    }
-                    else if (m_chara == Charas.Monster) {
-                        m_puzzle.GetComponent<MonsterPuzzle>().m_interactDetection = this;
-                    }
-                    else if (m_chara == Charas.Robot) {
-                        m_puzzle.GetComponent<RobotPuzzleManager>().m_interactDetection = this;
-                    }
+                    if (m_chara == Charas.Human) { m_puzzle.GetComponent<HumanSubPuzzle>().m_interactDetection = this; }
+                    else if (m_chara == Charas.Monster) { m_puzzle.GetComponent<MonsterPuzzle>().m_interactDetection = this; }
+                    else if (m_chara == Charas.Robot) { m_puzzle.GetComponent<RobotPuzzleManager>().m_interactDetection = this; }
 
                     m_puzzle.SetActive(true);
                     m_isInSubPuzzle = true;
                     m_playerController.m_isForbiddenToMove = true; //We forbid the movements for the player
-                    m_buttonActivate = false;
                 }
             }
-            else m_activationButton.SetActive(false);
+            else
+            {
+                m_activationButton.SetActive(false);
+                m_buttonActivate = false;
+            }
             
         }
         
@@ -138,14 +135,14 @@ public class Interact_Detection : MonoBehaviour
         {
             StartCoroutine(EndLook());
         }
-        else if(m_isInSubPuzzle){
+        else if (!GuardBehavior.m_isKillingSomeone)
+        {
             m_playerController.m_isForbiddenToMove = false;
             m_activationButton.SetActive(true);
             m_buttonActivate = true;
             m_isInSubPuzzle = false;
             m_puzzle.SetActive(false);
         }
-        else if(!GuardBehavior.m_isKillingSomeone){ m_playerController.m_isForbiddenToMove = false;}
     }
 
     /// <summary>
@@ -203,7 +200,7 @@ public class Interact_Detection : MonoBehaviour
     /// <param name="p_other"></param>
     private void OnTriggerExit(Collider p_other)
     {
-        //m_playerController = null;
+        m_playerController = null;
         m_activationButton.SetActive(false);
         m_buttonActivate = false;
     }

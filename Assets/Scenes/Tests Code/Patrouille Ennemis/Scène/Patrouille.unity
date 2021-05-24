@@ -248,7 +248,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 205744751}
-  m_LocalRotation: {x: 0.46872506, y: -0.002163086, z: 0.0011477933, w: 0.8833408}
+  m_LocalRotation: {x: 0.46872497, y: -0.0021630859, z: 0.001147793, w: 0.8833408}
   m_LocalPosition: {x: 1.2169789, y: 15.41, z: -9.476203}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -395,13 +395,41 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 89996859199575062, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
+      propertyPath: m_lowAttackEnemy
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 89996859199575062, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
+      propertyPath: m_highAttackEnemy
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 89996859199575062, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
+      propertyPath: m_lowWarningEnemy
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 89996859199575062, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
+      propertyPath: m_highWarningEnemy
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 89996859199575062, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
+      propertyPath: m_lowMonsterIntimidation
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 89996859199575062, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
+      propertyPath: m_highMonsterIntimidation
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 89996859199575062, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
+      propertyPath: m_destinationsTransforms.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 89996859199575062, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
       propertyPath: m_destinationsTransforms.Array.data[0]
       value: 
       objectReference: {fileID: 582093095}
     - target: {fileID: 89996859199575062, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
       propertyPath: m_destinationsTransforms.Array.data[1]
       value: 
-      objectReference: {fileID: 1973028763}
+      objectReference: {fileID: 1316913234}
     - target: {fileID: 89996859199575062, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
       propertyPath: m_destinationsTransforms.Array.data[2]
       value: 
@@ -571,6 +599,10 @@ PrefabInstance:
       value: Enemy
       objectReference: {fileID: 0}
     - target: {fileID: 8011153223543391582, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8011153223543391582, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 8
       objectReference: {fileID: 0}
@@ -718,7 +750,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 89996859199575062, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
   m_PrefabInstance: {fileID: 231718131}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 435258445}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 63f56499eeb07624cad235a0834af819, type: 3}
@@ -1082,6 +1114,41 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 428830535}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &435258445 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8011153223543391582, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
+  m_PrefabInstance: {fileID: 231718131}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &435258453
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 435258445}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: 73dc124103809604ab5153bedc82312b, type: 3}
+  m_NotificationBehavior: 0
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: Gamepad
+  m_DefaultActionMap: 98171f65-b0b1-4510-b736-218631853d12
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 1031546553}
 --- !u!1 &582093094
 GameObject:
   m_ObjectHideFlags: 0
@@ -1961,7 +2028,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1316913233}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 13.71, y: 1.6, z: 2.37}
+  m_LocalPosition: {x: 18.57, y: 1.6, z: 0.69}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1241976374}
@@ -2328,7 +2395,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4622563909794635407, guid: f003976da38f7944b9948bca20225ac6, type: 3}
       propertyPath: m_rumbleDuration
-      value: 0.5
+      value: 0.28
       objectReference: {fileID: 0}
     - target: {fileID: 4622563909794635407, guid: f003976da38f7944b9948bca20225ac6, type: 3}
       propertyPath: m_rumbleDurration

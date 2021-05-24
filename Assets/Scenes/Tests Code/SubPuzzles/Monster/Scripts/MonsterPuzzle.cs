@@ -8,7 +8,6 @@ using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 using UnityEngine.InputSystem;
 using System.Linq;
-using UnityEngine.InputSystem.Controls;
 
 public class MonsterPuzzle : MonoBehaviour
 {
@@ -200,7 +199,6 @@ public class MonsterPuzzle : MonoBehaviour
         float horizontalAxis = Input.GetAxis("Horizontal");
         float verticalAxis = Input.GetAxis("Vertical");
         bool selectorValidation = Input.GetKeyDown(m_inputs.inputMonster);
-        bool canSelect = true;
 
         if (!m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis >m_limitPosition || verticalAxis < -m_limitPosition) {
             
@@ -281,7 +279,7 @@ public class MonsterPuzzle : MonoBehaviour
                 }
             }
             
-            /////////////// VERIFICATION SI C'EST UNE PIECE CORRECTE /////////////
+            /////////////// VERIFICATION SI C'EST UNE PIECE INCORRECTE /////////////
             for (int i = 0; i < m_potentialPieces.Count; i++) //pour chaque pièce dans les pièces correctes
             {
                 if (m_prefabStock[m_selectorY, m_selectorX] == m_potentialPieces[i]) //si le sélecteur est à la même position que la pièce actuelle de correct pieces
@@ -324,7 +322,7 @@ public class MonsterPuzzle : MonoBehaviour
         
 
         //Sortie du subPuzzle en cas de changement de personnage
-        if (m_interactDetection.m_isInSubPuzzle && m_gamepad.buttonEast.isPressed || m_gamepad.buttonWest.isPressed)    //(m_interactDetection.m_isInSubPuzzle && Input.GetKeyDown(m_inputs.inputHuman) || Input.GetKeyDown(m_inputs.inputRobot))
+        if (m_interactDetection.m_isInSubPuzzle && (m_gamepad.buttonEast.isPressed || m_gamepad.buttonWest.isPressed))    //(m_interactDetection.m_isInSubPuzzle && Input.GetKeyDown(m_inputs.inputHuman) || Input.GetKeyDown(m_inputs.inputRobot))
         {
             if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
         }
@@ -363,6 +361,8 @@ public class MonsterPuzzle : MonoBehaviour
     /// </summary>
     void OnDisable()
     {
+        //m_gamepad = null;
+        
         m_errorDone = 0;
         m_findPiece = 0;
         
