@@ -73,9 +73,7 @@ public class GuardBehavior : MonoBehaviour {
         m_sphereCol.isTrigger = true;
         
         //We transform the list of Transforms (easier to serialize) into a list of Vector3 (easier to manipulate)
-        for (int i = 0; i < m_destinationsTransforms.Count; i++) {
-            m_destinations.Add(m_destinationsTransforms[i].position);
-        }
+        for (int i = 0; i < m_destinationsTransforms.Count; i++) { m_destinations.Add(m_destinationsTransforms[i].position); }
         m_nma = gameObject.GetComponent<NavMeshAgent>();
         
         //The first position where the guard will aim at
