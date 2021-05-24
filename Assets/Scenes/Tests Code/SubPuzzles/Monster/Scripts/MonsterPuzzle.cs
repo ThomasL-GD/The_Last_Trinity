@@ -18,9 +18,10 @@ public class MonsterPuzzle : MonoBehaviour
     
     [Header("Listes")]
     [Tooltip("liste des pièces qui peuvent apparaitre")]private List<GameObject> m_stockPieces = new List<GameObject>();
-    [Tooltip("liste des pièces dans la scène")] private List<GameObject> m_potentialPieces = new List<GameObject>();
-    [Tooltip("liste des pièces correctes")] private List<GameObject> m_correctPieces = new List<GameObject>();
-    [Tooltip("List des pièces trouvées")] private List<GameObject> m_foundPieces = new List<GameObject>();
+    [SerializeField] [Tooltip("liste des pièces dans la scène")] private List<GameObject> m_potentialPieces = new List<GameObject>();
+    [SerializeField] [Tooltip("liste des pièces correctes")] private List<GameObject> m_correctPieces = new List<GameObject>();
+    [SerializeField] [Tooltip("liste des pièces Incorrectes")] private List<GameObject> m_incorrectPieces = new List<GameObject>();
+    [SerializeField] [Tooltip("List des pièces trouvées")] private List<GameObject> m_foundPieces = new List<GameObject>();
 
     //Décalage
     [Tooltip("FOR DEBUG ONLY\nSize of each cell in Rect Transorm anchor units")] private float m_offset = 4.0f;
@@ -199,7 +200,7 @@ public class MonsterPuzzle : MonoBehaviour
         float horizontalAxis = Input.GetAxis("Horizontal");
         float verticalAxis = Input.GetAxis("Vertical");
         bool selectorValidation = Input.GetKeyDown(m_inputs.inputMonster);
-
+        bool canSelect = true;
 
         if (!m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis >m_limitPosition || verticalAxis < -m_limitPosition) {
             
@@ -239,9 +240,10 @@ public class MonsterPuzzle : MonoBehaviour
         if (selectorValidation) //input monster
         {
             
-            bool isCorrectPiece = false;    //variable booléènne qui indique si le joueur est sur une bonne pièce ou non
+            bool isCorrectPiece = false;    //variable booléènne qui indique si le joueur est sur une bonne pièce
             bool isAlreadyFound = false;    //Variable booléènne qui indique si la pièce a déjà été trouvée
             
+            /////////////// VERIFICATION SI C'EST UNE PIECE CORRECTE /////////////
             for (int i = 0; i < m_correctPieces.Count; i++) //pour chaque pièce dans les pièces correctes
             {
                 if (m_prefabStock[m_selectorY, m_selectorX] == m_correctPieces[i]) //si le sélecteur est à la même position que la pièce actuelle de correct pieces
@@ -255,7 +257,8 @@ public class MonsterPuzzle : MonoBehaviour
                         }
                     }
 
-                    if (!isAlreadyFound)    //Si la pièce n'a pas encore été trouvée
+                    //PIECE PAS ENCORE TROUVEE ET CORRECTE
+                    if (!isAlreadyFound)    
                     {
                         m_foundPieces.Add(m_correctPieces[i]); //ajout d'une pièce correcte à pièce trouvé
                         
@@ -271,27 +274,51 @@ public class MonsterPuzzle : MonoBehaviour
                             if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
                         }
 
-                        m_prefabStock[m_selectorY, m_selectorX].SetActive(false);   //feedback disparition
-
+                        Instantiate(m_selectorTransform, m_prefabStock[m_selectorY, m_selectorX].transform.position, m_prefabStock[m_selectorY, m_selectorX].transform.rotation, gameObject.transform);  //feedback de trouvage de pièce
+                        
                         i = m_correctPieces.Count; //Arrête la boucle for dès trouvaille de pièce correcte
                     }
                 }
             }
+            
+            /////////////// VERIFICATION SI C'EST UNE PIECE CORRECTE /////////////
+            for (int i = 0; i < m_potentialPieces.Count; i++) //pour chaque pièce dans les pièces correctes
+            {
+                if (m_prefabStock[m_selectorY, m_selectorX] == m_potentialPieces[i]) //si le sélecteur est à la même position que la pièce actuelle de correct pieces
+                {
+                    for (int j = 0; j < m_incorrectPieces.Count; j++)   //Pour chaque pièces dans les pièces trouvées
+                    {
+                        if (m_prefabStock[m_selectorY, m_selectorX] == m_incorrectPieces[j])    //Si le sélecteur est à la même position que la pièce actuelle dans foundPiece
+                        {
+                            isAlreadyFound = true;  //la pièce en question a déjà été trouvé
+                            j = m_foundPieces.Count;
+                        }
+                    }
 
+                    //PIECE PAS ENCORE TROUVEE ET INCORRECTE
+                    if (!isAlreadyFound)    
+                    {
+                        m_incorrectPieces.Add(m_potentialPieces[i]); //ajout d'une pièce incorrecte aux pièces incorrectes
+                        
+                        isCorrectPiece = false; //indique qu'une pièce est incorrecte
+                        
+                        m_prefabStock[m_selectorY, m_selectorX].SetActive(false);   //désactive la pièce
+                        
+                        i = m_potentialPieces.Count; //Arrête la boucle for dès trouvaille de pièce incorrecte
+                    }
+                }
+            }
             
             if(isCorrectPiece == false && isAlreadyFound == false) //compteur de défaite s'incrémente de 1
             {
                 m_errorDone++;   //nombre d'erreurs possibles avant défaite diminue
-                Debug.Log($"{m_errorDone}");
-                
+
                 if(m_errorDone != m_errorAllowed) StartCoroutine("Rumble");   //Vibration
                 else if (m_errorDone == m_errorAllowed)
                 {
-                    Debug.Log("Vous avez perdu.");
                     if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
                 }
             }
-
             selectorValidation = false;
         }
         
