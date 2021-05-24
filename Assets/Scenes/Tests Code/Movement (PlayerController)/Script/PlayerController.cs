@@ -20,6 +20,9 @@ public class PlayerController : MonoBehaviour
     [Tooltip("For Debug Only")] public bool m_isActive = false;
     private static bool s_inBetweenSwitching = false; //is Active when someone is switching character
 
+    private CharacterController m_charaController = null;
+    [SerializeField] [Tooltip("Gravity strength on this character")] private float m_gravity = -9.81f;
+    private Vector3 m_charaVelocity = Vector3.zero;
     private Animator m_animator = null;
     
     [Tooltip("For Debug Only")] public bool m_isForbiddenToMove = false; 
@@ -82,6 +85,9 @@ public class PlayerController : MonoBehaviour
 
         if (TryGetComponent(out Animator animator)) m_animator = animator;
         else Debug.LogWarning("JEEZ ! THE GAME DESIGNER FORGOT TO PUT AN ANIMATOR ON THIS CHARA ! (it's still gonna work tought)");
+        
+        if (TryGetComponent(out CharacterController charaController)) m_charaController = charaController;
+        else Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT A CHARA CONTROLLER ON THIS CHARA !");
 
         m_soulScript = m_soul.GetComponent<AutoRotation>();
         
@@ -97,7 +103,17 @@ public class PlayerController : MonoBehaviour
         // TODO technique a verifier dans le projet complet
         if (Time.timeScale == 0) return;
         
-        //If the character is in a transition between two characters
+        //Gravity with Character Controller
+        if (m_charaController.isGrounded) {
+            m_charaVelocity.y = 0.0f;
+        }
+        else if (!m_charaController.isGrounded) {
+            m_charaVelocity.y += m_gravity * Time.deltaTime;
+            m_charaController.Move(m_charaVelocity * Time.deltaTime);
+        }
+        Debug.Log(m_charaController.isGrounded);
+        
+        //If the character is not in a transition between two characters
         if (!m_isSwitchingChara) {
             
             //The character is not able to move if not selected
@@ -107,8 +123,11 @@ public class PlayerController : MonoBehaviour
                 
                 Vector3 movementDirection = new Vector3(horizontalInput,  0, verticalInput);
                 movementDirection.Normalize();
-                        
-                if(m_isActive) transform.Translate(movementDirection * (m_speed * Time.deltaTime), Space.World);
+                
+                //The line below doesn't work with the charController component
+                //if(m_isActive) transform.Translate(movementDirection * (m_speed * Time.deltaTime), Space.World);
+
+                if (m_isActive) m_charaController.Move(movementDirection * (m_speed * Time.deltaTime));
             
                 //Utilisation du Quaternion pour permettre au player de toujours se déplacer dans l'angle où il regarde
                 if (movementDirection != Vector3.zero)
@@ -316,7 +335,6 @@ public class PlayerController : MonoBehaviour
     /// Function called to let the player the time to play its death animation
     /// </summary>
     public void Death() {
-        Debug.Log($"m_isPlayingDead : {m_isPlayingDead}");
         if (!m_isPlayingDead) {
             DeathAnim(true);
             m_isForbiddenToMove = true;
@@ -340,10 +358,10 @@ public class PlayerController : MonoBehaviour
     private void EndDeath() {
         //Reset of all death-related values
         m_isDying = false;
-        Debug.Log($"m_isDying : {m_isDying}");
         m_deathCounter = 0.0f;
         m_isForbiddenToMove = false;
 
+        //Debug.Log($"{m_spawnPoint}");
         transform.position = m_spawnPoint;
         DeathAnim(false);
     }
