@@ -139,7 +139,6 @@ public class Interact_Detection : MonoBehaviour
             StartCoroutine(EndLook());
         }
         else if(m_isInSubPuzzle){
-            Debug.Log("?????????????");
             m_playerController.m_isForbiddenToMove = false;
             m_activationButton.SetActive(true);
             m_buttonActivate = true;

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Random = UnityEngine.Random;
@@ -43,6 +44,13 @@ public class HumanSubPuzzle : MonoBehaviour {
     [Header("Prefabs for visual representation")]
     [SerializeField] [Tooltip("The visual representation of the player")] private GameObject m_prefabPlayer = null;
     [SerializeField] [Tooltip("The prefab of the background")] private GameObject m_prefabBG = null;
+    
+    [Header("Rumble")]
+    [SerializeField] [Range(0f,10f)] private float m_rumbleDuration = 0f;
+    [SerializeField] [Range(0f,1f)] private float m_lowA =0f;
+    [SerializeField] [Range(0f,1f)] private float m_highA =0f;
+    private PlayerInput m_playerInput;
+    Gamepad m_gamepad = Gamepad.current;
     
     [Header("Debug")]
     [SerializeField] [Tooltip("If on, the walls will be displayed for debug")] private bool m_debugMode = false;
@@ -87,6 +95,9 @@ public class HumanSubPuzzle : MonoBehaviour {
         }
 
         MazeInitialization();
+        
+        m_playerInput = GetComponent<PlayerInput>();
+        m_gamepad = GetGamepad();
     }
 
     /// <summary>
@@ -395,31 +406,39 @@ public class HumanSubPuzzle : MonoBehaviour {
 
         float horizontalAxis = Input.GetAxis("Horizontal");
         float verticalAxis = Input.GetAxis("Vertical");
+        
+        //Joystick se recentre sur la manette
+        if (horizontalAxis < m_limitPosition && horizontalAxis > -m_limitPosition && verticalAxis < m_limitPosition && verticalAxis > -m_limitPosition)
+        {
+            m_hasMoved = false;
+        }
 
-        if (!m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis >m_limitPosition || verticalAxis < -m_limitPosition) {
+        if (!m_hasMoved && (horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis > m_limitPosition || verticalAxis < -m_limitPosition)) {
             
             Directions attemptedMovement = Directions.None;
+            m_hasMoved = true;
             
             //We first stocks the way the player wants to go if he's not blocked by the limits of the maze
-            if (m_interactDetection.m_canMove && !m_hasMoved && horizontalAxis < -m_limitPosition && m_selector.x > 0) {
+            if (m_interactDetection.m_canMove && horizontalAxis < -m_limitPosition && m_selector.x > 0) {
                 attemptedMovement = Directions.Left;
-                m_hasMoved = true;
+                
             }
-            else if (m_interactDetection.m_canMove && !m_hasMoved && horizontalAxis > m_limitPosition && m_selector.x < m_maze.GetLength(1) - 1) {
+            else if (m_interactDetection.m_canMove && horizontalAxis > m_limitPosition && m_selector.x < m_maze.GetLength(1) - 1) {
                 attemptedMovement = Directions.Right;
-                m_hasMoved = true;
+                
             }
-            else if (m_interactDetection.m_canMove && !m_hasMoved && verticalAxis > m_limitPosition && m_selector.y < m_maze.GetLength(0) - 1) {
+            else if (m_interactDetection.m_canMove && verticalAxis > m_limitPosition && m_selector.y < m_maze.GetLength(0) - 1) {
                 attemptedMovement = Directions.Up;
-                m_hasMoved = true;
+                
             }
-            else if (m_interactDetection.m_canMove && !m_hasMoved && verticalAxis < -m_limitPosition && m_selector.y > 0) {
+            else if (m_interactDetection.m_canMove && verticalAxis < -m_limitPosition && m_selector.y > 0) {
                 attemptedMovement = Directions.Down;
-                m_hasMoved = true;
+                
             }
 
             //First we verify the player has no wall blocking the way he wants to go;
             if (attemptedMovement == Directions.None || m_maze[m_selector.y, m_selector.x].HasFlag(attemptedMovement)) {
+                StartCoroutine("Rumble");   //Vibration
                 Debug.Log("Nah bro, you cannot go this way");
             }
             else {
@@ -445,12 +464,6 @@ public class HumanSubPuzzle : MonoBehaviour {
 
         }
         
-        //Joystick se recentre sur la manette
-        if (horizontalAxis < m_limitPosition && horizontalAxis > -m_limitPosition && verticalAxis < m_limitPosition && verticalAxis > -m_limitPosition)
-        {
-            m_hasMoved = false;
-        }
-        
         //Win verification
         if (m_selector.x == m_mazeWidth - 1 && m_selector.y == 0) {
             Win();
@@ -464,6 +477,15 @@ public class HumanSubPuzzle : MonoBehaviour {
         
     }
 
+    
+    IEnumerator Rumble()
+    {
+        m_gamepad.SetMotorSpeeds(m_lowA, m_highA);
+        yield return new WaitForSeconds(m_rumbleDuration);
+        m_gamepad.SetMotorSpeeds(0, 0);
+    }
+    
+    
     /// <summary>
     /// Place correctly an element with its rect transform
     /// </summary>
@@ -484,13 +506,40 @@ public class HumanSubPuzzle : MonoBehaviour {
 
     private void Win() {
         Debug.Log("IT'S A WIN !");
-        
+
+        m_gamepad.SetMotorSpeeds(0.0f,0.0f);
         m_interactDetection.m_achieved = true;  //le joueur est arrivé au bout
         m_interactDetection.m_canMove = false; //le joueur ne peut plus bouger le sélecteur
         if(m_interactDetection.enabled) m_interactDetection.PuzzleDeactivation();
     }
 	
 	
+    // Private helpers
+    private Gamepad GetGamepad()
+    {
+        return Gamepad.all.FirstOrDefault(g => m_playerInput.devices.Any(d => d.deviceId == g.deviceId));
+
+        #region Linq Query Equivalent Logic
+        //Gamepad gamepad = null;
+        //foreach (var g in Gamepad.all)
+        //{
+        //    foreach (var d in _playerInput.devices)
+        //    {
+        //        if(d.deviceId == g.deviceId)
+        //        {
+        //            gamepad = g;
+        //            break;
+        //        }
+        //    }
+        //    if(gamepad != null)
+        //    {
+        //        break;
+        //    }
+        //}
+        //return gamepad;
+        #endregion
+    }
+    
     /// <summary>
     /// Is called when this gameObject is setActive(false)
     /// Is used to destroy everything it created

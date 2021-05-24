@@ -351,6 +351,7 @@ public class MonsterPuzzle : MonoBehaviour
         foreach(Transform child in gameObject.transform) {
             Destroy(child.gameObject);
         }
+        
     }
     
     
