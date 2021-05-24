@@ -47,22 +47,18 @@ public class Interact_Detection : MonoBehaviour
     
     private void Start()
     {
-        if (m_puzzle == null) {
-            Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO ADD A SUBPUZZLE IN INTERACT_DETECTION !");
+        if (m_puzzle == null) { Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO ADD A SUBPUZZLE IN INTERACT_DETECTION !");
         }
         else {
             switch (m_chara) {
                 case Charas.Human:
-                    if (!m_puzzle.TryGetComponent(out HumanSubPuzzle hsb))
-                        Debug.LogError("JEEZ ! THE GAME DESIGNER PUT A SUBPUZZLE DIFFERENT FROM THE CHARA CHOOSED ABOVE IN INTERACT_DETECTION !");
+                    if (!m_puzzle.TryGetComponent(out HumanSubPuzzle hsb)) Debug.LogError("JEEZ ! THE GAME DESIGNER PUT A SUBPUZZLE DIFFERENT FROM THE CHARA CHOOSED ABOVE IN INTERACT_DETECTION !");
                     break;
                 case Charas.Monster:
-                    if (!m_puzzle.TryGetComponent(out MonsterPuzzle msb))
-                        Debug.LogError("JEEZ ! THE GAME DESIGNER PUT A SUBPUZZLE DIFFERENT FROM THE CHARA CHOOSED ABOVE IN INTERACT_DETECTION !");
+                    if (!m_puzzle.TryGetComponent(out MonsterPuzzle msb)) Debug.LogError("JEEZ ! THE GAME DESIGNER PUT A SUBPUZZLE DIFFERENT FROM THE CHARA CHOOSED ABOVE IN INTERACT_DETECTION !");
                     break;
                 case Charas.Robot:
-                    if (!m_puzzle.TryGetComponent(out RobotPuzzleManager rsb))
-                        Debug.LogError("JEEZ ! THE GAME DESIGNER PUT A SUBPUZZLE DIFFERENT FROM THE CHARA CHOOSED ABOVE IN INTERACT_DETECTION !");
+                    if (!m_puzzle.TryGetComponent(out RobotPuzzleManager rsb)) Debug.LogError("JEEZ ! THE GAME DESIGNER PUT A SUBPUZZLE DIFFERENT FROM THE CHARA CHOOSED ABOVE IN INTERACT_DETECTION !");
                     break;
             }
         }
@@ -93,7 +89,9 @@ public class Interact_Detection : MonoBehaviour
             else if (m_chara == Charas.Robot) input = Input.GetKeyDown(m_inputs.inputRobot);
             
             
-            if (!m_playerController.m_isForbiddenToMove) {
+            if (m_playerController.m_isActive) {
+                
+                m_activationButton.SetActive(true);
 
                 //Le bouton d'activation regarde toujours en direction de la caméra de jeu
                 m_activationButton.transform.LookAt(m_camera);
@@ -105,6 +103,7 @@ public class Interact_Detection : MonoBehaviour
                     else if (m_chara == Charas.Monster) { m_puzzle.GetComponent<MonsterPuzzle>().m_interactDetection = this; }
                     else if (m_chara == Charas.Robot) { m_puzzle.GetComponent<RobotPuzzleManager>().m_interactDetection = this; }
 
+                    
                     m_puzzle.SetActive(true);
                     m_isInSubPuzzle = true;
                     m_playerController.m_isForbiddenToMove = true; //We forbid the movements for the player
@@ -132,15 +131,15 @@ public class Interact_Detection : MonoBehaviour
         {
             StartCoroutine(EndLook());
         }
-        else if(m_playerController.m_isForbiddenToMove)
-        {
+        else {
             m_playerController.m_isForbiddenToMove = false;
-            m_isInSubPuzzle = false;
-            m_buttonActivate = true;
             m_activationButton.SetActive(true);
+            m_buttonActivate = true;
+            m_isInSubPuzzle = false;
             m_puzzle.SetActive(false);
         }
-        else if(!GuardBehavior.m_isKillingSomeone){ m_playerController.m_isForbiddenToMove = false;}
+        
+        if(!GuardBehavior.m_isKillingSomeone){ m_playerController.m_isForbiddenToMove = false;}
     }
 
     /// <summary>
@@ -197,6 +196,7 @@ public class Interact_Detection : MonoBehaviour
     /// <param name="p_other"></param>
     private void OnTriggerExit(Collider p_other)
     {
+        //mm_playerController = null;
         m_activationButton.SetActive(false);
         m_buttonActivate = false;
     }
