@@ -134,17 +134,19 @@ public class Interact_Detection : MonoBehaviour
     /// </summary>
     public void PuzzleDeactivation()
     {
-        if (m_achieved == true)
+        if (m_achieved)
         {
             StartCoroutine(EndLook());
         }
-        else if(!GuardBehavior.m_isKillingSomeone){ m_playerController.m_isForbiddenToMove = false;}
         else if(m_isInSubPuzzle){
+            Debug.Log("?????????????");
+            m_playerController.m_isForbiddenToMove = false;
             m_activationButton.SetActive(true);
             m_buttonActivate = true;
             m_isInSubPuzzle = false;
             m_puzzle.SetActive(false);
         }
+        else if(!GuardBehavior.m_isKillingSomeone){ m_playerController.m_isForbiddenToMove = false;}
     }
 
     /// <summary>
@@ -157,9 +159,10 @@ public class Interact_Detection : MonoBehaviour
         yield return new WaitForSeconds(m_timer);
 
         m_canMove = false;
-        m_puzzle.SetActive(false);
         m_activationButton.SetActive(false);
         m_buttonActivate = false;
+        m_isInSubPuzzle = false;
+        m_puzzle.SetActive(false);
         StartCoroutine(DoorTimer());
     }
 

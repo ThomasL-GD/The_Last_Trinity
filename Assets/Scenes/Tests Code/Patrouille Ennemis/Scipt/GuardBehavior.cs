@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.InputSystem;
 using UnityEngine.Rendering.UI;
 using UnityEngine.Serialization;
 using UnityEngine.SocialPlatforms;
@@ -42,14 +43,15 @@ public class GuardBehavior : MonoBehaviour {
     [SerializeField] [Tooltip("temps de capacité de monstre")] [Range(0,100)] private float m_intimidationTime = 1.0f;
     [SerializeField] [Tooltip("temps de stun qu'est l'ennemi")] [Range(0,100)] private float m_stunTime = 1.0f;
     
-     [Tooltip("For Debug Only")] private bool m_enterZone = false;
+    [Tooltip("For Debug Only")] private bool m_enterZone = false;
     private bool m_hasSeenPlayer = false;
     private bool m_isGoingTowardsPlayer = false;
     public static bool m_isKillingSomeone = false;  //tous les script de l'ennemi possèdent la même valeur de la variable au même moment
-     [Tooltip("For Debug Only")] private List<PlayerController> m_charactersInDangerScript = new List<PlayerController>(); //Liste des scripts sur les character qui entrent et sortent de la zone de l'ennemi
+    [Tooltip("For Debug Only")] private List<PlayerController> m_charactersInDangerScript = new List<PlayerController>(); //Liste des scripts sur les character qui entrent et sortent de la zone de l'ennemi
 
-
-
+     [Header("Vibration Script")]
+     [SerializeField] private GameObject m_rumbler;
+     
     // Start is called before the first frame update
     void Start() {
         
@@ -68,6 +70,8 @@ public class GuardBehavior : MonoBehaviour {
         
         //The first position where the guard will aim at
         m_nma.SetDestination(m_destinations[m_currentDestination]);
+
+        //m_rumbler = GetComponent<PlayerInput>();
     }
     
 
