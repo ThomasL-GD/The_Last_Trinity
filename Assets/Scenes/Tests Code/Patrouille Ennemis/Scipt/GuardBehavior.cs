@@ -47,10 +47,11 @@ public class GuardBehavior : MonoBehaviour {
     [SerializeField] [Tooltip("valeur de la vibration forte lorsque le character entre dans la zone de l'ennemi")] [Range(0f,1f)] private float m_highWarningEnemy =0f;
     [SerializeField] [Tooltip("valeur de la vibration faible lorsque le character est visible par l'ennemi")] [Range(0f,1f)] private float m_lowAttackEnemy =0f;
     [SerializeField] [Tooltip("valeur de la vibration forte lorsque le character est visible par l'ennemi")] [Range(0f,1f)] private float m_highAttackEnemy =0f;
-    [SerializeField] [Tooltip("valeur de la vibration faible lorsque le character monstre utilise sa compétence")] [Range(0f,1f)] private float m_lowMonsterIntimidation =0f;
-    [SerializeField] [Tooltip("valeur de la vibration forte lorsque le character monstre utilise sa compétence")] [Range(0f,1f)] private float m_highMonsterIntimidation =0f;
+    [Tooltip("valeur de la vibration faible lorsque le character monstre utilise sa compétence")] [Range(0f,1f)] private float m_lowMonsterIntimidation =0.5f;
+    [Tooltip("valeur de la vibration forte lorsque le character monstre utilise sa compétence")] [Range(0f,1f)] private float m_highMonsterIntimidation =0.5f;
     private PlayerInput m_playerInput;
     Gamepad m_gamepad = DualShockGamepad.current;
+    
     bool m_warningVibe = false; //présence d'un character dans la zone de l'ennemi
     bool m_intimidationVibe = false;   //utilisation de la compétence du monstre dans la zone de l'ennemi
     bool m_attackVibe = false;   //attack de l'ennemi sur un character
@@ -60,7 +61,7 @@ public class GuardBehavior : MonoBehaviour {
     private bool m_hasSeenPlayer = false;
     private bool m_isGoingTowardsPlayer = false;
     public static bool m_isKillingSomeone = false;  //tous les script de l'ennemi possèdent la même valeur de la variable au même moment
-    [SerializeField] [Tooltip("For Debug Only")] private List<PlayerController> m_charactersInDangerScript = new List<PlayerController>(); //Liste des scripts sur les character qui entrent et sortent de la zone de l'ennemi
+    [Tooltip("For Debug Only")] private List<PlayerController> m_charactersInDangerScript = new List<PlayerController>(); //Liste des scripts sur les character qui entrent et sortent de la zone de l'ennemi
 
 
     // Start is called before the first frame update
@@ -82,6 +83,8 @@ public class GuardBehavior : MonoBehaviour {
 
         m_playerInput = GetComponent<PlayerInput>();
         m_gamepad = GetGamepad();
+        
+        Debug.Log($" ennemy gamepad : {m_gamepad.name}");
     }
     
 
@@ -220,6 +223,8 @@ public class GuardBehavior : MonoBehaviour {
 
     IEnumerator DeathCoroutine()
     {
+        Debug.Log($" ennemy gamepad : {m_gamepad.name}");
+        
         m_isKillingSomeone = true;
         PlayerController scriptCharaWhoIsDying = m_charactersInDangerScript[0];
         m_nma.isStopped = true;

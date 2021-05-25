@@ -101,10 +101,11 @@ public class HumanSubPuzzle : MonoBehaviour {
 
         MazeInitialization();
         
-        Debug.Log(m_gamepad.name);
         
         m_playerInput = GetComponent<PlayerInput>();
         m_gamepad = GetGamepad();
+        
+        Debug.Log($" human gamepad : {m_gamepad.name}");
     }
 
     
@@ -489,6 +490,7 @@ public class HumanSubPuzzle : MonoBehaviour {
     
     IEnumerator Rumble()
     {
+        Debug.Log($" human gamepad : {m_gamepad.name}");
         m_gamepad.SetMotorSpeeds(m_lowA, m_highA);
         yield return new WaitForSeconds(m_rumbleDuration);
         m_gamepad.SetMotorSpeeds(0, 0);

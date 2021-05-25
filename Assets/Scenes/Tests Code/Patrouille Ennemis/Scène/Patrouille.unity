@@ -614,6 +614,14 @@ PrefabInstance:
       value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 89996859199575062, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
+      propertyPath: m_lowMonsterIntimidation
+      value: 0.16
+      objectReference: {fileID: 0}
+    - target: {fileID: 89996859199575062, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
+      propertyPath: m_highMonsterIntimidation
+      value: 0.164
+      objectReference: {fileID: 0}
+    - target: {fileID: 89996859199575062, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
       propertyPath: m_destinationsTransforms.Array.data[0]
       value: 
       objectReference: {fileID: 582093095}
@@ -791,7 +799,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8011153223543391582, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8011153223543391582, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -1392,11 +1400,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7837382016498156148, guid: e86021a21d911b94ab8761b45653fa1f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 27.92
+      value: 30.8
       objectReference: {fileID: 0}
     - target: {fileID: 7837382016498156148, guid: e86021a21d911b94ab8761b45653fa1f, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -5.74
+      value: -5.98
       objectReference: {fileID: 0}
     - target: {fileID: 8577763002202655040, guid: e86021a21d911b94ab8761b45653fa1f, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1791,8 +1799,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 780364263}
-  m_LocalRotation: {x: 0.55658174, y: -0.0020354576, z: 0.0013636413, w: 0.83078927}
-  m_LocalPosition: {x: 26.996393, y: 15.409999, z: -9.349947}
+  m_LocalRotation: {x: 0.56238794, y: -0.0020248054, z: 0.0013771529, w: 0.8268699}
+  m_LocalPosition: {x: 29.875132, y: 15.409998, z: -9.335848}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2006038831}
@@ -1931,6 +1939,36 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 2119879784173922818, guid: 37c4abfc0b4bbf64ca12cd323618b81a, type: 3}
   m_PrefabInstance: {fileID: 912550685}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &912550688
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 912550687}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: 73dc124103809604ab5153bedc82312b, type: 3}
+  m_NotificationBehavior: 0
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: Gamepad
+  m_DefaultActionMap: Player
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 1031546553}
 --- !u!1 &952073402
 GameObject:
   m_ObjectHideFlags: 0
@@ -2427,6 +2465,41 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4973650483923431519, guid: 9362e6136bd641344b425a192b223d05, type: 3}
   m_PrefabInstance: {fileID: 1126033297}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1153867098 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8011153223543391582, guid: fe6cc4d8b1db545449a77e3353766008, type: 3}
+  m_PrefabInstance: {fileID: 231718131}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1153867099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1153867098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: 73dc124103809604ab5153bedc82312b, type: 3}
+  m_NotificationBehavior: 0
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: Gamepad
+  m_DefaultActionMap: Player
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 1031546553}
 --- !u!1001 &1173039530
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2954,6 +3027,36 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1136796023594334117, guid: fb417586abd5c3b4487f55457056e119, type: 3}
   m_PrefabInstance: {fileID: 1396223938}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1396223941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1396223940}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: 73dc124103809604ab5153bedc82312b, type: 3}
+  m_NotificationBehavior: 0
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: Gamepad
+  m_DefaultActionMap: Player
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 1031546553}
 --- !u!1 &1441204326
 GameObject:
   m_ObjectHideFlags: 0
@@ -3497,7 +3600,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Path: {fileID: 952073403}
-  m_PathPosition: 4.0484667
+  m_PathPosition: 4.4560175
   m_PositionUnits: 0
   m_PathOffset: {x: 0, y: 0, z: 0}
   m_XDamping: 0

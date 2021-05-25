@@ -94,6 +94,8 @@ public class MonsterPuzzle : MonoBehaviour
         
         m_playerInput = GetComponent<PlayerInput>();
         m_gamepad = GetGamepad();
+        
+        Debug.Log($" monster gamepad : {m_gamepad.name}");
     }
     
 
@@ -335,6 +337,7 @@ public class MonsterPuzzle : MonoBehaviour
 
     IEnumerator Rumble()
     {
+        Debug.Log($" monster gamepad : {m_gamepad.name}");
         m_gamepad.SetMotorSpeeds(m_lowA, m_highA);
         yield return new WaitForSeconds(m_rumbleDuration);
         m_gamepad.SetMotorSpeeds(0, 0);
@@ -365,8 +368,6 @@ public class MonsterPuzzle : MonoBehaviour
     /// </summary>
     void OnDisable()
     {
-        //m_gamepad = null;
-        
         m_errorDone = 0;
         m_findPiece = 0;
         
@@ -391,6 +392,7 @@ public class MonsterPuzzle : MonoBehaviour
     {
         //return Gamepad.all.FirstOrDefault(g => m_playerInput.devices.Any(d => d.deviceId == g.deviceId));
         return DualShockGamepad.current;
+        
         #region Linq Query Equivalent Logic
         //Gamepad gamepad = null;
         //foreach (var g in Gamepad.all)
