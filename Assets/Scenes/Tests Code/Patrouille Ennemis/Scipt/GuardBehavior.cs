@@ -34,12 +34,12 @@ public class GuardBehavior : MonoBehaviour {
     private List<Vector3> m_destinations = new List<Vector3>();
 
     [Header("Death")]
-    [SerializeField] [Tooltip("distance d'élimination")] [Range(0,100)] private float m_deathPos = 1.0f;
-    [SerializeField] [Tooltip("temps d'animation de mort")] [Range(0,10)] private float m_deathTime = 3.0f;
+    [SerializeField] [Tooltip("distance d'élimination")] [Range(0f,10f)] private float m_deathPos = 1.0f;
+    [SerializeField] [Tooltip("temps d'animation de mort")] [Range(0f,10f)] private float m_deathTime = 3.0f;
     
     [Header("Monster Ability")]
-    [SerializeField] [Tooltip("temps de capacité de monstre")] [Range(0,100)] private float m_intimidationTime = 1.0f;
-    [SerializeField] [Tooltip("temps de stun qu'est l'ennemi")] [Range(0,100)] private float m_stunTime = 1.0f;
+    [SerializeField] [Tooltip("temps de capacité de monstre")] [Range(0f,60f)] private float m_intimidationTime = 1.0f;
+    [SerializeField] [Tooltip("temps de stun qu'est l'ennemi")] [Range(0f,180f)] private float m_stunTime = 1.0f;
     
     // [Header("Rumble")]
     // [SerializeField] [Tooltip("valeur de la vibration faible lorsque le character entre dans la zone de l'ennemi")] [Range(0f,1f)] private float m_lowWarningEnemy =0f;
@@ -188,7 +188,7 @@ public class GuardBehavior : MonoBehaviour {
                         //mort du joueur dès qu'il est assez proche
                         if (Vector3.Distance(m_charactersInDangerScript[0].transform.position, transform.position) < m_deathPos)
                         {
-                            StartCoroutine("DeathCoroutine");
+                            StartCoroutine(DeathCoroutine());
                         }
                     }
                 }
@@ -207,7 +207,7 @@ public class GuardBehavior : MonoBehaviour {
         yield return new WaitForSeconds(m_intimidationTime); //temps d'animation d'intimidation
         //m_gamepad.SetMotorSpeeds(0.0f, 0.0f);
         scriptCharaWhoIsDying.m_isForbiddenToMove = false;
-        StartCoroutine("Stun");
+        StartCoroutine(Stun());
     }
 
     IEnumerator Stun()
@@ -225,8 +225,7 @@ public class GuardBehavior : MonoBehaviour {
         
         yield return new WaitForSeconds(m_deathTime); //temps d'animation de mort du monstre
 
-        scriptCharaWhoIsDying.m_isForbiddenToMove = false;
-        DeathManager.DeathDelegator?.Invoke();  //mort
+        scriptCharaWhoIsDying.Death();  //mort   // We will reset m_isForbiddenToMove in there
         m_nma.isStopped = false;
         m_isKillingSomeone = false;
     }
