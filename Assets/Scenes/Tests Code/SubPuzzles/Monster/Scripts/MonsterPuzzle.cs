@@ -58,7 +58,7 @@ public class MonsterPuzzle : MonoBehaviour
     [SerializeField] [Range(0f,1f)] private float m_lowA =0f;
     [SerializeField] [Range(0f,1f)] private float m_highA =0f;
     private PlayerInput m_playerInput;
-    Gamepad m_gamepad = DualShockGamepad.current;
+    public static Gamepad m_gamepad = DualShockGamepad.current;
     
     [HideInInspector] [Tooltip("Script d'intéraction entre le personnage et l'objet comprenant le subpuzzle")] public Interact_Detection m_interactDetection = null;
     
@@ -383,6 +383,10 @@ public class MonsterPuzzle : MonoBehaviour
         foreach(Transform child in gameObject.transform) {
             Destroy(child.gameObject);
         }
+        
+        Debug.Log($"Debug fermeture subPuzzle 1 :{m_gamepad}");
+        m_gamepad = null;
+        Debug.Log($"Debug fermeture subPuzzle 2 :{m_gamepad}");
         
     }
     

@@ -50,7 +50,7 @@ public class HumanSubPuzzle : MonoBehaviour {
     [SerializeField] [Range(0f,1f)] private float m_lowA =0f;
     [SerializeField] [Range(0f,1f)] private float m_highA =0f;
     private PlayerInput m_playerInput;
-    Gamepad m_gamepad = DualShockGamepad.current;
+    public static Gamepad m_gamepad = DualShockGamepad.current;
     
     [Header("Debug")]
     [SerializeField] [Tooltip("If on, the walls will be displayed for debug")] private bool m_debugMode = false;
@@ -59,14 +59,7 @@ public class HumanSubPuzzle : MonoBehaviour {
     [SerializeField] [Tooltip("For debug only")] private GameObject m_prefabRight = null;
     [SerializeField] [Tooltip("For debug only")] private GameObject m_prefabDown = null;
 
-    private The_Last_Trinity m_inputScript;
-
-    private void Awake()
-    {
-        m_inputScript = new The_Last_Trinity();
-        
-        //m_inputScript.Player.Move.performed
-    }
+    
 
     /// <summary>
     /// OnEnable is called once each time the Game Object is enabled
@@ -568,6 +561,10 @@ public class HumanSubPuzzle : MonoBehaviour {
         foreach(Transform child in gameObject.transform) {
             Destroy(child.gameObject);
         }
+
+        Debug.Log($"Debug fermeture subPuzzle 1 :{m_gamepad}");
+        m_gamepad = null;
+        Debug.Log($"Debug fermeture subPuzzle 2 :{m_gamepad}");
     }
     
 }

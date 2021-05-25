@@ -50,7 +50,7 @@ public class GuardBehavior : MonoBehaviour {
     [Tooltip("valeur de la vibration faible lorsque le character monstre utilise sa compétence")] [Range(0f,1f)] private float m_lowMonsterIntimidation =0.5f;
     [Tooltip("valeur de la vibration forte lorsque le character monstre utilise sa compétence")] [Range(0f,1f)] private float m_highMonsterIntimidation =0.5f;
     private PlayerInput m_playerInput;
-    Gamepad m_gamepad = DualShockGamepad.current;
+    private Gamepad m_gamepad = DualShockGamepad.current;
     
     bool m_warningVibe = false; //présence d'un character dans la zone de l'ennemi
     bool m_intimidationVibe = false;   //utilisation de la compétence du monstre dans la zone de l'ennemi
@@ -62,10 +62,11 @@ public class GuardBehavior : MonoBehaviour {
     private bool m_isGoingTowardsPlayer = false;
     public static bool m_isKillingSomeone = false;  //tous les script de l'ennemi possèdent la même valeur de la variable au même moment
     [Tooltip("For Debug Only")] private List<PlayerController> m_charactersInDangerScript = new List<PlayerController>(); //Liste des scripts sur les character qui entrent et sortent de la zone de l'ennemi
-    
-    
 
 
+    private HumanSubPuzzle m_humanSubPuzzle;
+    private MonsterPuzzle m_monsterPuzzle;
+    
     // Start is called before the first frame update
     void Start() {
         
@@ -83,8 +84,12 @@ public class GuardBehavior : MonoBehaviour {
         //The first position where the guard will aim at
         m_nma.SetDestination(m_destinations[m_currentDestination]);
 
-        m_playerInput = GetComponent<PlayerInput>();
-        m_gamepad = GetGamepad();
+        
+        if (m_humanSubPuzzle == null && m_monsterPuzzle == null) {
+            m_playerInput = GetComponent<PlayerInput>();
+            m_gamepad = GetGamepad();
+        }
+        else {m_gamepad = null;}
         
         Debug.Log($" ennemy gamepad : {m_gamepad.name}");
     }
@@ -114,15 +119,12 @@ public class GuardBehavior : MonoBehaviour {
             }
         }
 
-        
-        if (m_warningVibe && !m_intimidationVibe && !m_attackVibe) m_gamepad.SetMotorSpeeds(m_lowWarningEnemy, m_highWarningEnemy);
-        else if(m_intimidationVibe && !m_warningVibe && !m_attackVibe) m_gamepad.SetMotorSpeeds(m_lowMonsterIntimidation, m_highMonsterIntimidation);
-        else if(m_attackVibe && !m_warningVibe && !m_intimidationVibe) m_gamepad.SetMotorSpeeds(m_lowAttackEnemy, m_highAttackEnemy);
-        else if (!m_warningVibe && !m_attackVibe && !m_intimidationVibe)
-        {
-            m_gamepad.SetMotorSpeeds(0.0f, 0.0f);
+        if (m_gamepad != null) {
+            if (m_warningVibe && !m_intimidationVibe && !m_attackVibe) m_gamepad.SetMotorSpeeds(m_lowWarningEnemy, m_highWarningEnemy);
+            else if (m_intimidationVibe && !m_warningVibe && !m_attackVibe) m_gamepad.SetMotorSpeeds(m_lowMonsterIntimidation, m_highMonsterIntimidation);
+            else if (m_attackVibe && !m_warningVibe && !m_intimidationVibe) m_gamepad.SetMotorSpeeds(m_lowAttackEnemy, m_highAttackEnemy);
+            else if (!m_warningVibe && !m_attackVibe && !m_intimidationVibe) m_gamepad.SetMotorSpeeds(0.0f, 0.0f);
         }
-        
 
         if (m_enterZone && !m_isKillingSomeone)
         {
@@ -212,7 +214,7 @@ public class GuardBehavior : MonoBehaviour {
         scriptCharaWhoIsDying.m_isForbiddenToMove = true;
         
         yield return new WaitForSeconds(m_intimidationTime); //temps d'animation d'intimidation
-        m_gamepad.SetMotorSpeeds(0.0f, 0.0f);
+        if(m_gamepad != null) m_gamepad.SetMotorSpeeds(0.0f, 0.0f);
         scriptCharaWhoIsDying.m_isForbiddenToMove = false;
         StartCoroutine(Stun());
     }
@@ -265,6 +267,10 @@ public class GuardBehavior : MonoBehaviour {
         //If the thing we are colliding is a playable character and only him
         if (p_other.gameObject.TryGetComponent(out PlayerController charaScript))
         {
+            Debug.Log($"Debug entrée 1 :{m_gamepad}");
+            m_playerInput = GetComponent<PlayerInput>();
+            m_gamepad = GetGamepad();
+            Debug.Log($"Debug entrée 2 :{m_gamepad}");
             
             bool isAlreadyInList = false;
             for(int i = 0; i<m_charactersInDangerScript.Count; i++) {
@@ -289,6 +295,10 @@ public class GuardBehavior : MonoBehaviour {
         //If the thing we are colliding is a playable character and only him
         if (p_other.gameObject.TryGetComponent(out PlayerController charaScript))
         {
+            Debug.Log($"Debug sortie 1 :{m_gamepad}");
+            m_gamepad = null;
+            Debug.Log($"Debug sortie 2 :{m_gamepad}");
+            
             //enlèvement du personnage qui est sorti
             m_charactersInDangerScript.Remove(charaScript);
 
@@ -313,10 +323,11 @@ public class GuardBehavior : MonoBehaviour {
     // Private helpers
     private Gamepad GetGamepad()
     {
-        //return Gamepad.all.FirstOrDefault(g => m_playerInput.devices.Any(d => d.deviceId == g.deviceId));
-        return DualShockGamepad.current;
+        return Gamepad.all.FirstOrDefault(g => m_playerInput.devices.Any(d => d.deviceId == g.deviceId));
+        //return m_gamepad
         
         #region Linq Query Equivalent Logic
+        
         //Gamepad gamepad = null;
         //foreach (var g in Gamepad.all)
         //{

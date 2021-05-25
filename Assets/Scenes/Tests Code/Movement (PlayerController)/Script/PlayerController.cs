@@ -111,7 +111,7 @@ public class PlayerController : MonoBehaviour
             m_charaVelocity.y += m_gravity * Time.deltaTime;
             m_charaController.Move(m_charaVelocity * Time.deltaTime);
         }
-        Debug.Log(m_charaController.isGrounded);
+        //Debug.Log(m_charaController.isGrounded);
         
         //If the character is not in a transition between two characters
         if (!m_isSwitchingChara) {
