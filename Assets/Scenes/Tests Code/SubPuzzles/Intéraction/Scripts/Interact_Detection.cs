@@ -84,9 +84,9 @@ public class Interact_Detection : MonoBehaviour
             bool input = false;
 
             //input des différents character
-            if (m_chara == Charas.Human) input = Gamepad.current.buttonWest.isPressed; //Input.GetKeyDown(m_inputs.inputHuman);
-            else if (m_chara == Charas.Monster) input = Gamepad.current.buttonNorth.isPressed; //Input.GetKeyDown(m_inputs.inputMonster);
-            else if (m_chara == Charas.Robot) input = Gamepad.current.buttonEast.isPressed; //Input.GetKeyDown(m_inputs.inputRobot);
+            if (m_chara == Charas.Human) input = Input.GetKeyDown(m_inputs.inputHuman); //Gamepad.current.buttonWest.isPressed; 
+            else if (m_chara == Charas.Monster) input = Input.GetKeyDown(m_inputs.inputMonster); //Gamepad.current.buttonNorth.isPressed; 
+            else if (m_chara == Charas.Robot) input = Input.GetKeyDown(m_inputs.inputRobot); //Gamepad.current.buttonEast.isPressed; 
             
             if (m_playerController.m_isActive) {
                 
