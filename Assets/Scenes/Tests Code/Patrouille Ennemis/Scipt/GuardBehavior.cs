@@ -48,11 +48,12 @@ public class GuardBehavior : MonoBehaviour {
     [SerializeField] [Tooltip("valeur de la vibration forte lorsque le character est visible par l'ennemi")] [Range(0f,1f)] private float m_highAttackEnemy =0f;
     [SerializeField] [Tooltip("valeur de la vibration faible lorsque le character monstre utilise sa compétence")] [Range(0f,1f)] private float m_lowMonsterIntimidation =0f;
     [SerializeField] [Tooltip("valeur de la vibration forte lorsque le character monstre utilise sa compétence")] [Range(0f,1f)] private float m_highMonsterIntimidation =0f;
-    private PlayerInput m_playerInput;
-    Gamepad m_gamepad = Gamepad.current;
+    //private PlayerInput m_playerInput;
+    //Gamepad m_gamepad = Gamepad.current;
     bool m_warningVibe = false; //présence d'un character dans la zone de l'ennemi
     bool m_intimidationVibe = false;   //utilisation de la compétence du monstre dans la zone de l'ennemi
     bool m_attackVibe = false;   //attack de l'ennemi sur un character
+    
     
     [Tooltip("For Debug Only")] private bool m_enterZone = false;
     private bool m_hasSeenPlayer = false;
@@ -60,8 +61,7 @@ public class GuardBehavior : MonoBehaviour {
     public static bool m_isKillingSomeone = false;  //tous les script de l'ennemi possèdent la même valeur de la variable au même moment
     [Tooltip("For Debug Only")] private List<PlayerController> m_charactersInDangerScript = new List<PlayerController>(); //Liste des scripts sur les character qui entrent et sortent de la zone de l'ennemi
 
-    
-     
+
     // Start is called before the first frame update
     void Start() {
         
@@ -79,8 +79,8 @@ public class GuardBehavior : MonoBehaviour {
         //The first position where the guard will aim at
         m_nma.SetDestination(m_destinations[m_currentDestination]);
 
-        m_playerInput = GetComponent<PlayerInput>();
-        m_gamepad = GetGamepad();
+        //m_playerInput = GetComponent<PlayerInput>();
+        //m_gamepad = GetGamepad();
     }
     
 
@@ -108,7 +108,7 @@ public class GuardBehavior : MonoBehaviour {
             }
         }
 
-        
+        /*
         if (m_warningVibe && !m_intimidationVibe && !m_attackVibe) m_gamepad.SetMotorSpeeds(m_lowWarningEnemy, m_highWarningEnemy);
         else if(m_intimidationVibe && !m_warningVibe && !m_attackVibe) m_gamepad.SetMotorSpeeds(m_lowMonsterIntimidation, m_highMonsterIntimidation);
         else if(m_attackVibe && !m_warningVibe && !m_intimidationVibe) m_gamepad.SetMotorSpeeds(m_lowAttackEnemy, m_highAttackEnemy);
@@ -116,6 +116,7 @@ public class GuardBehavior : MonoBehaviour {
         {
             m_gamepad.SetMotorSpeeds(0.0f, 0.0f);
         }
+        */
 
         if (m_enterZone && !m_isKillingSomeone)
         {
@@ -204,7 +205,7 @@ public class GuardBehavior : MonoBehaviour {
         scriptCharaWhoIsDying.m_isForbiddenToMove = true;
         
         yield return new WaitForSeconds(m_intimidationTime); //temps d'animation d'intimidation
-        m_gamepad.SetMotorSpeeds(0.0f, 0.0f);
+        //m_gamepad.SetMotorSpeeds(0.0f, 0.0f);
         scriptCharaWhoIsDying.m_isForbiddenToMove = false;
         StartCoroutine("Stun");
     }
@@ -239,9 +240,8 @@ public class GuardBehavior : MonoBehaviour {
     private void CheckOutSomewhere(Vector3 p_playerPos) {
         
         //If the guard was already off his path, we cancel his last destination
-        if (m_isGoingTowardsPlayer) {
-            m_destinations.Remove(m_destinations[m_currentDestination]);
-        }
+        if (m_isGoingTowardsPlayer) m_destinations.Remove(m_destinations[m_currentDestination]);
+        
         //We make the guard go to the position of the player when he was seen
         m_isGoingTowardsPlayer = true;
         m_destinations.Insert(m_currentDestination, p_playerPos);
@@ -279,7 +279,6 @@ public class GuardBehavior : MonoBehaviour {
     /// <param name="p_other">collision avec un character</param>
     private void OnTriggerExit(Collider p_other)
     {
-        
         //If the thing we are colliding is a playable character and only him
         if (p_other.gameObject.TryGetComponent(out PlayerController charaScript))
         {
@@ -303,6 +302,7 @@ public class GuardBehavior : MonoBehaviour {
         }
     }
 
+    /*
     // Private helpers
     private Gamepad GetGamepad()
     {
@@ -328,4 +328,5 @@ public class GuardBehavior : MonoBehaviour {
         //return gamepad;
         #endregion
     }
+    */
 }

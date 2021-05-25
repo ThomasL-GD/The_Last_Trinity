@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SocialPlatforms;
 
 public class Interact_Detection : MonoBehaviour
@@ -78,16 +79,14 @@ public class Interact_Detection : MonoBehaviour
             this.PuzzleDeactivation();
         }
         
-        
         if (m_buttonActivate || m_isInSubPuzzle) {
 
             bool input = false;
 
             //input des différents character
-            if (m_chara == Charas.Human) input = Input.GetKeyDown(m_inputs.inputHuman);
-            else if (m_chara == Charas.Monster) input = Input.GetKeyDown(m_inputs.inputMonster);
-            else if (m_chara == Charas.Robot) input = Input.GetKeyDown(m_inputs.inputRobot);
-            
+            if (m_chara == Charas.Human) input = Gamepad.current.buttonWest.isPressed; //Input.GetKeyDown(m_inputs.inputHuman);
+            else if (m_chara == Charas.Monster) input = Gamepad.current.buttonNorth.isPressed; //Input.GetKeyDown(m_inputs.inputMonster);
+            else if (m_chara == Charas.Robot) input = Gamepad.current.buttonEast.isPressed; //Input.GetKeyDown(m_inputs.inputRobot);
             
             if (m_playerController.m_isActive) {
                 
@@ -131,6 +130,11 @@ public class Interact_Detection : MonoBehaviour
         {
             StartCoroutine(EndLook());
         }
+        else if(GuardBehavior.m_isKillingSomeone){ m_activationButton.SetActive(true);
+            m_buttonActivate = true;
+            m_isInSubPuzzle = false;
+            m_puzzle.SetActive(false);
+        }
         else {
             m_playerController.m_isForbiddenToMove = false;
             m_activationButton.SetActive(true);
@@ -138,8 +142,6 @@ public class Interact_Detection : MonoBehaviour
             m_isInSubPuzzle = false;
             m_puzzle.SetActive(false);
         }
-        
-        if(!GuardBehavior.m_isKillingSomeone){ m_playerController.m_isForbiddenToMove = false;}
     }
 
     /// <summary>
