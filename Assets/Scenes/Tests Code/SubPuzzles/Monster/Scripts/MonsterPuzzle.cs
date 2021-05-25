@@ -8,6 +8,7 @@ using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 using UnityEngine.InputSystem;
 using System.Linq;
+using UnityEngine.InputSystem.DualShock;
 
 public class MonsterPuzzle : MonoBehaviour
 {
@@ -57,7 +58,7 @@ public class MonsterPuzzle : MonoBehaviour
     [SerializeField] [Range(0f,1f)] private float m_lowA =0f;
     [SerializeField] [Range(0f,1f)] private float m_highA =0f;
     private PlayerInput m_playerInput;
-    Gamepad m_gamepad = Gamepad.current;
+    Gamepad m_gamepad = DualShockGamepad.current;
     
     [HideInInspector] [Tooltip("Script d'intéraction entre le personnage et l'objet comprenant le subpuzzle")] public Interact_Detection m_interactDetection = null;
     
@@ -388,8 +389,8 @@ public class MonsterPuzzle : MonoBehaviour
     // Private helpers
     private Gamepad GetGamepad()
     {
-        return Gamepad.all.FirstOrDefault(g => m_playerInput.devices.Any(d => d.deviceId == g.deviceId));
-
+        //return Gamepad.all.FirstOrDefault(g => m_playerInput.devices.Any(d => d.deviceId == g.deviceId));
+        return DualShockGamepad.current;
         #region Linq Query Equivalent Logic
         //Gamepad gamepad = null;
         //foreach (var g in Gamepad.all)

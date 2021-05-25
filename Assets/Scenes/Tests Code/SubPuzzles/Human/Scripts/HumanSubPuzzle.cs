@@ -3,7 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.DualShock;
+using UnityEngine.InputSystem.Layouts;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 
@@ -50,7 +54,7 @@ public class HumanSubPuzzle : MonoBehaviour {
     [SerializeField] [Range(0f,1f)] private float m_lowA =0f;
     [SerializeField] [Range(0f,1f)] private float m_highA =0f;
     private PlayerInput m_playerInput;
-    Gamepad m_gamepad = Gamepad.current;
+    Gamepad m_gamepad = DualShockGamepad.current;
     
     [Header("Debug")]
     [SerializeField] [Tooltip("If on, the walls will be displayed for debug")] private bool m_debugMode = false;
@@ -60,6 +64,7 @@ public class HumanSubPuzzle : MonoBehaviour {
     [SerializeField] [Tooltip("For debug only")] private GameObject m_prefabDown = null;
 
     
+
     /// <summary>
     /// OnEnable is called once each time the Game Object is enabled
     /// In our case, it will initialize the maze
@@ -96,10 +101,13 @@ public class HumanSubPuzzle : MonoBehaviour {
 
         MazeInitialization();
         
+        Debug.Log(m_gamepad.name);
+        
         m_playerInput = GetComponent<PlayerInput>();
         m_gamepad = GetGamepad();
     }
 
+    
     /// <summary>
     /// Will remove walls from the full maze in order to have at least one possible solution and then break some random walls
     /// </summary>
@@ -407,6 +415,7 @@ public class HumanSubPuzzle : MonoBehaviour {
         float horizontalAxis = Input.GetAxis("Horizontal");
         float verticalAxis = Input.GetAxis("Vertical");
         
+
         //Joystick se recentre sur la manette
         if (horizontalAxis < m_limitPosition && horizontalAxis > -m_limitPosition && verticalAxis < m_limitPosition && verticalAxis > -m_limitPosition)
         {
@@ -438,7 +447,7 @@ public class HumanSubPuzzle : MonoBehaviour {
 
             //First we verify the player has no wall blocking the way he wants to go;
             if (attemptedMovement == Directions.None || m_maze[m_selector.y, m_selector.x].HasFlag(attemptedMovement)) {
-                Debug.Log("Nah bro, you cannot go this way");
+                //Debug.Log("Nah bro, you cannot go this way");
                 StartCoroutine("Rumble");   //Vibration
             }
             else {
@@ -517,9 +526,11 @@ public class HumanSubPuzzle : MonoBehaviour {
     // Private helpers
     private Gamepad GetGamepad()
     {
-        return Gamepad.all.FirstOrDefault(g => m_playerInput.devices.Any(d => d.deviceId == g.deviceId));
+        //return Gamepad.all.FirstOrDefault(g => m_playerInput.devices.Any(d => d.deviceId == g.deviceId));
+        return DualShockGamepad.current;
 
         #region Linq Query Equivalent Logic
+
         //Gamepad gamepad = null;
         //foreach (var g in Gamepad.all)
         //{
@@ -537,6 +548,7 @@ public class HumanSubPuzzle : MonoBehaviour {
         //    }
         //}
         //return gamepad;
+
         #endregion
     }
     

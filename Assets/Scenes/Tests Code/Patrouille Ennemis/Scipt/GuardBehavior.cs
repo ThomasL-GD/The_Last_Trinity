@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.DualShock;
 
 [RequireComponent(typeof(SphereCollider))]
 public class GuardBehavior : MonoBehaviour {
@@ -49,7 +50,7 @@ public class GuardBehavior : MonoBehaviour {
     [SerializeField] [Tooltip("valeur de la vibration faible lorsque le character monstre utilise sa compétence")] [Range(0f,1f)] private float m_lowMonsterIntimidation =0f;
     [SerializeField] [Tooltip("valeur de la vibration forte lorsque le character monstre utilise sa compétence")] [Range(0f,1f)] private float m_highMonsterIntimidation =0f;
     private PlayerInput m_playerInput;
-    Gamepad m_gamepad = Gamepad.current;
+    Gamepad m_gamepad = DualShockGamepad.current;
     bool m_warningVibe = false; //présence d'un character dans la zone de l'ennemi
     bool m_intimidationVibe = false;   //utilisation de la compétence du monstre dans la zone de l'ennemi
     bool m_attackVibe = false;   //attack de l'ennemi sur un character
@@ -305,8 +306,9 @@ public class GuardBehavior : MonoBehaviour {
     // Private helpers
     private Gamepad GetGamepad()
     {
-        return Gamepad.all.FirstOrDefault(g => m_playerInput.devices.Any(d => d.deviceId == g.deviceId));
-
+        //return Gamepad.all.FirstOrDefault(g => m_playerInput.devices.Any(d => d.deviceId == g.deviceId));
+        return DualShockGamepad.current;
+        
         #region Linq Query Equivalent Logic
         //Gamepad gamepad = null;
         //foreach (var g in Gamepad.all)
