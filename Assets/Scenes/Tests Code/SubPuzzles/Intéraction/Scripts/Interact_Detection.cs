@@ -68,7 +68,7 @@ public class Interact_Detection : MonoBehaviour
 
         if (m_camera == null) Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE CAMERA IN INTERACT_DETECTION !");
         if (m_inputs == null) Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO ADD THE INPUTS IN INTERACT_DETECTION !");
-        
+        if(m_doorSub.Length == 0) Debug.LogWarning("BE CAREFUL ! THERE IS NO DOOR FOR ANIMATION IN INTERACT_DETECTION !");
         
     }
 
@@ -96,7 +96,7 @@ public class Interact_Detection : MonoBehaviour
                 m_activationButton.transform.LookAt(m_camera);
 
                 //Input et bouton visible ==> entrée dans subpuzzle 
-                if (input) {
+                if (input && m_canMove) {
 
                     if (m_chara == Charas.Human) { m_puzzle.GetComponent<HumanSubPuzzle>().m_interactDetection = this; }
                     else if (m_chara == Charas.Monster) { m_puzzle.GetComponent<MonsterPuzzle>().m_interactDetection = this; }
@@ -113,7 +113,7 @@ public class Interact_Detection : MonoBehaviour
         }
         
         
-        if (m_openDoor) {
+        if (m_openDoor && m_doorSub.Length > 0) {
             foreach (MovableDoor door in m_doorSub) {
                 door.m_door.transform.position = Vector3.SmoothDamp(door.m_door.transform.position, door.m_positionToGo, ref door.m_velocity , m_doorOpeningTime);
             }
@@ -128,12 +128,15 @@ public class Interact_Detection : MonoBehaviour
     {
         if (m_achieved)
         {
+            Debug.Log("Ouiiiiiiiiii");
             StartCoroutine(EndLook());
         }
-        else if(GuardBehavior.m_isKillingSomeone){ m_activationButton.SetActive(true);
+        else if(!GuardBehavior.m_isKillingSomeone){ 
+            m_activationButton.SetActive(true);
             m_buttonActivate = true;
             m_isInSubPuzzle = false;
             m_puzzle.SetActive(false);
+            m_isInSubPuzzle = false;
         }
         else {
             m_playerController.m_isForbiddenToMove = false;
@@ -155,9 +158,12 @@ public class Interact_Detection : MonoBehaviour
 
         m_canMove = false;
         m_puzzle.SetActive(false);
+        m_isInSubPuzzle = false;
         m_activationButton.SetActive(false);
         m_buttonActivate = false;
-        StartCoroutine(DoorTimer());
+        
+        Debug.Log("Ca devrait rester invisible ici");
+        if(m_doorSub.Length != 0) StartCoroutine(DoorTimer());
     }
 
     /// <summary>

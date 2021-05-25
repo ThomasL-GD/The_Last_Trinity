@@ -41,25 +41,25 @@ public class GuardBehavior : MonoBehaviour {
     [SerializeField] [Tooltip("temps de capacité de monstre")] [Range(0,100)] private float m_intimidationTime = 1.0f;
     [SerializeField] [Tooltip("temps de stun qu'est l'ennemi")] [Range(0,100)] private float m_stunTime = 1.0f;
     
-    [Header("Rumble")]
-    [SerializeField] [Tooltip("valeur de la vibration faible lorsque le character entre dans la zone de l'ennemi")] [Range(0f,1f)] private float m_lowWarningEnemy =0f;
-    [SerializeField] [Tooltip("valeur de la vibration forte lorsque le character entre dans la zone de l'ennemi")] [Range(0f,1f)] private float m_highWarningEnemy =0f;
-    [SerializeField] [Tooltip("valeur de la vibration faible lorsque le character est visible par l'ennemi")] [Range(0f,1f)] private float m_lowAttackEnemy =0f;
-    [SerializeField] [Tooltip("valeur de la vibration forte lorsque le character est visible par l'ennemi")] [Range(0f,1f)] private float m_highAttackEnemy =0f;
-    [SerializeField] [Tooltip("valeur de la vibration faible lorsque le character monstre utilise sa compétence")] [Range(0f,1f)] private float m_lowMonsterIntimidation =0f;
-    [SerializeField] [Tooltip("valeur de la vibration forte lorsque le character monstre utilise sa compétence")] [Range(0f,1f)] private float m_highMonsterIntimidation =0f;
+    // [Header("Rumble")]
+    // [SerializeField] [Tooltip("valeur de la vibration faible lorsque le character entre dans la zone de l'ennemi")] [Range(0f,1f)] private float m_lowWarningEnemy =0f;
+    // [SerializeField] [Tooltip("valeur de la vibration forte lorsque le character entre dans la zone de l'ennemi")] [Range(0f,1f)] private float m_highWarningEnemy =0f;
+    // [SerializeField] [Tooltip("valeur de la vibration faible lorsque le character est visible par l'ennemi")] [Range(0f,1f)] private float m_lowAttackEnemy =0f;
+    // [SerializeField] [Tooltip("valeur de la vibration forte lorsque le character est visible par l'ennemi")] [Range(0f,1f)] private float m_highAttackEnemy =0f;
+    // [SerializeField] [Tooltip("valeur de la vibration faible lorsque le character monstre utilise sa compétence")] [Range(0f,1f)] private float m_lowMonsterIntimidation =0f;
+    // [SerializeField] [Tooltip("valeur de la vibration forte lorsque le character monstre utilise sa compétence")] [Range(0f,1f)] private float m_highMonsterIntimidation =0f;
     //private PlayerInput m_playerInput;
     //Gamepad m_gamepad = Gamepad.current;
-    bool m_warningVibe = false; //présence d'un character dans la zone de l'ennemi
-    bool m_intimidationVibe = false;   //utilisation de la compétence du monstre dans la zone de l'ennemi
-    bool m_attackVibe = false;   //attack de l'ennemi sur un character
+    // bool m_warningVibe = false; //présence d'un character dans la zone de l'ennemi
+    // bool m_intimidationVibe = false;   //utilisation de la compétence du monstre dans la zone de l'ennemi
+    // bool m_attackVibe = false;   //attack de l'ennemi sur un character
     
     
-    [Tooltip("For Debug Only")] private bool m_enterZone = false;
+    private bool m_enterZone = false;
     private bool m_hasSeenPlayer = false;
     private bool m_isGoingTowardsPlayer = false;
     public static bool m_isKillingSomeone = false;  //tous les script de l'ennemi possèdent la même valeur de la variable au même moment
-    [Tooltip("For Debug Only")] private List<PlayerController> m_charactersInDangerScript = new List<PlayerController>(); //Liste des scripts sur les character qui entrent et sortent de la zone de l'ennemi
+    [SerializeField] [Tooltip("For Debug Only")] private List<PlayerController> m_charactersInDangerScript = new List<PlayerController>(); //Liste des scripts sur les character qui entrent et sortent de la zone de l'ennemi
 
 
     // Start is called before the first frame update
@@ -120,9 +120,9 @@ public class GuardBehavior : MonoBehaviour {
 
         if (m_enterZone && !m_isKillingSomeone)
         {
-            m_warningVibe = true;
-            m_intimidationVibe = false;
-            m_attackVibe = false;
+            // m_warningVibe = true;
+            // m_intimidationVibe = false;
+            // m_attackVibe = false;
 
             //calcul de la position du premier chara entré dans la zone
             Vector3 targetDir = (m_charactersInDangerScript[0].gameObject.transform.position - transform.position).normalized;
@@ -149,9 +149,9 @@ public class GuardBehavior : MonoBehaviour {
                     //INTIMIDATION DU MONSTRE
                     if (Input.GetKeyDown(m_charactersInDangerScript[0].m_selector.inputMonster))
                     {
-                        m_warningVibe = false;
-                        m_intimidationVibe = true;
-                        m_attackVibe = false;
+                        // m_warningVibe = false;
+                        // m_intimidationVibe = true;
+                        // m_attackVibe = false;
                         StartCoroutine("Intimidate");
                     }
                     
@@ -175,9 +175,9 @@ public class GuardBehavior : MonoBehaviour {
                     //si le joueur est visible par l'ennemi
                     else if (angleForward <= m_angleUncertainty)
                     {
-                        m_warningVibe = false;
-                        m_intimidationVibe = false;
-                        m_attackVibe = true;
+                        // m_warningVibe = false;
+                        // m_intimidationVibe = false;
+                        // m_attackVibe = true;
                         
                         m_hasSeenPlayer = true;
                         CheckOutSomewhere(m_charactersInDangerScript[0].gameObject.transform.position);
@@ -294,9 +294,9 @@ public class GuardBehavior : MonoBehaviour {
                 m_nma.angularSpeed = m_normalRotationSpeed;
                 m_enterZone = false;
 
-                m_attackVibe = false;
-                m_warningVibe = false;
-                m_intimidationVibe = false;
+                // m_attackVibe = false;
+                // m_warningVibe = false;
+                // m_intimidationVibe = false;
             }
             
         }
