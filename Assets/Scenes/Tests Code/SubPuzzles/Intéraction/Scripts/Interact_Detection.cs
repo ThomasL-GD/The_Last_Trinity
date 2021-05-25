@@ -74,8 +74,9 @@ public class Interact_Detection : MonoBehaviour
 
     private void Update()
     {
-        if (GuardBehavior.m_isKillingSomeone)
+        if (m_isInSubPuzzle && GuardBehavior.m_isKillingSomeone)
         {
+            Debug.Log("Tue moi ce type qui est dans le subpuzzle");
             this.PuzzleDeactivation();
         }
         
@@ -128,15 +129,7 @@ public class Interact_Detection : MonoBehaviour
     {
         if (m_achieved)
         {
-            Debug.Log("Ouiiiiiiiiii");
             StartCoroutine(EndLook());
-        }
-        else if(!GuardBehavior.m_isKillingSomeone){ 
-            m_activationButton.SetActive(true);
-            m_buttonActivate = true;
-            m_isInSubPuzzle = false;
-            m_puzzle.SetActive(false);
-            m_isInSubPuzzle = false;
         }
         else {
             m_playerController.m_isForbiddenToMove = false;
@@ -144,6 +137,7 @@ public class Interact_Detection : MonoBehaviour
             m_buttonActivate = true;
             m_isInSubPuzzle = false;
             m_puzzle.SetActive(false);
+            Debug.Log("Le puzzle doit se fermer");
         }
     }
 
@@ -162,7 +156,6 @@ public class Interact_Detection : MonoBehaviour
         m_activationButton.SetActive(false);
         m_buttonActivate = false;
         
-        Debug.Log("Ca devrait rester invisible ici");
         if(m_doorSub.Length != 0) StartCoroutine(DoorTimer());
     }
 

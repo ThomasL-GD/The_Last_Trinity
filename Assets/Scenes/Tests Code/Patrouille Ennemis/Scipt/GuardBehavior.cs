@@ -138,7 +138,7 @@ public class GuardBehavior : MonoBehaviour {
             //Debug du raycast dans la scène
             if (raycastHasHit)
             {
-                //Debug.DrawRay(transform.position, targetDir * hit.distance, Color.magenta, 10f);
+                Debug.DrawRay(transform.position, targetDir * hit.distance, Color.magenta, 10f);
                 
                 if (m_charactersInDangerScript[0].gameObject.transform.position != hit.transform.position) //le chara se trouve derrière un obstacle et n'est pas visible par l'ennemi
                 {
@@ -188,6 +188,7 @@ public class GuardBehavior : MonoBehaviour {
                         //mort du joueur dès qu'il est assez proche
                         if (Vector3.Distance(m_charactersInDangerScript[0].transform.position, transform.position) < m_deathPos)
                         {
+                            Debug.Log("J'AI TROUVE UNE VICTIME");
                             StartCoroutine(DeathCoroutine());
                         }
                     }
@@ -222,7 +223,6 @@ public class GuardBehavior : MonoBehaviour {
         PlayerController scriptCharaWhoIsDying = m_charactersInDangerScript[0];
         m_nma.isStopped = true;
         scriptCharaWhoIsDying.m_isForbiddenToMove = true;
-        
         yield return new WaitForSeconds(m_deathTime); //temps d'animation de mort du monstre
 
         scriptCharaWhoIsDying.Death();  //mort   // We will reset m_isForbiddenToMove in there

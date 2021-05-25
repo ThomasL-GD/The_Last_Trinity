@@ -429,8 +429,9 @@ public class RobotPuzzleManager : MonoBehaviour {
 		}
 		
 		//Sortie du subPuzzle en cas de changement de personnage
-		if (m_interactDetection.m_isInSubPuzzle && Input.GetKeyDown(m_inputs.inputMonster) || Input.GetKeyDown(m_inputs.inputHuman))
+		if (m_interactDetection.m_isInSubPuzzle && (Input.GetKeyDown(m_inputs.inputMonster) || Input.GetKeyDown(m_inputs.inputHuman)))
 		{
+			Debug.Log("Bye Roboooooot");
 			if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
 		}
 
