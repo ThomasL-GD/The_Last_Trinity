@@ -17,10 +17,10 @@ public class MonsterPuzzle : MonoBehaviour
     
     [Header("Listes")]
     [Tooltip("liste des pièces qui peuvent apparaitre")]private List<GameObject> m_stockPieces = new List<GameObject>();
-    [SerializeField] [Tooltip("liste des pièces dans la scène")] private List<GameObject> m_potentialPieces = new List<GameObject>();
-    [SerializeField] [Tooltip("liste des pièces correctes")] private List<GameObject> m_correctPieces = new List<GameObject>();
-    [SerializeField] [Tooltip("liste des pièces Incorrectes")] private List<GameObject> m_incorrectPieces = new List<GameObject>();
-    [SerializeField] [Tooltip("List des pièces trouvées")] private List<GameObject> m_foundPieces = new List<GameObject>();
+    [Tooltip("liste des pièces dans la scène")] private List<GameObject> m_potentialPieces = new List<GameObject>();
+    [Tooltip("liste des pièces correctes")] private List<GameObject> m_correctPieces = new List<GameObject>();
+    [Tooltip("liste des pièces Incorrectes")] private List<GameObject> m_incorrectPieces = new List<GameObject>();
+    [Tooltip("List des pièces trouvées")] private List<GameObject> m_foundPieces = new List<GameObject>();
 
     //Décalage
     [Tooltip("FOR DEBUG ONLY\nSize of each cell in Rect Transorm anchor units")] private float m_offset = 4.0f;

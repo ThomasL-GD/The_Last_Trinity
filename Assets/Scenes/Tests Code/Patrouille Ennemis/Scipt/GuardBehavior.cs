@@ -41,18 +41,18 @@ public class GuardBehavior : MonoBehaviour {
     [SerializeField] [Tooltip("temps de capacité de monstre")] [Range(0f,60f)] private float m_intimidationTime = 1.0f;
     [SerializeField] [Tooltip("temps de stun qu'est l'ennemi")] [Range(0f,180f)] private float m_stunTime = 1.0f;
     
-    // [Header("Rumble")]
-    // [SerializeField] [Tooltip("valeur de la vibration faible lorsque le character entre dans la zone de l'ennemi")] [Range(0f,1f)] private float m_lowWarningEnemy =0f;
-    // [SerializeField] [Tooltip("valeur de la vibration forte lorsque le character entre dans la zone de l'ennemi")] [Range(0f,1f)] private float m_highWarningEnemy =0f;
-    // [SerializeField] [Tooltip("valeur de la vibration faible lorsque le character est visible par l'ennemi")] [Range(0f,1f)] private float m_lowAttackEnemy =0f;
-    // [SerializeField] [Tooltip("valeur de la vibration forte lorsque le character est visible par l'ennemi")] [Range(0f,1f)] private float m_highAttackEnemy =0f;
-    // [SerializeField] [Tooltip("valeur de la vibration faible lorsque le character monstre utilise sa compétence")] [Range(0f,1f)] private float m_lowMonsterIntimidation =0f;
-    // [SerializeField] [Tooltip("valeur de la vibration forte lorsque le character monstre utilise sa compétence")] [Range(0f,1f)] private float m_highMonsterIntimidation =0f;
-    //private PlayerInput m_playerInput;
-    //Gamepad m_gamepad = Gamepad.current;
-    // bool m_warningVibe = false; //présence d'un character dans la zone de l'ennemi
-    // bool m_intimidationVibe = false;   //utilisation de la compétence du monstre dans la zone de l'ennemi
-    // bool m_attackVibe = false;   //attack de l'ennemi sur un character
+    [Header("Rumble")]
+    [SerializeField] [Tooltip("valeur de la vibration faible lorsque le character entre dans la zone de l'ennemi")] [Range(0f,1f)] private float m_lowWarningEnemy =0f;
+    [SerializeField] [Tooltip("valeur de la vibration forte lorsque le character entre dans la zone de l'ennemi")] [Range(0f,1f)] private float m_highWarningEnemy =0f;
+    [SerializeField] [Tooltip("valeur de la vibration faible lorsque le character est visible par l'ennemi")] [Range(0f,1f)] private float m_lowAttackEnemy =0f;
+    [SerializeField] [Tooltip("valeur de la vibration forte lorsque le character est visible par l'ennemi")] [Range(0f,1f)] private float m_highAttackEnemy =0f;
+    [SerializeField] [Tooltip("valeur de la vibration faible lorsque le character monstre utilise sa compétence")] [Range(0f,1f)] private float m_lowMonsterIntimidation =0f;
+    [SerializeField] [Tooltip("valeur de la vibration forte lorsque le character monstre utilise sa compétence")] [Range(0f,1f)] private float m_highMonsterIntimidation =0f;
+    private PlayerInput m_playerInput;
+    Gamepad m_gamepad = Gamepad.current;
+    bool m_warningVibe = false; //présence d'un character dans la zone de l'ennemi
+    bool m_intimidationVibe = false;   //utilisation de la compétence du monstre dans la zone de l'ennemi
+    bool m_attackVibe = false;   //attack de l'ennemi sur un character
     
     
     private bool m_enterZone = false;
@@ -79,8 +79,8 @@ public class GuardBehavior : MonoBehaviour {
         //The first position where the guard will aim at
         m_nma.SetDestination(m_destinations[m_currentDestination]);
 
-        //m_playerInput = GetComponent<PlayerInput>();
-        //m_gamepad = GetGamepad();
+        m_playerInput = GetComponent<PlayerInput>();
+        m_gamepad = GetGamepad();
     }
     
 
@@ -108,7 +108,7 @@ public class GuardBehavior : MonoBehaviour {
             }
         }
 
-        /*
+        
         if (m_warningVibe && !m_intimidationVibe && !m_attackVibe) m_gamepad.SetMotorSpeeds(m_lowWarningEnemy, m_highWarningEnemy);
         else if(m_intimidationVibe && !m_warningVibe && !m_attackVibe) m_gamepad.SetMotorSpeeds(m_lowMonsterIntimidation, m_highMonsterIntimidation);
         else if(m_attackVibe && !m_warningVibe && !m_intimidationVibe) m_gamepad.SetMotorSpeeds(m_lowAttackEnemy, m_highAttackEnemy);
@@ -116,13 +116,13 @@ public class GuardBehavior : MonoBehaviour {
         {
             m_gamepad.SetMotorSpeeds(0.0f, 0.0f);
         }
-        */
+        
 
         if (m_enterZone && !m_isKillingSomeone)
         {
-            // m_warningVibe = true;
-            // m_intimidationVibe = false;
-            // m_attackVibe = false;
+            m_warningVibe = true;
+            m_intimidationVibe = false;
+            m_attackVibe = false;
 
             //calcul de la position du premier chara entré dans la zone
             Vector3 targetDir = (m_charactersInDangerScript[0].gameObject.transform.position - transform.position).normalized;
@@ -138,7 +138,7 @@ public class GuardBehavior : MonoBehaviour {
             //Debug du raycast dans la scène
             if (raycastHasHit)
             {
-                Debug.DrawRay(transform.position, targetDir * hit.distance, Color.magenta, 10f);
+                //Debug.DrawRay(transform.position, targetDir * hit.distance, Color.magenta, 10f);
                 
                 if (m_charactersInDangerScript[0].gameObject.transform.position != hit.transform.position) //le chara se trouve derrière un obstacle et n'est pas visible par l'ennemi
                 {
@@ -149,9 +149,9 @@ public class GuardBehavior : MonoBehaviour {
                     //INTIMIDATION DU MONSTRE
                     if (Input.GetKeyDown(m_charactersInDangerScript[0].m_selector.inputMonster))
                     {
-                        // m_warningVibe = false;
-                        // m_intimidationVibe = true;
-                        // m_attackVibe = false;
+                        m_warningVibe = false;
+                        m_intimidationVibe = true;
+                        m_attackVibe = false;
                         StartCoroutine("Intimidate");
                     }
                     
@@ -175,9 +175,9 @@ public class GuardBehavior : MonoBehaviour {
                     //si le joueur est visible par l'ennemi
                     else if (angleForward <= m_angleUncertainty)
                     {
-                        // m_warningVibe = false;
-                        // m_intimidationVibe = false;
-                        // m_attackVibe = true;
+                        m_warningVibe = false;
+                        m_intimidationVibe = false;
+                        m_attackVibe = true;
                         
                         m_hasSeenPlayer = true;
                         CheckOutSomewhere(m_charactersInDangerScript[0].gameObject.transform.position);
@@ -206,7 +206,7 @@ public class GuardBehavior : MonoBehaviour {
         scriptCharaWhoIsDying.m_isForbiddenToMove = true;
         
         yield return new WaitForSeconds(m_intimidationTime); //temps d'animation d'intimidation
-        //m_gamepad.SetMotorSpeeds(0.0f, 0.0f);
+        m_gamepad.SetMotorSpeeds(0.0f, 0.0f);
         scriptCharaWhoIsDying.m_isForbiddenToMove = false;
         StartCoroutine(Stun());
     }
@@ -293,15 +293,15 @@ public class GuardBehavior : MonoBehaviour {
                 m_nma.angularSpeed = m_normalRotationSpeed;
                 m_enterZone = false;
 
-                // m_attackVibe = false;
-                // m_warningVibe = false;
-                // m_intimidationVibe = false;
+                m_attackVibe = false;
+                m_warningVibe = false;
+                m_intimidationVibe = false;
             }
             
         }
     }
 
-    /*
+    
     // Private helpers
     private Gamepad GetGamepad()
     {
@@ -327,5 +327,5 @@ public class GuardBehavior : MonoBehaviour {
         //return gamepad;
         #endregion
     }
-    */
+    
 }

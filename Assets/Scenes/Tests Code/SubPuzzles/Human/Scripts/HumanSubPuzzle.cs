@@ -438,8 +438,8 @@ public class HumanSubPuzzle : MonoBehaviour {
 
             //First we verify the player has no wall blocking the way he wants to go;
             if (attemptedMovement == Directions.None || m_maze[m_selector.y, m_selector.x].HasFlag(attemptedMovement)) {
-                StartCoroutine("Rumble");   //Vibration
                 Debug.Log("Nah bro, you cannot go this way");
+                StartCoroutine("Rumble");   //Vibration
             }
             else {
                 //If the movement is not blocked by a wall, we update the selector coordinates according to the wanted direction
