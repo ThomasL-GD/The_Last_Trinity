@@ -62,6 +62,8 @@ public class GuardBehavior : MonoBehaviour {
     private bool m_isGoingTowardsPlayer = false;
     public static bool m_isKillingSomeone = false;  //tous les script de l'ennemi possèdent la même valeur de la variable au même moment
     [Tooltip("For Debug Only")] private List<PlayerController> m_charactersInDangerScript = new List<PlayerController>(); //Liste des scripts sur les character qui entrent et sortent de la zone de l'ennemi
+    
+    
 
 
     // Start is called before the first frame update

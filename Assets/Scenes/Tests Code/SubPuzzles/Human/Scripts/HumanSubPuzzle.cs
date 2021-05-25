@@ -3,13 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.DualShock;
-using UnityEngine.InputSystem.Layouts;
-using UnityEngine.UI;
 using Random = UnityEngine.Random;
-
 
 public class HumanSubPuzzle : MonoBehaviour {
 
@@ -63,7 +59,14 @@ public class HumanSubPuzzle : MonoBehaviour {
     [SerializeField] [Tooltip("For debug only")] private GameObject m_prefabRight = null;
     [SerializeField] [Tooltip("For debug only")] private GameObject m_prefabDown = null;
 
-    
+    private The_Last_Trinity m_inputScript;
+
+    private void Awake()
+    {
+        m_inputScript = new The_Last_Trinity();
+        
+        //m_inputScript.Player.Move.performed
+    }
 
     /// <summary>
     /// OnEnable is called once each time the Game Object is enabled
@@ -72,7 +75,6 @@ public class HumanSubPuzzle : MonoBehaviour {
     void OnEnable() {
         
         m_interactDetection.SquarePanelToScreen();
-        
 
         if (m_mazeHeight < 2 || m_mazeWidth < 2) {
             Debug.LogError("Invalid size of the maze ! each dimension must be 2 or more cell long");
