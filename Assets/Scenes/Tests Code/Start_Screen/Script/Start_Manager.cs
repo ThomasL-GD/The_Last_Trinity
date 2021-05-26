@@ -84,9 +84,6 @@ public class Start_Manager : MonoBehaviour {
         else if(m_timer < m_opacityDuration) m_timer = m_opacityDuration;   //Arrêt du timer après visibilité totale
 
 
-        /////////////////////////////       START ANIMATIONS        /////////////////////////////
-        
-        
         //animation d'opacité du titre
         if (m_isFading)
         {
@@ -114,7 +111,7 @@ public class Start_Manager : MonoBehaviour {
             //accès au menu principal après input sur le bouton start ou le bouton croix
             if ((Input.GetKeyDown(KeyCode.JoystickButton9) || Input.GetKeyDown(KeyCode.JoystickButton1)) && m_timer >= m_opacityDuration)
             {
-
+                
                 //m_englishMainMenu.SetActive(true);
                 m_mainMenu.SetActive(true);
                 m_englishMenuIsActive = true;
@@ -205,7 +202,7 @@ public class Start_Manager : MonoBehaviour {
         /////////////////////////////       ANIMATION CAMERA       /////////////////////////////
 
 
-        if (!Input.GetKeyDown(KeyCode.JoystickButton9) || !Input.GetKeyDown(KeyCode.JoystickButton1)) {
+        if (!m_englishMenuIsActive) {
             //déplacement de la caméra de la position initiale à la position de recul   (les deux points sont dans la liste m_destinationsTransform)
             m_camera.transform.position = Vector3.MoveTowards(m_camera.transform.position, m_destinationsTransforms[1].transform.position, m_backSpeedCamera * Time.deltaTime);
             //rotation de la caméra sur la durée pour avoir la même que la rotation de la vue de recul
@@ -213,14 +210,22 @@ public class Start_Manager : MonoBehaviour {
                 m_camera.transform.Rotate(Vector3.left * (m_endSpeedRotationCamera * Time.deltaTime));
             }
         }
-        else {
+        else if(m_englishMenuIsActive){
             //déplacement de la caméra de la position initiale à la position de recul   (les deux points sont dans la liste m_destinationsTransform)
             m_camera.transform.position = Vector3.MoveTowards(m_camera.transform.position,m_destinationsTransforms[2].transform.position, m_endSpeedCamera*Time.deltaTime);
             //rotation de la caméra sur la durée pour avoir la même que la rotation de la vue de recul
-            // if (m_camera.transform.rotation.x >= m_destinationsTransforms[2].transform.rotation.x)
-            // {
-            //     m_camera.transform.Rotate(Vector3.left * (m_endSpeedRotationCamera * Time.deltaTime));
-            // }
+            if (m_camera.transform.rotation.x >= m_destinationsTransforms[2].transform.rotation.x)
+            {
+                m_camera.transform.Rotate(Vector3.left * (m_endSpeedRotationCamera * Time.deltaTime));
+            }
+            if (m_camera.transform.rotation.y <= m_destinationsTransforms[2].transform.rotation.y)
+            {
+                m_camera.transform.Rotate(Vector3.up * (m_endSpeedRotationCamera * Time.deltaTime));
+            }
+            if(m_camera.transform.rotation.z <= m_destinationsTransforms[2].transform.rotation.z)
+            {
+                m_camera.transform.Rotate(Vector3.forward * (m_endSpeedRotationCamera * Time.deltaTime));
+            }
         }
         
     }
