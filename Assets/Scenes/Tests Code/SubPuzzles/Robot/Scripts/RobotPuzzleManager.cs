@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using System.Reflection;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Rendering;
 using Random = UnityEngine.Random;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.DualShock;
 
 public class RobotPuzzleManager : MonoBehaviour {
 
@@ -66,8 +67,8 @@ public class RobotPuzzleManager : MonoBehaviour {
 	[HideInInspector] [Tooltip("variable de déplacement en points par points du sélecteur")] private bool m_hasMoved = false;
 	
 	[HideInInspector] [Tooltip("Script d'intéraction entre le personnage et l'objet comprenant le subpuzzle")] public Interact_Detection m_interactDetection = null;
-	
-	
+
+
 	private void Awake()
 	{
 		m_piecePrefabs = new GameObject[6];	//tableau. Le 6 est arbitraire et représente le nombre de pièces différentes
@@ -142,8 +143,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 		else {
 			Debug.LogError ("JEEZ ! THE GAME DESIGNER PUT A WRONG PREFAB FOR THE SELECTOR, IT MUST BE A UI ELEMENT WITH A RECT TRANSFORM !");
 		}
-		
-		
+
 	}
 
 
@@ -431,10 +431,39 @@ public class RobotPuzzleManager : MonoBehaviour {
 		//Sortie du subPuzzle en cas de changement de personnage
 		if (m_interactDetection.m_isInSubPuzzle && (Input.GetKeyDown(m_inputs.inputMonster) || Input.GetKeyDown(m_inputs.inputHuman)))
 		{
-			Debug.Log("Bye Roboooooot");
 			if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
 		}
 
+	}
+	
+	
+	// Private helpers
+	private Gamepad GetGamepad()
+	{
+		//return Gamepad.all.FirstOrDefault(g => m_playerInput.devices.Any(d => d.deviceId == g.deviceId));
+		return DualShockGamepad.current;
+
+		#region Linq Query Equivalent Logic
+
+		//Gamepad gamepad = null;
+		//foreach (var g in Gamepad.all)
+		//{
+		//    foreach (var d in _playerInput.devices)
+		//    {
+		//        if(d.deviceId == g.deviceId)
+		//        {
+		//            gamepad = g;
+		//            break;
+		//        }
+		//    }
+		//    if(gamepad != null)
+		//    {
+		//        break;
+		//    }
+		//}
+		//return gamepad;
+
+		#endregion
 	}
 
 	/// <summary>

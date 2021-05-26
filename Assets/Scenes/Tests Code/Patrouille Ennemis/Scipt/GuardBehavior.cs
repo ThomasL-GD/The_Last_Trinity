@@ -59,7 +59,6 @@ public class GuardBehavior : MonoBehaviour {
     bool m_detectiveVibration = false;   //attack de l'ennemi sur un character
     
     
-    
     private bool m_enterZone = false;
     private bool m_hasSeenPlayer = false;
     private bool m_isGoingTowardsPlayer = false;
@@ -101,11 +100,7 @@ public class GuardBehavior : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(m_attackVibe);
-        Debug.Log(m_intimidationVibe);
-        Debug.Log(m_warningVibe);
-        
-        
+
         //If the guard is close enough to the point he was trying to reach
         if (transform.position.x <= m_destinations[m_currentDestination].x + m_uncertainty &&
             transform.position.x >= m_destinations[m_currentDestination].x - m_uncertainty &&
