@@ -34,9 +34,9 @@ public class Start_Manager : MonoBehaviour {
     private List<Vector3> m_destinations = new List<Vector3>();
     [SerializeField] [Tooltip("camera principale")] private GameObject m_camera;
     [SerializeField] [Tooltip("vitesse de déplacement de la camera jusqu'à la position de recul")] [Range(0.0f,50.0f)]private float m_backSpeedCamera = 1.0f;
-    [SerializeField] [Tooltip("vitesse de rotation de la camera jusqu'à la position de recul")] [Range(0.0f,500.0f)] private float m_backspeedRotationCamera = 100.0f;
-    [SerializeField] [Tooltip("vitesse de déplacement de la camera")] [Range(0.0f,5.0f)] private float m_endSpeedCamera = 1.0f;
-    [SerializeField] [Tooltip("vitesse de déplacement de la camera")] [Range(0.0f,500.0f)] private float m_endSpeedRotationCamera = 100.0f;
+    [SerializeField] [Tooltip("vitesse de rotation de la camera jusqu'à la position de recul")] [Range(0.0f,500.0f)] private float m_backSpeedRotationCamera = 100.0f;
+    [SerializeField] [Tooltip("vitesse de déplacement de la camera")] [Range(0.0f,50.0f)] private float m_endSpeedCamera = 1.0f;
+    [SerializeField] [Tooltip("vitesse de déplacement de la camera")] [Range(0.0f,1000.0f)] private float m_endSpeedRotationCamera = 100.0f;
     
     private float m_timer = 0f;  //temps qui s'écoule à chaque frame
 
@@ -69,7 +69,7 @@ public class Start_Manager : MonoBehaviour {
         }
         
         //La camera se positionne au même emplacement que le premier GameObject de la liste créée au-dessus
-        m_camera.transform.position = m_destinationsTransforms[0].transform.position;
+        m_camera.transform.position = m_destinationsTransforms[2].transform.position;
 
     }
 
@@ -202,30 +202,31 @@ public class Start_Manager : MonoBehaviour {
         /////////////////////////////       ANIMATION CAMERA       /////////////////////////////
 
 
-        if (!m_englishMenuIsActive) {
+        if (!m_englishMenuIsActive && !m_frenchMenuIsActive) {
             //déplacement de la caméra de la position initiale à la position de recul   (les deux points sont dans la liste m_destinationsTransform)
             m_camera.transform.position = Vector3.MoveTowards(m_camera.transform.position, m_destinationsTransforms[1].transform.position, m_backSpeedCamera * Time.deltaTime);
             //rotation de la caméra sur la durée pour avoir la même que la rotation de la vue de recul
             if (m_camera.transform.rotation.x >= m_destinationsTransforms[1].transform.rotation.x) {
-                m_camera.transform.Rotate(Vector3.left * (m_endSpeedRotationCamera * Time.deltaTime));
+                m_camera.transform.Rotate(Vector3.left * (m_backSpeedRotationCamera * Time.deltaTime));
             }
         }
-        else if(m_englishMenuIsActive){
+        else if(m_englishMenuIsActive || m_frenchMenuIsActive){
             //déplacement de la caméra de la position initiale à la position de recul   (les deux points sont dans la liste m_destinationsTransform)
             m_camera.transform.position = Vector3.MoveTowards(m_camera.transform.position,m_destinationsTransforms[2].transform.position, m_endSpeedCamera*Time.deltaTime);
             //rotation de la caméra sur la durée pour avoir la même que la rotation de la vue de recul
-            if (m_camera.transform.rotation.x >= m_destinationsTransforms[2].transform.rotation.x)
+            if(m_camera.transform.rotation.z <= m_destinationsTransforms[2].transform.rotation.z)
             {
-                m_camera.transform.Rotate(Vector3.left * (m_endSpeedRotationCamera * Time.deltaTime));
+                m_camera.transform.Rotate(Vector3.forward * (m_endSpeedRotationCamera * Time.deltaTime));
             }
             if (m_camera.transform.rotation.y <= m_destinationsTransforms[2].transform.rotation.y)
             {
                 m_camera.transform.Rotate(Vector3.up * (m_endSpeedRotationCamera * Time.deltaTime));
             }
-            if(m_camera.transform.rotation.z <= m_destinationsTransforms[2].transform.rotation.z)
+            if (m_camera.transform.rotation.x >= m_destinationsTransforms[2].transform.rotation.x)
             {
-                m_camera.transform.Rotate(Vector3.forward * (m_endSpeedRotationCamera * Time.deltaTime));
+                m_camera.transform.Rotate(Vector3.left * (m_endSpeedRotationCamera * Time.deltaTime));
             }
+
         }
         
     }
