@@ -93,7 +93,7 @@ public class GuardBehavior : MonoBehaviour {
         }
         else {m_gamepad = null;}
         
-        //Debug.Log($" ennemy gamepad : {m_gamepad.name}");
+        Debug.Log($" ennemy initial gamepad : {m_gamepad.name}");
     }
     
 
@@ -273,10 +273,10 @@ public class GuardBehavior : MonoBehaviour {
         //If the thing we are colliding is a playable character and only him
         if (p_other.gameObject.TryGetComponent(out PlayerController charaScript))
         {
-            //Debug.Log($"Debug ennemi entrée 1 :{m_gamepad}");
+            Debug.Log($"Debug ennemi entrée 1 :{m_gamepad}");
             m_playerInput = GetComponent<PlayerInput>();
             m_gamepad = GetGamepad();
-            //Debug.Log($"Debug ennemi entrée 2 :{m_gamepad}");
+            Debug.Log($"Debug ennemi entrée 2 :{m_gamepad}");
             
             bool isAlreadyInList = false;
             for(int i = 0; i<m_charactersInDangerScript.Count; i++) {
@@ -298,7 +298,7 @@ public class GuardBehavior : MonoBehaviour {
     /// <param name="p_other">collision avec un character</param>
     private void OnTriggerExit(Collider p_other)
     {
-        if (m_charactersInDangerScript.Count == 0)
+        if (m_charactersInDangerScript.Count <1)
         {
             m_gamepad.SetMotorSpeeds(0.0f,0.0f);
         }
@@ -306,7 +306,6 @@ public class GuardBehavior : MonoBehaviour {
         //If the thing we are colliding is a playable character and only him
         if (p_other.gameObject.TryGetComponent(out PlayerController charaScript))
         {
-            
             //enlèvement du personnage qui est sorti
             m_charactersInDangerScript.Remove(charaScript);
 
@@ -322,6 +321,8 @@ public class GuardBehavior : MonoBehaviour {
                 m_attackVibe = false;
                 m_warningVibe = false;
                 m_intimidationVibe = false;
+
+                m_gamepad = null;
             }
             
         }
@@ -332,10 +333,10 @@ public class GuardBehavior : MonoBehaviour {
     private Gamepad GetGamepad()
     {
         return Gamepad.all.FirstOrDefault(g => m_playerInput.devices.Any(d => d.deviceId == g.deviceId));
-        //return m_gamepad
-        
+        //return m_gamepad;
+
         #region Linq Query Equivalent Logic
-        
+
         //Gamepad gamepad = null;
         //foreach (var g in Gamepad.all)
         //{
@@ -353,6 +354,7 @@ public class GuardBehavior : MonoBehaviour {
         //    }
         //}
         //return gamepad;
+
         #endregion
     }
     
