@@ -95,7 +95,7 @@ public class MonsterPuzzle : MonoBehaviour
         m_playerInput = GetComponent<PlayerInput>();
         m_gamepad = GetGamepad();
         
-        Debug.Log($" monster gamepad : {m_gamepad.name}");
+        //Debug.Log($" monster gamepad : {m_gamepad.name}");
     }
     
 
@@ -338,7 +338,7 @@ public class MonsterPuzzle : MonoBehaviour
 
     IEnumerator Rumble()
     {
-        Debug.Log($" monster gamepad : {m_gamepad.name}");
+        //Debug.Log($" monster gamepad : {m_gamepad.name}");
         m_gamepad.SetMotorSpeeds(m_lowA, m_highA);
         yield return new WaitForSeconds(m_rumbleDuration);
         m_gamepad.SetMotorSpeeds(0, 0);
@@ -385,9 +385,9 @@ public class MonsterPuzzle : MonoBehaviour
             Destroy(child.gameObject);
         }
         
-        Debug.Log($"Debug fermeture subPuzzle 1 :{m_gamepad}");
+        //Debug.Log($"Debug fermeture subPuzzle 1 :{m_gamepad}");
         m_gamepad = null;
-        Debug.Log($"Debug fermeture subPuzzle 2 :{m_gamepad}");
+        //Debug.Log($"Debug fermeture subPuzzle 2 :{m_gamepad}");
         
     }
     

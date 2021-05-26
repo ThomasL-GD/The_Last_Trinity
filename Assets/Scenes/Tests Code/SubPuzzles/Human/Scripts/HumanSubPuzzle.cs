@@ -72,8 +72,6 @@ public class HumanSubPuzzle : MonoBehaviour {
     /// </summary>
     void OnEnable() {
         
-
-        
         m_interactDetection.SquarePanelToScreen();
 
         if (m_mazeHeight < 2 || m_mazeWidth < 2) {
@@ -107,7 +105,7 @@ public class HumanSubPuzzle : MonoBehaviour {
         m_playerInput = GetComponent<PlayerInput>();
         m_gamepad = GetGamepad();
         
-        Debug.Log($" human gamepad : {m_gamepad.name}");
+        //Debug.Log($" human gamepad : {m_gamepad.name}");
     }
 
     
@@ -541,7 +539,7 @@ public class HumanSubPuzzle : MonoBehaviour {
     
     IEnumerator Rumble()
     {
-        Debug.Log($" human gamepad : {m_gamepad.name}");
+        //Debug.Log($" human gamepad : {m_gamepad.name}");
         m_gamepad.SetMotorSpeeds(m_lowA, m_highA);
         yield return new WaitForSeconds(m_rumbleDuration);
         m_gamepad.SetMotorSpeeds(0, 0);
@@ -650,7 +648,6 @@ public class HumanSubPuzzle : MonoBehaviour {
     /// </summary>
     void OnDisable()
     {
-
         m_playerPath.Clear();
         
         // https://memegenerator.net/instance/44816816/plotracoon-we-shall-destroy-them-all
@@ -659,9 +656,9 @@ public class HumanSubPuzzle : MonoBehaviour {
             Destroy(child.gameObject);
         }
 
-        Debug.Log($"Debug fermeture subPuzzle 1 :{m_gamepad}");
+        //Debug.Log($"Debug fermeture subPuzzle 1 :{m_gamepad}");
         m_gamepad = null;
-        Debug.Log($"Debug fermeture subPuzzle 2 :{m_gamepad}");
+        //Debug.Log($"Debug fermeture subPuzzle 2 :{m_gamepad}");
     }
     
 }
