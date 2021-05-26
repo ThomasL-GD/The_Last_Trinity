@@ -14,7 +14,6 @@ public class Start_Manager : MonoBehaviour {
     [SerializeField] [Tooltip("Menu Principal")] private GameObject m_mainMenu=null;
     [SerializeField] [Tooltip("Liste des positions sur lesquelles on va se déplacer ")] private List<Transform> m_test = new List<Transform>();
     
-    
     [Header("Menu Selector")] 
     [SerializeField] [Tooltip("Selecteur du menu")] private GameObject m_menuSelector;
     
@@ -30,6 +29,15 @@ public class Start_Manager : MonoBehaviour {
     [HideInInspector] [Tooltip("variable de déplacement en points par points du sélecteur")] private bool m_hasMoved = false;
     private int m_selectorIndex = 0;    //index du sélecteur
     
+    [Header("Waypoints Manager")]
+    [SerializeField] [Tooltip("The list of points the guard will travel to, in order from up to down and cycling")] private List<GameObject> m_destinationsTransforms = new List<GameObject>();
+    private List<Vector3> m_destinations = new List<Vector3>();
+    [SerializeField] [Tooltip("camera principale")] private GameObject m_camera;
+    [SerializeField] [Tooltip("vitesse de déplacement de la camera jusqu'à la position de recul")] [Range(0.0f,50.0f)]private float m_backSpeedCamera = 1.0f;
+    [SerializeField] [Tooltip("vitesse de rotation de la camera jusqu'à la position de recul")] [Range(0.0f,500.0f)] private float m_backspeedRotationCamera = 100.0f;
+    [SerializeField] [Tooltip("vitesse de déplacement de la camera")] [Range(0.0f,5.0f)] private float m_endSpeedCamera = 1.0f;
+    [SerializeField] [Tooltip("vitesse de déplacement de la camera")] [Range(0.0f,500.0f)] private float m_endSpeedRotationCamera = 100.0f;
+    
     private float m_timer = 0f;  //temps qui s'écoule à chaque frame
 
     
@@ -44,9 +52,24 @@ public class Start_Manager : MonoBehaviour {
         
         m_mainMenu.SetActive(false);
 
+        ////////// BOUTON D'ACCES AU MENU PRINCIPAL ////////////
         m_pressStartText = m_pressStartButton.GetComponentInChildren<TextMeshProUGUI>();  //Récupération de la couleur du text du bouton de lancement
         m_pressStartText.color = new Color(1, 1, 1, 0);
         m_title.color = new Color(1, 1, 1, 0);  //le titre est mis en transparence 
+        
+        
+        ///////// CAMERA BASE SETTINGS //////////
+        if (m_destinationsTransforms.Count < 3) Debug.LogError("OH NO, U FORGOT TO PUT THE WAYPOINTS FOR THE TRAVELLING OF THE CAMERA !!!");
+        if (m_camera == null) Debug.LogError("OH NO, U FORGOT TO ADD A CAMERA FOR THE TRAVELLING OF THE CAMERA !!!");
+        
+        //Deux points servant de transfère de la caméra
+        for (int i = 0; i < m_destinationsTransforms.Count; i++)
+        {
+            m_destinations.Add(m_destinationsTransforms[i].transform.position);
+        }
+        
+        //La camera se positionne au même emplacement que le premier GameObject de la liste créée au-dessus
+        m_camera.transform.position = m_destinationsTransforms[0].transform.position;
 
     }
 
@@ -61,9 +84,6 @@ public class Start_Manager : MonoBehaviour {
         else if(m_timer < m_opacityDuration) m_timer = m_opacityDuration;   //Arrêt du timer après visibilité totale
 
 
-        /////////////////////////////       START ANIMATIONS        /////////////////////////////
-        
-        
         //animation d'opacité du titre
         if (m_isFading)
         {
@@ -91,6 +111,7 @@ public class Start_Manager : MonoBehaviour {
             //accès au menu principal après input sur le bouton start ou le bouton croix
             if ((Input.GetKeyDown(KeyCode.JoystickButton9) || Input.GetKeyDown(KeyCode.JoystickButton1)) && m_timer >= m_opacityDuration)
             {
+                
                 //m_englishMainMenu.SetActive(true);
                 m_mainMenu.SetActive(true);
                 m_englishMenuIsActive = true;
@@ -176,6 +197,37 @@ public class Start_Manager : MonoBehaviour {
                     break;
             }
         }
+        
+        
+        /////////////////////////////       ANIMATION CAMERA       /////////////////////////////
+
+
+        if (!m_englishMenuIsActive) {
+            //déplacement de la caméra de la position initiale à la position de recul   (les deux points sont dans la liste m_destinationsTransform)
+            m_camera.transform.position = Vector3.MoveTowards(m_camera.transform.position, m_destinationsTransforms[1].transform.position, m_backSpeedCamera * Time.deltaTime);
+            //rotation de la caméra sur la durée pour avoir la même que la rotation de la vue de recul
+            if (m_camera.transform.rotation.x >= m_destinationsTransforms[1].transform.rotation.x) {
+                m_camera.transform.Rotate(Vector3.left * (m_endSpeedRotationCamera * Time.deltaTime));
+            }
+        }
+        else if(m_englishMenuIsActive){
+            //déplacement de la caméra de la position initiale à la position de recul   (les deux points sont dans la liste m_destinationsTransform)
+            m_camera.transform.position = Vector3.MoveTowards(m_camera.transform.position,m_destinationsTransforms[2].transform.position, m_endSpeedCamera*Time.deltaTime);
+            //rotation de la caméra sur la durée pour avoir la même que la rotation de la vue de recul
+            if (m_camera.transform.rotation.x >= m_destinationsTransforms[2].transform.rotation.x)
+            {
+                m_camera.transform.Rotate(Vector3.left * (m_endSpeedRotationCamera * Time.deltaTime));
+            }
+            if (m_camera.transform.rotation.y <= m_destinationsTransforms[2].transform.rotation.y)
+            {
+                m_camera.transform.Rotate(Vector3.up * (m_endSpeedRotationCamera * Time.deltaTime));
+            }
+            if(m_camera.transform.rotation.z <= m_destinationsTransforms[2].transform.rotation.z)
+            {
+                m_camera.transform.Rotate(Vector3.forward * (m_endSpeedRotationCamera * Time.deltaTime));
+            }
+        }
+        
     }
     
     
