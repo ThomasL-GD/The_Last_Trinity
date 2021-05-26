@@ -329,7 +329,7 @@ public class MonsterPuzzle : MonoBehaviour
         
 
         //Sortie du subPuzzle en cas de changement de personnage
-        if (m_interactDetection.m_isInSubPuzzle && (m_gamepad.buttonEast.isPressed || m_gamepad.buttonWest.isPressed))    //(m_interactDetection.m_isInSubPuzzle && Input.GetKeyDown(m_inputs.inputHuman) || Input.GetKeyDown(m_inputs.inputRobot))
+        if (m_interactDetection.m_isInSubPuzzle && (m_gamepad.buttonEast.isPressed || m_gamepad.buttonWest.isPressed || m_gamepad.buttonSouth.isPressed))    //(m_interactDetection.m_isInSubPuzzle && Input.GetKeyDown(m_inputs.inputHuman) || Input.GetKeyDown(m_inputs.inputRobot))
         {
             if (m_interactDetection.enabled) m_interactDetection.PuzzleDeactivation();
         }

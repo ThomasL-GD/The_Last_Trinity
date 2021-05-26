@@ -207,6 +207,8 @@ public class PlayerController : MonoBehaviour
                 DeathManager.DeathDelegator?.Invoke();
             }
         }
+        
+        //if(m_chara == Charas.Robot)Debug.Log($"{transform.position}");
     }
 
     /// <summary>
@@ -349,7 +351,7 @@ public class PlayerController : MonoBehaviour
     /// <returns></returns>
     IEnumerator DeathTimer() {
         yield return new WaitForSeconds(m_deathAnimTime);
-        EndDeath();
+        DeathManager.DeathDelegator();
     }
     
     /// <summary>
@@ -361,8 +363,12 @@ public class PlayerController : MonoBehaviour
         m_deathCounter = 0.0f;
         m_isForbiddenToMove = false;
 
-        //Debug.Log($"{m_spawnPoint}");
-        transform.position = m_spawnPoint;
+        transform.SetPositionAndRotation(m_spawnPoint, transform.rotation);
+        if (m_chara == Charas.Robot) {
+            //Debug.Log($"WELP : {m_spawnPoint}");
+            //Debug.Log($"Welp (suite) : {transform.position}");
+        }
+        GuardBehavior.m_isKillingSomeone = false;
         DeathAnim(false);
     }
 

@@ -37,6 +37,7 @@ public class GuardBehavior : MonoBehaviour {
     [Header("Death")]
     [SerializeField] [Tooltip("distance d'élimination")] [Range(0f,10f)] private float m_deathPos = 1.0f;
     [SerializeField] [Tooltip("temps d'animation de mort")] [Range(0f,10f)] private float m_deathTime = 3.0f;
+    private Vector3 m_spawnPoint = Vector3.zero;
     
     [Header("Monster Ability")]
     [SerializeField] [Tooltip("temps de capacité de monstre")] [Range(0f,60f)] private float m_intimidationTime = 1.0f;
@@ -59,7 +60,7 @@ public class GuardBehavior : MonoBehaviour {
     bool m_detectiveVibration = false;   //attack de l'ennemi sur un character
     
     
-    private bool m_enterZone = false;
+    [SerializeField] [Tooltip("For Debug Only")] private bool m_enterZone = false;
     private bool m_hasSeenPlayer = false;
     private bool m_isGoingTowardsPlayer = false;
     public static bool m_isKillingSomeone = false;  //tous les script de l'ennemi possèdent la même valeur de la variable au même moment
@@ -95,11 +96,19 @@ public class GuardBehavior : MonoBehaviour {
         
         Debug.Log($" ennemy initial gamepad : {m_gamepad.name}");
     }
-    
+
+    private void OnEnable() {
+        m_spawnPoint = transform.position;
+        DeathManager.DeathDelegator += Death;
+    }
+
+    private void OnDisable() {
+        DeathManager.DeathDelegator -= Death;
+    }
+
 
     // Update is called once per frame
-    void Update()
-    {
+    void Update() {
 
         //If the guard is close enough to the point he was trying to reach
         if (transform.position.x <= m_destinations[m_currentDestination].x + m_uncertainty &&
@@ -121,19 +130,12 @@ public class GuardBehavior : MonoBehaviour {
                 m_nma.SetDestination(m_destinations[m_currentDestination]);
             }
         }
-
-        if (m_gamepad != null) {
-            if (m_warningVibe && !m_intimidationVibe && !m_attackVibe) m_gamepad.SetMotorSpeeds(m_lowWarningEnemy, m_highWarningEnemy);
-            else if (m_intimidationVibe && !m_warningVibe && !m_attackVibe) m_gamepad.SetMotorSpeeds(m_lowMonsterIntimidation, m_highMonsterIntimidation);
-            else if (m_attackVibe && !m_warningVibe && !m_intimidationVibe) m_gamepad.SetMotorSpeeds(m_lowAttackEnemy, m_highAttackEnemy);
-            else if (!m_warningVibe && !m_attackVibe && !m_intimidationVibe) m_gamepad.SetMotorSpeeds(0.0f, 0.0f);
-        }
     
         if (m_enterZone && !m_isKillingSomeone) {
             m_warningVibe = true;
             m_intimidationVibe = false;
             m_attackVibe = false;
-            if(m_gamepad != null) m_gamepad.SetMotorSpeeds(m_lowWarningEnemy, m_highWarningEnemy);
+
 
             //calcul de la position du premier chara entré dans la zone
             Vector3 targetDir = (m_charactersInDangerScript[0].gameObject.transform.position - transform.position).normalized;
@@ -190,6 +192,7 @@ public class GuardBehavior : MonoBehaviour {
                         m_intimidationVibe = false;
                         m_attackVibe = true;
                         
+                        Debug.Log($" attack monstre : {m_gamepad}");
                         if(m_gamepad != null) m_gamepad.SetMotorSpeeds(m_lowAttackEnemy, m_highAttackEnemy);
                         
                         m_hasSeenPlayer = true;
@@ -199,21 +202,44 @@ public class GuardBehavior : MonoBehaviour {
                         m_nma.angularSpeed = m_attackRotationSpeed;
 
                         //mort du joueur dès qu'il est assez proche
-                        if (Vector3.Distance(m_charactersInDangerScript[0].transform.position, transform.position) < m_deathPos)
+                        if (Vector3.Distance(m_charactersInDangerScript[0].transform.position, transform.position) < m_deathPos && !m_isKillingSomeone)
                         {
-                            Debug.Log("J'AI TROUVE UNE VICTIME");
+                            //Debug.Log("J'AI TROUVE UNE VICTIME");
                             StartCoroutine(DeathCoroutine());
                         }
                     }
                 }
             }
             else {}//Debug.LogWarning("The raycast hit nothing nowhere");
-        }
             
+            
+
+            if (m_gamepad != null) {
+                if (m_warningVibe && !m_intimidationVibe && !m_attackVibe)
+                {
+                    m_gamepad.SetMotorSpeeds(m_lowWarningEnemy, m_highWarningEnemy);
+                }
+                else if (m_intimidationVibe && !m_warningVibe && !m_attackVibe)
+                {
+                    m_gamepad.SetMotorSpeeds(m_lowMonsterIntimidation, m_highMonsterIntimidation);
+                }
+                else if (m_attackVibe && !m_warningVibe && !m_intimidationVibe)
+                {
+                    m_gamepad.SetMotorSpeeds(m_lowAttackEnemy, m_highAttackEnemy);
+                }
+                else if (!m_warningVibe && !m_attackVibe && !m_intimidationVibe) {
+                    m_gamepad.SetMotorSpeeds(0, 0);
+                    m_gamepad.PauseHaptics();
+                }
+            }
+        }
+           
+        
     }
 
     IEnumerator Intimidate()
     {
+        Debug.Log($" Intimidation : {m_gamepad}");
         if(m_gamepad != null) m_gamepad.SetMotorSpeeds(m_lowMonsterIntimidation, m_highMonsterIntimidation);
         
         m_nma.isStopped = true;
@@ -221,7 +247,10 @@ public class GuardBehavior : MonoBehaviour {
         scriptCharaWhoIsDying.m_isForbiddenToMove = true;
         
         yield return new WaitForSeconds(m_intimidationTime); //temps d'animation d'intimidation
+        
+        Debug.Log($" fin intimidation : {m_gamepad}");
         if(m_gamepad != null) m_gamepad.SetMotorSpeeds(0.0f, 0.0f);
+        
         scriptCharaWhoIsDying.m_isForbiddenToMove = false;
         StartCoroutine(Stun());
     }
@@ -239,10 +268,11 @@ public class GuardBehavior : MonoBehaviour {
         m_nma.isStopped = true;
         scriptCharaWhoIsDying.m_isForbiddenToMove = true;
         yield return new WaitForSeconds(m_deathTime); //temps d'animation de mort du monstre
-        if(m_gamepad != null) m_gamepad.SetMotorSpeeds(0.0f, 0.0f);
-        scriptCharaWhoIsDying.Death();  //mort   // We will reset m_isForbiddenToMove in there
         m_nma.isStopped = false;
-        m_isKillingSomeone = false;
+        scriptCharaWhoIsDying.Death();  //mort   // We will reset m_isForbiddenToMove and m_isKillingSomeone in there
+        
+        //Debug.Log($" Mort joueur : {m_gamepad}");
+        if(m_gamepad != null) m_gamepad.SetMotorSpeeds(0.0f, 0.0f);
     }
     
     
@@ -298,11 +328,7 @@ public class GuardBehavior : MonoBehaviour {
     /// <param name="p_other">collision avec un character</param>
     private void OnTriggerExit(Collider p_other)
     {
-        // if (m_charactersInDangerScript.Count <1)
-        // {
-        //     m_gamepad.SetMotorSpeeds(0.0f,0.0f);
-        // }
-        
+
         //If the thing we are colliding is a playable character and only him
         if (p_other.gameObject.TryGetComponent(out PlayerController charaScript))
         {
@@ -332,8 +358,8 @@ public class GuardBehavior : MonoBehaviour {
     // Private helpers
     private Gamepad GetGamepad()
     {
-        //return Gamepad.all.FirstOrDefault(g => m_playerInput.devices.Any(d => d.deviceId == g.deviceId));
-        return DualShockGamepad.current;
+        return Gamepad.all.FirstOrDefault(g => m_playerInput.devices.Any(d => d.deviceId == g.deviceId));
+        //return DualShockGamepad.current;
 
         #region Linq Query Equivalent Logic
 
@@ -356,6 +382,11 @@ public class GuardBehavior : MonoBehaviour {
         //return gamepad;
 
         #endregion
+    }
+
+    private void Death() {
+        m_isGoingTowardsPlayer = false;
+        transform.position = m_spawnPoint;
     }
     
 }
