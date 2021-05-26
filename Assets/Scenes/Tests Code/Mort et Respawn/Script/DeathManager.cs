@@ -52,8 +52,7 @@ public class DeathManager : MonoBehaviour {
 
         private void Initialize()
         {
-            if (!string.IsNullOrWhiteSpace(m_objectName))
-                gameObject.name = m_objectName;
+            if (!string.IsNullOrWhiteSpace(m_objectName)) gameObject.name = m_objectName;
         }
         
     //The "real" code starts here
