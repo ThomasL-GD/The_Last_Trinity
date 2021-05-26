@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SocialPlatforms;
 
 public class Interact_Detection : MonoBehaviour
@@ -47,22 +48,18 @@ public class Interact_Detection : MonoBehaviour
     
     private void Start()
     {
-        if (m_puzzle == null) {
-            Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO ADD A SUBPUZZLE IN INTERACT_DETECTION !");
+        if (m_puzzle == null) { Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO ADD A SUBPUZZLE IN INTERACT_DETECTION !");
         }
         else {
             switch (m_chara) {
                 case Charas.Human:
-                    if (!m_puzzle.TryGetComponent(out HumanSubPuzzle hsb))
-                        Debug.LogError("JEEZ ! THE GAME DESIGNER PUT A SUBPUZZLE DIFFERENT FROM THE CHARA CHOOSED ABOVE IN INTERACT_DETECTION !");
+                    if (!m_puzzle.TryGetComponent(out HumanSubPuzzle hsb)) Debug.LogError("JEEZ ! THE GAME DESIGNER PUT A SUBPUZZLE DIFFERENT FROM THE CHARA CHOOSED ABOVE IN INTERACT_DETECTION !");
                     break;
                 case Charas.Monster:
-                    if (!m_puzzle.TryGetComponent(out MonsterPuzzle msb))
-                        Debug.LogError("JEEZ ! THE GAME DESIGNER PUT A SUBPUZZLE DIFFERENT FROM THE CHARA CHOOSED ABOVE IN INTERACT_DETECTION !");
+                    if (!m_puzzle.TryGetComponent(out MonsterPuzzle msb)) Debug.LogError("JEEZ ! THE GAME DESIGNER PUT A SUBPUZZLE DIFFERENT FROM THE CHARA CHOOSED ABOVE IN INTERACT_DETECTION !");
                     break;
                 case Charas.Robot:
-                    if (!m_puzzle.TryGetComponent(out RobotPuzzleManager rsb))
-                        Debug.LogError("JEEZ ! THE GAME DESIGNER PUT A SUBPUZZLE DIFFERENT FROM THE CHARA CHOOSED ABOVE IN INTERACT_DETECTION !");
+                    if (!m_puzzle.TryGetComponent(out RobotPuzzleManager rsb)) Debug.LogError("JEEZ ! THE GAME DESIGNER PUT A SUBPUZZLE DIFFERENT FROM THE CHARA CHOOSED ABOVE IN INTERACT_DETECTION !");
                     break;
             }
         }
@@ -71,14 +68,15 @@ public class Interact_Detection : MonoBehaviour
 
         if (m_camera == null) Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE CAMERA IN INTERACT_DETECTION !");
         if (m_inputs == null) Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO ADD THE INPUTS IN INTERACT_DETECTION !");
-        
+        if(m_doorSub.Length == 0) Debug.LogWarning("BE CAREFUL ! THERE IS NO DOOR FOR ANIMATION IN INTERACT_DETECTION !");
         
     }
 
     private void Update()
     {
-        if (GuardBehavior.m_isKillingSomeone)
+        if (m_isInSubPuzzle && GuardBehavior.m_isKillingSomeone)
         {
+            Debug.Log("Tue moi ce type qui est dans le subpuzzle");
             this.PuzzleDeactivation();
         }
         
@@ -87,30 +85,25 @@ public class Interact_Detection : MonoBehaviour
             bool input = false;
 
             //input des différents character
-            if (m_chara == Charas.Human) input = Input.GetKeyDown(m_inputs.inputHuman);
-            else if (m_chara == Charas.Monster) input = Input.GetKeyDown(m_inputs.inputMonster);
-            else if (m_chara == Charas.Robot) input = Input.GetKeyDown(m_inputs.inputRobot);
+            if (m_chara == Charas.Human) input = Input.GetKeyDown(m_inputs.inputHuman); //Gamepad.current.buttonWest.isPressed; 
+            else if (m_chara == Charas.Monster) input = Input.GetKeyDown(m_inputs.inputMonster); //Gamepad.current.buttonNorth.isPressed; 
+            else if (m_chara == Charas.Robot) input = Input.GetKeyDown(m_inputs.inputRobot); //Gamepad.current.buttonEast.isPressed; 
             
-            if (!m_playerController.m_isForbiddenToMove) {
-
+            if (m_playerController.m_isActive) {
+                
                 m_activationButton.SetActive(true);
 
                 //Le bouton d'activation regarde toujours en direction de la caméra de jeu
                 m_activationButton.transform.LookAt(m_camera);
 
                 //Input et bouton visible ==> entrée dans subpuzzle 
-                if (input) {
+                if (input && m_canMove) {
 
-                    if (m_chara == Charas.Human) {
-                        m_puzzle.GetComponent<HumanSubPuzzle>().m_interactDetection = this;
-                    }
-                    else if (m_chara == Charas.Monster) {
-                        m_puzzle.GetComponent<MonsterPuzzle>().m_interactDetection = this;
-                    }
-                    else if (m_chara == Charas.Robot) {
-                        m_puzzle.GetComponent<RobotPuzzleManager>().m_interactDetection = this;
-                    }
+                    if (m_chara == Charas.Human) { m_puzzle.GetComponent<HumanSubPuzzle>().m_interactDetection = this; }
+                    else if (m_chara == Charas.Monster) { m_puzzle.GetComponent<MonsterPuzzle>().m_interactDetection = this; }
+                    else if (m_chara == Charas.Robot) { m_puzzle.GetComponent<RobotPuzzleManager>().m_interactDetection = this; }
 
+                    
                     m_puzzle.SetActive(true);
                     m_isInSubPuzzle = true;
                     m_playerController.m_isForbiddenToMove = true; //We forbid the movements for the player
@@ -118,10 +111,10 @@ public class Interact_Detection : MonoBehaviour
                 }
             }
             else m_activationButton.SetActive(false);
-            
         }
         
-        if (m_openDoor) {
+        
+        if (m_openDoor && m_doorSub.Length > 0) {
             foreach (MovableDoor door in m_doorSub) {
                 door.m_door.transform.position = Vector3.SmoothDamp(door.m_door.transform.position, door.m_positionToGo, ref door.m_velocity , m_doorOpeningTime);
             }
@@ -134,16 +127,17 @@ public class Interact_Detection : MonoBehaviour
     /// </summary>
     public void PuzzleDeactivation()
     {
-        if (m_achieved == true)
+        if (m_achieved)
         {
             StartCoroutine(EndLook());
         }
-        else if(!GuardBehavior.m_isKillingSomeone){ m_playerController.m_isForbiddenToMove = false;}
-        else if(m_isInSubPuzzle){
+        else {
+            m_playerController.m_isForbiddenToMove = false;
             m_activationButton.SetActive(true);
             m_buttonActivate = true;
             m_isInSubPuzzle = false;
             m_puzzle.SetActive(false);
+            Debug.Log("Le puzzle doit se fermer");
         }
     }
 
@@ -158,9 +152,11 @@ public class Interact_Detection : MonoBehaviour
 
         m_canMove = false;
         m_puzzle.SetActive(false);
+        m_isInSubPuzzle = false;
         m_activationButton.SetActive(false);
         m_buttonActivate = false;
-        StartCoroutine(DoorTimer());
+        
+        if(m_doorSub.Length != 0) StartCoroutine(DoorTimer());
     }
 
     /// <summary>
@@ -201,7 +197,7 @@ public class Interact_Detection : MonoBehaviour
     /// <param name="p_other"></param>
     private void OnTriggerExit(Collider p_other)
     {
-        //m_playerController = null;
+        //mm_playerController = null;
         m_activationButton.SetActive(false);
         m_buttonActivate = false;
     }

@@ -1,9 +1,14 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Net.NetworkInformation;
+using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
+using UnityEngine.InputSystem;
+using System.Linq;
+using UnityEngine.InputSystem.DualShock;
 
 public class MonsterPuzzle : MonoBehaviour
 {
@@ -15,6 +20,7 @@ public class MonsterPuzzle : MonoBehaviour
     [Tooltip("liste des pièces qui peuvent apparaitre")]private List<GameObject> m_stockPieces = new List<GameObject>();
     [Tooltip("liste des pièces dans la scène")] private List<GameObject> m_potentialPieces = new List<GameObject>();
     [Tooltip("liste des pièces correctes")] private List<GameObject> m_correctPieces = new List<GameObject>();
+    [Tooltip("liste des pièces Incorrectes")] private List<GameObject> m_incorrectPieces = new List<GameObject>();
     [Tooltip("List des pièces trouvées")] private List<GameObject> m_foundPieces = new List<GameObject>();
 
     //Décalage
@@ -47,9 +53,16 @@ public class MonsterPuzzle : MonoBehaviour
     [Tooltip("position limite de joystick")] private float m_limitPosition = 0.5f;
     [HideInInspector] [Tooltip("variable de déplacement en points par points du sélecteur")] private bool m_hasMoved = false;
 
+    [Header("Rumble")]
+    [SerializeField] [Range(0f,10f)] private float m_rumbleDuration = 0f;
+    [SerializeField] [Range(0f,1f)] private float m_lowA =0f;
+    [SerializeField] [Range(0f,1f)] private float m_highA =0f;
+    private PlayerInput m_playerInput;
+    public static Gamepad m_gamepad = DualShockGamepad.current;
+    
     [HideInInspector] [Tooltip("Script d'intéraction entre le personnage et l'objet comprenant le subpuzzle")] public Interact_Detection m_interactDetection = null;
     
-    
+
     
     // OnEnable is called before the first frame update
     void OnEnable() {
@@ -79,6 +92,10 @@ public class MonsterPuzzle : MonoBehaviour
         rect.localPosition = Vector3.zero;
         rect.anchoredPosition = Vector2.zero;
         
+        m_playerInput = GetComponent<PlayerInput>();
+        m_gamepad = GetGamepad();
+        
+        //Debug.Log($" monster gamepad : {m_gamepad.name}");
     }
     
 
@@ -128,6 +145,7 @@ public class MonsterPuzzle : MonoBehaviour
                 //récupération de la position de la première prefab instanciée
                 if (x == 0 && y == 0) m_initialPos = transform.position;
             }
+            
         }
         
         
@@ -182,11 +200,9 @@ public class MonsterPuzzle : MonoBehaviour
     /// </summary>
     void Update()
     {
-        
         float horizontalAxis = Input.GetAxis("Horizontal");
         float verticalAxis = Input.GetAxis("Vertical");
         bool selectorValidation = Input.GetKeyDown(m_inputs.inputMonster);
-        
 
         if (!m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis >m_limitPosition || verticalAxis < -m_limitPosition) {
             
@@ -222,12 +238,15 @@ public class MonsterPuzzle : MonoBehaviour
             m_hasMoved = false;
         }
         
-        
+
         if (selectorValidation) //input monster
         {
-            bool isCorrectPiece = false;    //variable booléènne qui indique si le joueur est sur une bonne pièce ou non
+            
+            bool isCorrectPiece = false;    //variable booléènne qui indique si le joueur est sur une bonne pièce
             bool isAlreadyFound = false;    //Variable booléènne qui indique si la pièce a déjà été trouvée
             
+            
+            /////////////// VERIFICATION SI C'EST UNE PIECE CORRECTE /////////////
             for (int i = 0; i < m_correctPieces.Count; i++) //pour chaque pièce dans les pièces correctes
             {
                 if (m_prefabStock[m_selectorY, m_selectorX] == m_correctPieces[i]) //si le sélecteur est à la même position que la pièce actuelle de correct pieces
@@ -241,7 +260,8 @@ public class MonsterPuzzle : MonoBehaviour
                         }
                     }
 
-                    if (!isAlreadyFound)    //Si la pièce n'a pas encore été trouvée
+                    //PIECE PAS ENCORE TROUVEE ET CORRECTE
+                    if (!isAlreadyFound)    
                     {
                         m_foundPieces.Add(m_correctPieces[i]); //ajout d'une pièce correcte à pièce trouvé
                         
@@ -251,39 +271,80 @@ public class MonsterPuzzle : MonoBehaviour
                         if (m_findPiece == m_nbAmalgamePieces) //Si le nombre de pièces trouvées = nombre de pièces à trouver
                         {
                             Debug.Log("Vous avez trouvé toutes les pièces !");
-                            
+
                             m_interactDetection.m_achieved = true;  //le joueur a trouvé toutes les pièces
                             m_interactDetection.m_canMove = false;  //le joueur ne peut plus bouger le selecteur
                             if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
                         }
 
-                        m_prefabStock[m_selectorY, m_selectorX].SetActive(false);   //feedback disparition
-
+                        Instantiate(m_selectorTransform, m_prefabStock[m_selectorY, m_selectorX].transform.position, m_prefabStock[m_selectorY, m_selectorX].transform.rotation, gameObject.transform);  //feedback de trouvage de pièce
+                        
                         i = m_correctPieces.Count; //Arrête la boucle for dès trouvaille de pièce correcte
                     }
                 }
             }
+            
+            
+            /////////////// VERIFICATION SI C'EST UNE PIECE INCORRECTE /////////////
+            for (int i = 0; i < m_potentialPieces.Count; i++) //pour chaque pièce dans les pièces correctes
+            {
+                if (m_prefabStock[m_selectorY, m_selectorX] == m_potentialPieces[i]) //si le sélecteur est à la même position que la pièce actuelle de correct pieces
+                {
+                    for (int j = 0; j < m_incorrectPieces.Count; j++)   //Pour chaque pièces dans les pièces trouvées
+                    {
+                        if (m_prefabStock[m_selectorY, m_selectorX] == m_incorrectPieces[j])    //Si le sélecteur est à la même position que la pièce actuelle dans foundPiece
+                        {
+                            isAlreadyFound = true;  //la pièce en question a déjà été trouvé
+                            j = m_foundPieces.Count;
+                        }
+                    }
 
+                    //PIECE PAS ENCORE TROUVEE ET INCORRECTE
+                    if (!isAlreadyFound)    
+                    {
+                        m_incorrectPieces.Add(m_potentialPieces[i]); //ajout d'une pièce incorrecte aux pièces incorrectes
+                        
+                        isCorrectPiece = false; //indique qu'une pièce est incorrecte
+                        
+                        m_prefabStock[m_selectorY, m_selectorX].SetActive(false);   //désactive la pièce
+                        
+                        i = m_potentialPieces.Count; //Arrête la boucle for dès trouvaille de pièce incorrecte
+                    }
+                }
+            }
+            
+            
             if(isCorrectPiece == false && isAlreadyFound == false) //compteur de défaite s'incrémente de 1
             {
-                if (m_errorDone == m_errorAllowed)
+                m_errorDone++;   //nombre d'erreurs possibles avant défaite diminue
+
+                if(m_errorDone != m_errorAllowed) StartCoroutine("Rumble");   //Vibration
+                else if (m_errorDone >= m_errorAllowed)
                 {
-                    Debug.Log("Vous avez perdu.");
                     if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
                 }
-                m_errorDone++;   //nombre d'erreurs possibles avant défaite diminue
             }
-
             selectorValidation = false;
         }
         
+
         //Sortie du subPuzzle en cas de changement de personnage
-        if (m_interactDetection.m_isInSubPuzzle && Input.GetKeyDown(m_inputs.inputHuman) || Input.GetKeyDown(m_inputs.inputRobot))
+        if (m_interactDetection.m_isInSubPuzzle && (m_gamepad.buttonEast.isPressed || m_gamepad.buttonWest.isPressed || m_gamepad.buttonSouth.isPressed))    //(m_interactDetection.m_isInSubPuzzle && Input.GetKeyDown(m_inputs.inputHuman) || Input.GetKeyDown(m_inputs.inputRobot))
         {
-            if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
+            if (m_interactDetection.enabled) m_interactDetection.PuzzleDeactivation();
         }
     }
 
+
+    IEnumerator Rumble()
+    {
+        //Debug.Log($" monster gamepad : {m_gamepad.name}");
+        m_gamepad.SetMotorSpeeds(m_lowA, m_highA);
+        yield return new WaitForSeconds(m_rumbleDuration);
+        m_gamepad.SetMotorSpeeds(0, 0);
+    }
+    
+    
     /// <summary>
     /// Place correctly an element with its rect transform
     /// </summary>
@@ -323,7 +384,38 @@ public class MonsterPuzzle : MonoBehaviour
         foreach(Transform child in gameObject.transform) {
             Destroy(child.gameObject);
         }
+        
+        //Debug.Log($"Debug fermeture subPuzzle 1 :{m_gamepad}");
+        m_gamepad = null;
+        //Debug.Log($"Debug fermeture subPuzzle 2 :{m_gamepad}");
+        
     }
     
     
+    // Private helpers
+    private Gamepad GetGamepad()
+    {
+        //return Gamepad.all.FirstOrDefault(g => m_playerInput.devices.Any(d => d.deviceId == g.deviceId));
+        return DualShockGamepad.current;
+        
+        #region Linq Query Equivalent Logic
+        //Gamepad gamepad = null;
+        //foreach (var g in Gamepad.all)
+        //{
+        //    foreach (var d in _playerInput.devices)
+        //    {
+        //        if(d.deviceId == g.deviceId)
+        //        {
+        //            gamepad = g;
+        //            break;
+        //        }
+        //    }
+        //    if(gamepad != null)
+        //    {
+        //        break;
+        //    }
+        //}
+        //return gamepad;
+        #endregion
+    }
 }
