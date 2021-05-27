@@ -1,9 +1,6 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.SocialPlatforms;
 
 public class Interact_Detection : MonoBehaviour
 {
@@ -130,6 +127,14 @@ public class Interact_Detection : MonoBehaviour
         if (m_achieved)
         {
             StartCoroutine(EndLook());
+        }
+        else if (GuardBehavior.m_isKillingSomeone)
+        {
+            m_playerController.m_isForbiddenToMove = true;
+            m_activationButton.SetActive(false);
+            m_buttonActivate = false;
+            m_isInSubPuzzle = false;
+            m_puzzle.SetActive(false);
         }
         else {
             m_playerController.m_isForbiddenToMove = false;

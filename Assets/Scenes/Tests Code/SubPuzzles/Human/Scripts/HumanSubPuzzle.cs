@@ -223,7 +223,7 @@ public class HumanSubPuzzle : MonoBehaviour {
         //positionnement du rect transform à l'emplacement du sélecteur
         SetRectPosition(instance, m_selector.x, m_selector.y);
         //désactivation du prefab qui ne doit être montré qu'à la fin
-        instance.SetActive(false);
+        //instance.SetActive(false);
         //Ajout à la list du rect transform de la prefab instanciée
         m_playerPath.Add(rt);
     }
@@ -570,6 +570,7 @@ public class HumanSubPuzzle : MonoBehaviour {
             // on enlève de la liste PlayerPath le dernier prefab intégré
             for (int i = m_playerPath.Count - 1; i >= 0; i--) {
                 if (m_playerPath[i].anchorMin == currentAnchorMin && m_playerPath[i].anchorMax == currentAnchorMax) break;
+                m_playerPath[i].gameObject.SetActive(false);
                 m_playerPath.RemoveAt(i);
             }
         }

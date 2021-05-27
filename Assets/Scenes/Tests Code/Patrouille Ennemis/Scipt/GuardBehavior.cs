@@ -56,10 +56,8 @@ public class GuardBehavior : MonoBehaviour {
     bool m_warningVibe = false; //présence d'un character dans la zone de l'ennemi
     bool m_intimidationVibe = false;   //utilisation de la compétence du monstre dans la zone de l'ennemi
     bool m_attackVibe = false;   //attack de l'ennemi sur un character
-    
-    bool m_detectiveVibration = false;   //attack de l'ennemi sur un character
-    
-    
+
+
     [SerializeField] [Tooltip("For Debug Only")] private bool m_enterZone = false;
     private bool m_hasSeenPlayer = false;
     private bool m_isGoingTowardsPlayer = false;
@@ -94,7 +92,7 @@ public class GuardBehavior : MonoBehaviour {
         }
         else {m_gamepad = null;}
         
-        Debug.Log($" ennemy initial gamepad : {m_gamepad.name}");
+        //Debug.Log($" ennemy initial gamepad : {m_gamepad.name}");
     }
 
     private void OnEnable() {
@@ -192,7 +190,7 @@ public class GuardBehavior : MonoBehaviour {
                         m_intimidationVibe = false;
                         m_attackVibe = true;
                         
-                        Debug.Log($" attack monstre : {m_gamepad}");
+                        //Debug.Log($" attack monstre : {m_gamepad}");
                         if(m_gamepad != null) m_gamepad.SetMotorSpeeds(m_lowAttackEnemy, m_highAttackEnemy);
                         
                         m_hasSeenPlayer = true;
@@ -217,6 +215,7 @@ public class GuardBehavior : MonoBehaviour {
             if (m_gamepad != null) {
                 if (m_warningVibe && !m_intimidationVibe && !m_attackVibe)
                 {
+                    Debug.Log(m_warningVibe);
                     m_gamepad.SetMotorSpeeds(m_lowWarningEnemy, m_highWarningEnemy);
                 }
                 else if (m_intimidationVibe && !m_warningVibe && !m_attackVibe)
@@ -270,9 +269,15 @@ public class GuardBehavior : MonoBehaviour {
         yield return new WaitForSeconds(m_deathTime); //temps d'animation de mort du monstre
         m_nma.isStopped = false;
         scriptCharaWhoIsDying.Death();  //mort   // We will reset m_isForbiddenToMove and m_isKillingSomeone in there
+
+        m_isKillingSomeone = false;
         
         //Debug.Log($" Mort joueur : {m_gamepad}");
-        if(m_gamepad != null) m_gamepad.SetMotorSpeeds(0.0f, 0.0f);
+        if (m_gamepad != null)
+        {
+            m_gamepad.PauseHaptics();
+            m_gamepad.SetMotorSpeeds(0.0f, 0.0f);
+        }
     }
     
     
