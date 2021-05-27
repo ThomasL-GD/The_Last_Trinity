@@ -1,9 +1,6 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.SocialPlatforms;
 
 public class Interact_Detection : MonoBehaviour
 {
@@ -125,11 +122,19 @@ public class Interact_Detection : MonoBehaviour
     /// <summary>
     /// désactivation du script actuel
     /// </summary>
-    public void PuzzleDeactivation()
+    public void PuzzleDeactivation(bool p_mustKillTheChara = false)
     {
         if (m_achieved)
         {
             StartCoroutine(EndLook());
+        }
+        else if (GuardBehavior.m_isKillingSomeone)
+        {
+            m_playerController.m_isForbiddenToMove = true;
+            m_activationButton.SetActive(false);
+            m_buttonActivate = false;
+            m_isInSubPuzzle = false;
+            m_puzzle.SetActive(false);
         }
         else {
             m_playerController.m_isForbiddenToMove = false;
@@ -138,6 +143,11 @@ public class Interact_Detection : MonoBehaviour
             m_isInSubPuzzle = false;
             m_puzzle.SetActive(false);
             Debug.Log("Le puzzle doit se fermer");
+        }
+
+        if (p_mustKillTheChara) {
+            Debug.Log("The subPuzzle killed a chara");
+            DeathManager.DeathDelegator?.Invoke();
         }
     }
 

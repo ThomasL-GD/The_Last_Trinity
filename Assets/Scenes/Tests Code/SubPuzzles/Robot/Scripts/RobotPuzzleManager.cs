@@ -67,7 +67,8 @@ public class RobotPuzzleManager : MonoBehaviour {
 	[HideInInspector] [Tooltip("variable de déplacement en points par points du sélecteur")] private bool m_hasMoved = false;
 	
 	[HideInInspector] [Tooltip("Script d'intéraction entre le personnage et l'objet comprenant le subpuzzle")] public Interact_Detection m_interactDetection = null;
-
+	
+	public static Gamepad m_gamepad = DualShockGamepad.current;
 
 	private void Awake()
 	{
@@ -143,7 +144,8 @@ public class RobotPuzzleManager : MonoBehaviour {
 		else {
 			Debug.LogError ("JEEZ ! THE GAME DESIGNER PUT A WRONG PREFAB FOR THE SELECTOR, IT MUST BE A UI ELEMENT WITH A RECT TRANSFORM !");
 		}
-
+		
+		m_gamepad = GetGamepad();
 	}
 
 
@@ -429,7 +431,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 		}
 		
 		//Sortie du subPuzzle en cas de changement de personnage
-		if (m_interactDetection.m_isInSubPuzzle && (Input.GetKeyDown(m_inputs.inputMonster) || Input.GetKeyDown(m_inputs.inputHuman)))
+		if (m_interactDetection.m_isInSubPuzzle && (Input.GetKeyDown(m_inputs.inputMonster) || Input.GetKeyDown(m_inputs.inputHuman) || m_gamepad.buttonSouth.isPressed))
 		{
 			if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
 		}

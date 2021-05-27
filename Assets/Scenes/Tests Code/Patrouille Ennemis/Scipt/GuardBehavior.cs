@@ -53,13 +53,11 @@ public class GuardBehavior : MonoBehaviour {
     private PlayerInput m_playerInput;
     private Gamepad m_gamepad = DualShockGamepad.current;
     
-    bool m_warningVibe = false; //présence d'un character dans la zone de l'ennemi
-    bool m_intimidationVibe = false;   //utilisation de la compétence du monstre dans la zone de l'ennemi
-    bool m_attackVibe = false;   //attack de l'ennemi sur un character
-    
-    bool m_detectiveVibration = false;   //attack de l'ennemi sur un character
-    
-    
+    [SerializeField] [Tooltip("For Debug Only")] bool m_warningVibe = false; //présence d'un character dans la zone de l'ennemi
+    [SerializeField] [Tooltip("For Debug Only")] bool m_intimidationVibe = false;   //utilisation de la compétence du monstre dans la zone de l'ennemi
+    [SerializeField] [Tooltip("For Debug Only")] bool m_attackVibe = false;   //attack de l'ennemi sur un character
+
+
     [SerializeField] [Tooltip("For Debug Only")] private bool m_enterZone = false;
     private bool m_hasSeenPlayer = false;
     private bool m_isGoingTowardsPlayer = false;
@@ -94,7 +92,7 @@ public class GuardBehavior : MonoBehaviour {
         }
         else {m_gamepad = null;}
         
-        Debug.Log($" ennemy initial gamepad : {m_gamepad.name}");
+        //Debug.Log($" ennemy initial gamepad : {m_gamepad.name}");
     }
 
     private void OnEnable() {
@@ -107,9 +105,12 @@ public class GuardBehavior : MonoBehaviour {
     }
 
 
+    private Coroutine m_intimidationCor = null;
+    
+
     // Update is called once per frame
     void Update() {
-
+        
         //If the guard is close enough to the point he was trying to reach
         if (transform.position.x <= m_destinations[m_currentDestination].x + m_uncertainty &&
             transform.position.x >= m_destinations[m_currentDestination].x - m_uncertainty &&
@@ -130,7 +131,7 @@ public class GuardBehavior : MonoBehaviour {
                 m_nma.SetDestination(m_destinations[m_currentDestination]);
             }
         }
-    
+
         if (m_enterZone && !m_isKillingSomeone) {
             m_warningVibe = true;
             m_intimidationVibe = false;
@@ -165,7 +166,7 @@ public class GuardBehavior : MonoBehaviour {
                         m_warningVibe = false;
                         m_intimidationVibe = true;
                         m_attackVibe = false;
-                        StartCoroutine("Intimidate");
+                        if (m_intimidationCor == null) StartCoroutine("Intimidate");
                     }
                     
                     //Si le joueur est dans l'angle mort de l'ennemi
@@ -192,7 +193,7 @@ public class GuardBehavior : MonoBehaviour {
                         m_intimidationVibe = false;
                         m_attackVibe = true;
                         
-                        Debug.Log($" attack monstre : {m_gamepad}");
+                        //Debug.Log($" attack monstre : {m_gamepad}");
                         if(m_gamepad != null) m_gamepad.SetMotorSpeeds(m_lowAttackEnemy, m_highAttackEnemy);
                         
                         m_hasSeenPlayer = true;
@@ -215,9 +216,10 @@ public class GuardBehavior : MonoBehaviour {
             
 
             if (m_gamepad != null) {
-                if (m_warningVibe && !m_intimidationVibe && !m_attackVibe)
+                if (m_warningVibe && !m_intimidationVibe && !m_attackVibe && m_charactersInDangerScript.Count>0)
                 {
-                    m_gamepad.SetMotorSpeeds(m_lowWarningEnemy, m_highWarningEnemy);
+                    Debug.Log(m_warningVibe);
+                    //m_gamepad.SetMotorSpeeds(m_lowWarningEnemy, m_highWarningEnemy);
                 }
                 else if (m_intimidationVibe && !m_warningVibe && !m_attackVibe)
                 {
@@ -233,13 +235,17 @@ public class GuardBehavior : MonoBehaviour {
                 }
             }
         }
-           
         
+
     }
 
+
+    
+    
     IEnumerator Intimidate()
     {
         Debug.Log($" Intimidation : {m_gamepad}");
+        
         if(m_gamepad != null) m_gamepad.SetMotorSpeeds(m_lowMonsterIntimidation, m_highMonsterIntimidation);
         
         m_nma.isStopped = true;
@@ -253,6 +259,7 @@ public class GuardBehavior : MonoBehaviour {
         
         scriptCharaWhoIsDying.m_isForbiddenToMove = false;
         StartCoroutine(Stun());
+        m_intimidationCor = null;
     }
 
     IEnumerator Stun()
@@ -270,9 +277,15 @@ public class GuardBehavior : MonoBehaviour {
         yield return new WaitForSeconds(m_deathTime); //temps d'animation de mort du monstre
         m_nma.isStopped = false;
         scriptCharaWhoIsDying.Death();  //mort   // We will reset m_isForbiddenToMove and m_isKillingSomeone in there
+
+        m_isKillingSomeone = false;
         
         //Debug.Log($" Mort joueur : {m_gamepad}");
-        if(m_gamepad != null) m_gamepad.SetMotorSpeeds(0.0f, 0.0f);
+        if (m_gamepad != null)
+        {
+            m_gamepad.PauseHaptics();
+            m_gamepad.SetMotorSpeeds(0.0f, 0.0f);
+        }
     }
     
     
