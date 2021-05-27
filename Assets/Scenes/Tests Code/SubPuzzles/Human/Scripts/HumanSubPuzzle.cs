@@ -46,6 +46,8 @@ public class HumanSubPuzzle : MonoBehaviour {
     [Header("Timer")]
     [SerializeField] [Tooltip("The time allowed to the player to complete this subPuzzle\n(unit : seconds)")] [Range(5f, 600f)] private float m_timeAllowed = 60f;
     [SerializeField] [Tooltip("The prefab for the appearance of the timer\n(will be massively distorted)\nMust be a Rect transform element")] private GameObject m_prefabTimer = null;
+    private RectTransform[] m_rectTimers = null; //The rect transforms of the time bars
+    private float m_elapsedTime = 0.0f; //The time passed since the subPuzzle Started
     
     [Header("Prefabs for visual representation")]
     [SerializeField] [Tooltip("The visual representation of the player\nMust be a Rect transform element")] private GameObject m_prefabPlayer = null;
@@ -120,6 +122,8 @@ public class HumanSubPuzzle : MonoBehaviour {
 
         m_gamepad = GetGamepad();
         //Debug.Log($" human gamepad : {m_gamepad.name}");
+
+        m_elapsedTime = 0.0f;
     }
 
     
@@ -225,6 +229,8 @@ public class HumanSubPuzzle : MonoBehaviour {
         
         
         //Création du timer
+        m_rectTimers = new RectTransform[2];
+        
         for (int i = 0; i < 2; i++) {
 
             GameObject timerObject = Instantiate(m_prefabTimer, transform.position, transform.rotation, gameObject.transform);
@@ -248,6 +254,9 @@ public class HumanSubPuzzle : MonoBehaviour {
 
                 rt.localPosition = Vector3.zero;
                 rt.anchoredPosition = Vector2.zero;
+
+                //We add the rect transform to an array to manipulate it later
+                m_rectTimers[i] = rt;
             }
         }
         
@@ -572,10 +581,31 @@ public class HumanSubPuzzle : MonoBehaviour {
         }
         
         //Sortie du subPuzzle en cas de changement de personnage
-        if (m_interactDetection.m_isInSubPuzzle && Input.GetKeyDown(m_inputs.inputMonster) || Input.GetKeyDown(m_inputs.inputRobot) || m_gamepad.buttonSouth.isPressed)
-        {
+        if (m_interactDetection.m_isInSubPuzzle && (Input.GetKeyDown(m_inputs.inputMonster) || Input.GetKeyDown(m_inputs.inputRobot) || m_gamepad.buttonSouth.isPressed)) {
             if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
         }
+
+        if (!m_interactDetection.m_achieved) {
+
+            foreach (RectTransform rectTimer in m_rectTimers) {
+            
+                //Check the SetRectPosition() function if you don't understand those lines
+                rectTimer.anchorMin = new Vector2(rectTimer.anchorMin.x, 0);
+                rectTimer.anchorMax = new Vector2(rectTimer.anchorMax.x, 1f - (1/(m_timeAllowed/m_elapsedTime)));
+
+                rectTimer.localPosition = Vector3.zero;
+                rectTimer.anchoredPosition = Vector2.zero;
+            }
+        
+            m_elapsedTime += Time.deltaTime;
+
+            if (m_elapsedTime > m_timeAllowed) {
+                m_interactDetection.PuzzleDeactivation(true);
+                //This line might destroy everything somehow :
+                //DeathManager.DeathDelegator?.Invoke();
+            }
+        }
+        
     }
 
     
@@ -646,6 +676,9 @@ public class HumanSubPuzzle : MonoBehaviour {
     private void Win() {
         //Debug.Log("IT'S A WIN !");
 
+        m_lightObject.GetComponentInChildren<Light>().color = m_soLight.colorFinished;
+        m_lightObject.GetComponent<Renderer>().material = m_soLight.materialFinished;
+        
         m_gamepad.SetMotorSpeeds(0.0f,0.0f);
         m_interactDetection.m_achieved = true;  //le joueur est arrivé au bout
         m_interactDetection.m_canMove = false; //le joueur ne peut plus bouger le sélecteur

@@ -122,7 +122,7 @@ public class Interact_Detection : MonoBehaviour
     /// <summary>
     /// désactivation du script actuel
     /// </summary>
-    public void PuzzleDeactivation()
+    public void PuzzleDeactivation(bool p_mustKillTheChara = false)
     {
         if (m_achieved)
         {
@@ -143,6 +143,11 @@ public class Interact_Detection : MonoBehaviour
             m_isInSubPuzzle = false;
             m_puzzle.SetActive(false);
             Debug.Log("Le puzzle doit se fermer");
+        }
+
+        if (p_mustKillTheChara) {
+            Debug.Log("The subPuzzle killed a chara");
+            DeathManager.DeathDelegator?.Invoke();
         }
     }
 
