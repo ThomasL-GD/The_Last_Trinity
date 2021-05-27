@@ -53,9 +53,9 @@ public class GuardBehavior : MonoBehaviour {
     private PlayerInput m_playerInput;
     private Gamepad m_gamepad = DualShockGamepad.current;
     
-    bool m_warningVibe = false; //présence d'un character dans la zone de l'ennemi
-    bool m_intimidationVibe = false;   //utilisation de la compétence du monstre dans la zone de l'ennemi
-    bool m_attackVibe = false;   //attack de l'ennemi sur un character
+    [SerializeField] [Tooltip("For Debug Only")] bool m_warningVibe = false; //présence d'un character dans la zone de l'ennemi
+    [SerializeField] [Tooltip("For Debug Only")] bool m_intimidationVibe = false;   //utilisation de la compétence du monstre dans la zone de l'ennemi
+    [SerializeField] [Tooltip("For Debug Only")] bool m_attackVibe = false;   //attack de l'ennemi sur un character
 
 
     [SerializeField] [Tooltip("For Debug Only")] private bool m_enterZone = false;
@@ -131,9 +131,7 @@ public class GuardBehavior : MonoBehaviour {
                 m_nma.SetDestination(m_destinations[m_currentDestination]);
             }
         }
-    
-        //if(!m_enterZone) m_gamepad.SetMotorSpeeds(0.0f, 0.0f);
-        
+
         if (m_enterZone && !m_isKillingSomeone) {
             m_warningVibe = true;
             m_intimidationVibe = false;
@@ -237,7 +235,7 @@ public class GuardBehavior : MonoBehaviour {
                 }
             }
         }
-
+        
 
     }
 
