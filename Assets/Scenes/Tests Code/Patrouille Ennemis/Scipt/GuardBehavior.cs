@@ -129,6 +129,8 @@ public class GuardBehavior : MonoBehaviour {
             }
         }
     
+        //if(!m_enterZone) m_gamepad.SetMotorSpeeds(0.0f, 0.0f);
+        
         if (m_enterZone && !m_isKillingSomeone) {
             m_warningVibe = true;
             m_intimidationVibe = false;
@@ -213,10 +215,10 @@ public class GuardBehavior : MonoBehaviour {
             
 
             if (m_gamepad != null) {
-                if (m_warningVibe && !m_intimidationVibe && !m_attackVibe)
+                if (m_warningVibe && !m_intimidationVibe && !m_attackVibe && m_charactersInDangerScript.Count>0)
                 {
                     Debug.Log(m_warningVibe);
-                    m_gamepad.SetMotorSpeeds(m_lowWarningEnemy, m_highWarningEnemy);
+                    //m_gamepad.SetMotorSpeeds(m_lowWarningEnemy, m_highWarningEnemy);
                 }
                 else if (m_intimidationVibe && !m_warningVibe && !m_attackVibe)
                 {
@@ -232,8 +234,8 @@ public class GuardBehavior : MonoBehaviour {
                 }
             }
         }
-           
-        
+
+
     }
 
     IEnumerator Intimidate()

@@ -57,7 +57,6 @@ public class MonsterPuzzle : MonoBehaviour
     [SerializeField] [Range(0f,10f)] private float m_rumbleDuration = 0f;
     [SerializeField] [Range(0f,1f)] private float m_lowA =0f;
     [SerializeField] [Range(0f,1f)] private float m_highA =0f;
-    private PlayerInput m_playerInput;
     public static Gamepad m_gamepad = DualShockGamepad.current;
     
     [HideInInspector] [Tooltip("Script d'intéraction entre le personnage et l'objet comprenant le subpuzzle")] public Interact_Detection m_interactDetection = null;
@@ -92,7 +91,6 @@ public class MonsterPuzzle : MonoBehaviour
         rect.localPosition = Vector3.zero;
         rect.anchoredPosition = Vector2.zero;
         
-        m_playerInput = GetComponent<PlayerInput>();
         m_gamepad = GetGamepad();
         
         //Debug.Log($" monster gamepad : {m_gamepad.name}");
