@@ -52,6 +52,12 @@ public class PlayerController : MonoBehaviour
     private static readonly int IsSneaky = Animator.StringToHash("IsSneaky");
     private static readonly int IsIntimidating = Animator.StringToHash("IsIntimidating");
 
+    //Those lines are now useless due to the project Settings > Physics > Layers parameters
+    // private void Awake()
+    // {
+    //     Physics.IgnoreLayerCollision(6,6); //Is supposed to forbid the collision between two players
+    // }
+
     private void Start()
     {
         DeathManager.DeathDelegator += EndDeath;
