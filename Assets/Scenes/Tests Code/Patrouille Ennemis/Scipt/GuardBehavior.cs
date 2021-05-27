@@ -105,9 +105,12 @@ public class GuardBehavior : MonoBehaviour {
     }
 
 
+    private Coroutine m_intimidationCor = null;
+    
+
     // Update is called once per frame
     void Update() {
-
+        
         //If the guard is close enough to the point he was trying to reach
         if (transform.position.x <= m_destinations[m_currentDestination].x + m_uncertainty &&
             transform.position.x >= m_destinations[m_currentDestination].x - m_uncertainty &&
@@ -165,7 +168,7 @@ public class GuardBehavior : MonoBehaviour {
                         m_warningVibe = false;
                         m_intimidationVibe = true;
                         m_attackVibe = false;
-                        StartCoroutine("Intimidate");
+                        if (m_intimidationCor == null) StartCoroutine("Intimidate");
                     }
                     
                     //Si le joueur est dans l'angle mort de l'ennemi
@@ -238,9 +241,13 @@ public class GuardBehavior : MonoBehaviour {
 
     }
 
+
+    
+    
     IEnumerator Intimidate()
     {
         Debug.Log($" Intimidation : {m_gamepad}");
+        
         if(m_gamepad != null) m_gamepad.SetMotorSpeeds(m_lowMonsterIntimidation, m_highMonsterIntimidation);
         
         m_nma.isStopped = true;
@@ -254,6 +261,7 @@ public class GuardBehavior : MonoBehaviour {
         
         scriptCharaWhoIsDying.m_isForbiddenToMove = false;
         StartCoroutine(Stun());
+        m_intimidationCor = null;
     }
 
     IEnumerator Stun()

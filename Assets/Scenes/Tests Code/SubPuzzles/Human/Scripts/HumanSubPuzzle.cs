@@ -26,6 +26,11 @@ public class HumanSubPuzzle : MonoBehaviour {
     private GameObject m_pathVisualisation = null; //Contains the coordinates of our
     [HideInInspector] [Tooltip("Script d'intéraction entre le personnage et l'objet comprenant le subpuzzle")] public Interact_Detection m_interactDetection = null;
     
+    /*Contains every cell of the maze and if each cell have a wall above, under, on the right or on the left of itself*/private Directions[,] m_maze = null;
+    
+    /*"Size of each cell (in anchor values so between 0 and 1"*/ private float m_offset = 0.25f;
+
+    
     [Header("Input Manager")]
     [SerializeField] public SOInputMultiChara m_inputs = null;
     [HideInInspector] [Tooltip("position limite de joystick")] private float m_limitPosition = 0.5f;
@@ -37,16 +42,24 @@ public class HumanSubPuzzle : MonoBehaviour {
     [SerializeField] [Tooltip("The number of random removed walls\n(Warning ! This function can remove walls that are already removed by the base algorithm) ")] [Range(0,500)] public int m_wallsToRemove = 5;
     [SerializeField] [Tooltip("If on, Every cell that is closed by all four directions will open itself (warning ! does not prevent a group of cells to be closed from the rest of the maze)")] private bool m_isBreakingClosedCells = true;
     [SerializeField] [Tooltip("The number of random removed walls AFTER the breaking of closed cells\n(Warning ! If isBreakingClosedCells is false, this parameter won't be used !)\n(Warning ! This function can remove walls that are already removed by the base algorithm) ")] [Range(0,500)] public int m_wallsToRemoveAfterBreaking = 5;
-    
-    /*Contains every cell of the maze and if each cell have a wall above, under, on the right or on the left of itself*/private Directions[,] m_maze = null;
-    
-    /*"Size of each cell (in anchor values so between 0 and 1"*/ private float m_offset = 0.25f;
 
+    [Header("Timer")]
+    [SerializeField] [Tooltip("The time allowed to the player to complete this subPuzzle\n(unit : seconds)")] [Range(5f, 600f)] private float m_timeAllowed = 60f;
+    [SerializeField] [Tooltip("The prefab for the appearance of the timer\n(will be massively distorted)\nMust be a Rect transform element")] private GameObject m_prefabTimer = null;
+    
     [Header("Prefabs for visual representation")]
-    [SerializeField] [Tooltip("The visual representation of the player")] private GameObject m_prefabPlayer = null;
-    [SerializeField] [Tooltip("The prefab of the background")] private GameObject m_prefabBG = null;
-    [SerializeField] [Tooltip("The visual representation of the path of the player")] private GameObject m_prefabPathVisualition = null;
-    [SerializeField] [Tooltip("List that shows the path of the player")] private List<RectTransform> m_playerPath = new List<RectTransform>();
+    [SerializeField] [Tooltip("The visual representation of the player\nMust be a Rect transform element")] private GameObject m_prefabPlayer = null;
+    [SerializeField] [Tooltip("The prefab of the background\nMust be a Rect transform element")] private GameObject m_prefabBG = null;
+    [SerializeField] [Tooltip("The visual representation of the path of the player\nMust be a Rect transform element")] private GameObject m_prefabPathVisualition = null;
+    [SerializeField] [Tooltip("List that shows the path of the player\nFor debug only I guess")] private List<RectTransform> m_playerPath = new List<RectTransform>();
+    [SerializeField] [Tooltip("The up wall\nMust be a Rect transform element")] private GameObject m_prefabUp = null;
+    [SerializeField] [Tooltip("The left wall\nMust be a Rect transform element")] private GameObject m_prefabLeft = null;
+    [SerializeField] [Tooltip("The right wall\nMust be a Rect transform element")] private GameObject m_prefabRight = null;
+    [SerializeField] [Tooltip("The down wall\nMust be a Rect transform element")] private GameObject m_prefabDown = null;
+
+    [Header("Light")]
+    [SerializeField] [Tooltip("The SOLight that will modify the light")] private SOLight m_soLight = null;
+    [SerializeField] [Tooltip("The actual gameObject for the light")] private GameObject m_lightObject = null;
     
     
     [Header("Rumble")]
@@ -57,11 +70,6 @@ public class HumanSubPuzzle : MonoBehaviour {
     
     [Header("Debug")]
     [SerializeField] [Tooltip("If on, the walls will be displayed for debug")] private bool m_debugMode = false;
-    [SerializeField] [Tooltip("If on, the walls will be displayed once the sub-puzzle is done\nIs useless if debug mode is already on")] private bool m_halfDebugMode = true;
-    [SerializeField] [Tooltip("For debug only")] private GameObject m_prefabUp = null;
-    [SerializeField] [Tooltip("For debug only")] private GameObject m_prefabLeft = null;
-    [SerializeField] [Tooltip("For debug only")] private GameObject m_prefabRight = null;
-    [SerializeField] [Tooltip("For debug only")] private GameObject m_prefabDown = null;
 
     
 
@@ -79,6 +87,16 @@ public class HumanSubPuzzle : MonoBehaviour {
         if (m_wallsToRemove + m_wallsToRemoveAfterBreaking >= m_mazeHeight * m_mazeWidth * 4) {
             Debug.LogWarning("Warning ! You want to remove to many random walls from the maze, it's gonna be either way too easy or completely fucked up");
         }
+        
+        if(m_prefabDown == null) Debug.LogError("JEEZ ! THERE IS NO PREFAB FOR THE DOWN WALL !");
+        if(m_prefabLeft == null) Debug.LogError("JEEZ ! THERE IS NO PREFAB FOR THE LEFT WALL !");
+        if(m_prefabRight == null) Debug.LogError("JEEZ ! THERE IS NO PREFAB FOR THE RIGHT WALL !");
+        if(m_prefabUp == null) Debug.LogError("JEEZ ! THERE IS NO PREFAB FOR THE UP WALL !");
+        if(m_prefabPlayer == null) Debug.LogError("JEEZ ! THERE IS NO PREFAB FOR THE PLAYER !");
+        if(m_prefabBG == null) Debug.LogError("JEEZ ! THERE IS NO PREFAB FOR THE BACKGROUND !");
+        if(m_prefabTimer == null) Debug.LogError("JEEZ ! THERE IS NO OBJECT FOR THE TIMER !");
+        if(m_lightObject == null) Debug.LogError("JEEZ ! THERE IS NO OBJECT FOR THE Light !");
+        if(m_soLight == null) Debug.LogError("JEEZ ! THERE IS NO SOLIGHT IN THE HUMAN SUBPUZZLE !");
         
         //We calculate the size of each cell
         m_offset = 0f;
@@ -99,8 +117,7 @@ public class HumanSubPuzzle : MonoBehaviour {
         }
 
         MazeInitialization();
-        
-        
+
         m_gamepad = GetGamepad();
         //Debug.Log($" human gamepad : {m_gamepad.name}");
     }
@@ -204,6 +221,34 @@ public class HumanSubPuzzle : MonoBehaviour {
         }
         else {
             Debug.LogError("Missing prefab for the path visualisation in the Human SubPuzzle script");
+        }
+        
+        
+        //Création du timer
+        for (int i = 0; i < 2; i++) {
+
+            GameObject timerObject = Instantiate(m_prefabTimer, transform.position, transform.rotation, gameObject.transform);
+            
+            if (timerObject.TryGetComponent<RectTransform>(out RectTransform rt)) {
+                
+                float shiftMin = -0.2f;
+                float shiftMax = 0f;
+                //If we're placing the second one, we shift it to the right instead of the left
+                if (i == 0) {
+                    shiftMin = -0.2f;
+                    shiftMax = 0f;
+                }else {
+                    shiftMin = 1f;
+                    shiftMax = 1.2f;
+                }
+            
+                //Check the SetRectPosition() function if you don't understand those lines
+                rt.anchorMin = new Vector2(shiftMin, 0);
+                rt.anchorMax = new Vector2(shiftMax, 1);
+
+                rt.localPosition = Vector3.zero;
+                rt.anchoredPosition = Vector2.zero;
+            }
         }
         
     }
@@ -424,7 +469,7 @@ public class HumanSubPuzzle : MonoBehaviour {
                 SetRectPosition(instance,j,i);
                 instance.transform.SetSiblingIndex(0);
 
-                
+                //Those are simple IFs and no else ifs and that is important because a tile might contains multiple walls 
                 if (m_maze[i, j].HasFlag(Directions.Up)) {
                     instance = Instantiate(m_prefabUp, transform.position, transform.rotation, gameObject.transform);
                     SetRectPosition(instance,j,i);
@@ -490,7 +535,7 @@ public class HumanSubPuzzle : MonoBehaviour {
             //First we verify the player has no wall blocking the way he wants to go;
             if (attemptedMovement == Directions.None || m_maze[m_selector.y, m_selector.x].HasFlag(attemptedMovement)) {
                 //Debug.Log("Nah bro, you cannot go this way");
-                StartCoroutine("Rumble");   //Vibration
+                StartCoroutine(Rumble());   //Vibration
             }
             else {
                 //If the movement is not blocked by a wall, we update the selector coordinates according to the wanted direction
@@ -571,8 +616,7 @@ public class HumanSubPuzzle : MonoBehaviour {
                 m_playerPath.RemoveAt(i);
             }
         }
-        else
-        {
+        else {
             //Sinon ajout d'une nouvelle position, elle devient maintenant déjà visité
             AddToPath();
         }
@@ -605,7 +649,7 @@ public class HumanSubPuzzle : MonoBehaviour {
         m_gamepad.SetMotorSpeeds(0.0f,0.0f);
         m_interactDetection.m_achieved = true;  //le joueur est arrivé au bout
         m_interactDetection.m_canMove = false; //le joueur ne peut plus bouger le sélecteur
-        if(m_halfDebugMode && !m_debugMode) GenerateVisualRepresentation();
+        if(!m_debugMode) GenerateVisualRepresentation();
         if(m_interactDetection.enabled) m_interactDetection.PuzzleDeactivation();
     }
 	
