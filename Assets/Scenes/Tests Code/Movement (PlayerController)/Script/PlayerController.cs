@@ -369,11 +369,9 @@ public class PlayerController : MonoBehaviour
         m_deathCounter = 0.0f;
         m_isForbiddenToMove = false;
 
+        //We teleport the player to their spawnpoint
         transform.SetPositionAndRotation(m_spawnPoint, transform.rotation);
-        if (m_chara == Charas.Robot) {
-            //Debug.Log($"WELP : {m_spawnPoint}");
-            //Debug.Log($"Welp (suite) : {transform.position}");
-        }
+        
         GuardBehavior.m_isKillingSomeone = false;
         DeathAnim(false);
     }
@@ -382,7 +380,10 @@ public class PlayerController : MonoBehaviour
     /// A Function to play the death animation and make sure this character can't move during their animation
     /// </summary>
     private void DeathAnim(bool p_isOn) {
-        if(m_animator != null) m_animator.SetBool("IsDead", p_isOn);
+        if (m_animator != null) {
+            m_animator.SetBool("IsDead", p_isOn);
+            if(p_isOn) m_animator.SetTrigger("Death");
+        }
         m_isPlayingDead = p_isOn;
     }
 
