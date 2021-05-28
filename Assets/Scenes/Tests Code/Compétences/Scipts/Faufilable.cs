@@ -96,7 +96,7 @@ public class Faufilable : MonoBehaviour
     /// Will remove the sneaky effect on the human and reset a few values
     /// </summary>
     private void RemoveSneakiness() {
-        m_humanScript.AbilityAnim(false);
+        if(!m_isTeleporting) m_humanScript.AbilityAnim(false);
         m_isSneaky = false;
         m_humanScript.m_speed *= 2;
     }
