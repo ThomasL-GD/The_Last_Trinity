@@ -11,8 +11,10 @@ GameObject:
   - component: {fileID: 6329207947228362849}
   - component: {fileID: 6951876179241416644}
   - component: {fileID: 5160828049280713486}
+  - component: {fileID: 375017857656247989}
+  - component: {fileID: 3653797336145261606}
   m_Layer: 0
-  m_Name: FBX_MurPorte
+  m_Name: P_P_MurPorte
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -81,3 +83,29 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &375017857656247989
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6673786767617843931}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 2.3956206, y: 3.8999996, z: 0.43131042}
+  m_Center: {x: -2.0521905, y: 1.9499998, z: -0.0000006109476}
+--- !u!65 &3653797336145261606
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6673786767617843931}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 2.390955, y: 3.8999996, z: 0.43131042}
+  m_Center: {x: 2.0545225, y: 1.9499998, z: -0.0000006109476}

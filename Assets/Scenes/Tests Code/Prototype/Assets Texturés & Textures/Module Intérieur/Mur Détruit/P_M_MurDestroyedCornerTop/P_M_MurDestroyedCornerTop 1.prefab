@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5780643107306533316}
   - component: {fileID: 7464474293018033761}
   - component: {fileID: 4644289406227647147}
+  - component: {fileID: 8505257098071291015}
   m_Layer: 0
   m_Name: P_M_MurDestroyedCornerTop 1
   m_TagString: Untagged
@@ -81,3 +82,17 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &8505257098071291015
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6589655673630403454}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -2506829897631598286, guid: e17e3421d5041324baf6c57bbfecf05a, type: 3}
