@@ -71,6 +71,7 @@ public class Faufilable : MonoBehaviour
             if (player.m_chara == Charas.Human && !m_exit.GetComponent<Faufilable>().m_isIntoWall) {
                 m_human = p_other.gameObject.transform;
                 m_humanScript = player;
+                player.AbilityAnim(true);
                 
                 m_isSneaky = true;
                 m_humanScript.m_speed /= 2;
@@ -95,6 +96,7 @@ public class Faufilable : MonoBehaviour
     /// Will remove the sneaky effect on the human and reset a few values
     /// </summary>
     private void RemoveSneakiness() {
+        m_humanScript.AbilityAnim(false);
         m_isSneaky = false;
         m_humanScript.m_speed *= 2;
     }
