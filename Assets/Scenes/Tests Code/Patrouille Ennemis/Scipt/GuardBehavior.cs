@@ -12,10 +12,17 @@ public class GuardBehavior : MonoBehaviour {
 
     //Collider présent sur notre ennemi
     private SphereCollider m_sphereCol = null;
+    private Animator m_animator = null;
 
     //variables d'IA
-    public NavMeshAgent m_nma = null;
+    [HideInInspector] public NavMeshAgent m_nma = null;
     private int m_currentDestination = 0;
+
+    [Header("Behavior")]
+    [SerializeField]
+    [Tooltip("If on, this ennemy will stay in place according to its initial position")] private bool m_isStatic = false;
+    private Vector3 m_staticPos = Vector3.zero;
+    private Quaternion m_staticRotation = new Quaternion(0,0,0,0);
 
     [Header("Metrics")] 
     [SerializeField] [Tooltip("Vitesse de déplacement normale")] [Range(0f,50f)] private float m_normalSpeed = 5.0f;
@@ -37,6 +44,9 @@ public class GuardBehavior : MonoBehaviour {
     [Header("Death")]
     [SerializeField] [Tooltip("distance d'élimination")] [Range(0f,10f)] private float m_deathPos = 1.0f;
     [SerializeField] [Tooltip("temps d'animation de mort")] [Range(0f,10f)] private float m_deathTime = 3.0f;
+
+    [SerializeField]
+    [Tooltip("The gameobject of the hit FX, must be already placed in a good position and setActive(false)\nMust be a child of this object\nCan be null")] private GameObject m_hitFX = null;
     private Vector3 m_spawnPoint = Vector3.zero;
     
     [Header("Monster Ability")]
@@ -77,13 +87,30 @@ public class GuardBehavior : MonoBehaviour {
         m_sphereCol = gameObject.GetComponent<SphereCollider>();
         m_sphereCol.radius = m_sphereRadius;
         m_sphereCol.isTrigger = true;
-        
-        //We transform the list of Transforms (easier to serialize) into a list of Vector3 (easier to manipulate)
-        for (int i = 0; i < m_destinationsTransforms.Count; i++) { m_destinations.Add(m_destinationsTransforms[i].position); }
+
+        m_animator = GetComponent<Animator>();
+
         m_nma = gameObject.GetComponent<NavMeshAgent>();
-        
-        //The first position where the guard will aim at
-        m_nma.SetDestination(m_destinations[m_currentDestination]);
+
+        if (m_isStatic) {
+            //If the ennemy is static, we stock its position and rotation
+            Transform transform1 = transform;
+            m_staticPos = transform1.position;
+            m_staticRotation = transform1.rotation;
+            if(m_animator != null)m_animator.SetBool("IsWalking", false);
+        }
+        else {
+            if(m_animator != null)m_animator.SetBool("IsWalking", true);
+            //We transform the list of Transforms (easier to serialize) into a list of Vector3 (easier to manipulate)
+            for (int i = 0; i < m_destinationsTransforms.Count; i++) {
+                m_destinations.Add(m_destinationsTransforms[i].position);
+            }
+
+            m_nma.speed = m_normalSpeed;
+
+            //The first position where the guard will aim at
+            m_nma.SetDestination(m_destinations[m_currentDestination]);
+        }
 
         
         if (m_humanSubPuzzle == null && m_monsterPuzzle == null) {
@@ -91,7 +118,7 @@ public class GuardBehavior : MonoBehaviour {
             m_gamepad = GetGamepad();
         }
         else {m_gamepad = null;}
-        
+
         //Debug.Log($" ennemy initial gamepad : {m_gamepad.name}");
     }
 
@@ -110,27 +137,51 @@ public class GuardBehavior : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        
-        //If the guard is close enough to the point he was trying to reach
-        if (transform.position.x <= m_destinations[m_currentDestination].x + m_uncertainty &&
-            transform.position.x >= m_destinations[m_currentDestination].x - m_uncertainty &&
-            transform.position.z <= m_destinations[m_currentDestination].z + m_uncertainty &&
-            transform.position.z >= m_destinations[m_currentDestination].z - m_uncertainty) {
 
-            //if he was off his initial path we simply put him back on
-            if (m_isGoingTowardsPlayer) {
-                m_isGoingTowardsPlayer = false;
-                m_destinations.Remove(m_destinations[m_currentDestination]);
-                m_nma.SetDestination(m_destinations[m_currentDestination]);
+        if (!m_isKillingSomeone) {
+            if(!m_isStatic){
+                if(m_animator != null)m_animator.SetBool("IsWalking", true);
+                //If the guard is close enough to the point he was trying to reach
+                if (transform.position.x <= m_destinations[m_currentDestination].x + m_uncertainty &&
+                    transform.position.x >= m_destinations[m_currentDestination].x - m_uncertainty &&
+                    transform.position.z <= m_destinations[m_currentDestination].z + m_uncertainty &&
+                    transform.position.z >= m_destinations[m_currentDestination].z - m_uncertainty) {
+
+                    //if he was off his initial path we simply put him back on
+                    if (m_isGoingTowardsPlayer) {
+                        m_isGoingTowardsPlayer = false;
+                        m_destinations.Remove(m_destinations[m_currentDestination]);
+                        m_nma.SetDestination(m_destinations[m_currentDestination]);
+                    }
+                    //If he reached a point on his initial path, the guard will aim at the next one
+                    else {
+                        m_currentDestination++;
+                        //If he reached the end of his path, we make him start over
+                        if (m_currentDestination >= m_destinations.Count) m_currentDestination = 0;
+                        m_nma.SetDestination(m_destinations[m_currentDestination]);
+                    }
+                }
             }
-            //If he reached a point on his initial path, the guard will aim at the next one
-            else {
-                m_currentDestination++;
-                //If he reached the end of his path, we make him start over
-                if (m_currentDestination >= m_destinations.Count) m_currentDestination = 0;
-                m_nma.SetDestination(m_destinations[m_currentDestination]);
+            else if (m_isStatic) {
+                //If the guard is close enough to the point he was trying to reach
+                if (transform.position.x <= m_staticPos.x + m_uncertainty &&
+                    transform.position.x >= m_staticPos.x - m_uncertainty &&
+                    transform.position.z <= m_staticPos.z + m_uncertainty &&
+                    transform.position.z >= m_staticPos.z - m_uncertainty) {
+                    
+                    if(m_animator != null)m_animator.SetBool("IsWalking", false);
+
+                    if (Mathf.Abs(m_staticRotation.eulerAngles.y) <= Mathf.Abs(transform.rotation.eulerAngles.y) + 1f) {
+                        float angleRight = Mathf.Abs(m_staticRotation.eulerAngles.y) - Mathf.Abs(transform.rotation.eulerAngles.y);
+                        if (Mathf.Abs(angleRight) > 0) m_nma.transform.Rotate(Vector3.up, m_normalRotationSpeed * Time.deltaTime);
+                        else if (Mathf.Abs(angleRight) <= 0) m_nma.transform.Rotate(Vector3.up, -m_normalRotationSpeed * Time.deltaTime);
+                        
+                    }
+                }
+                else{if(m_animator != null)m_animator.SetBool("IsWalking", true);}
             }
         }
+        
 
         if (m_enterZone && !m_isKillingSomeone) {
             m_warningVibe = true;
@@ -156,7 +207,7 @@ public class GuardBehavior : MonoBehaviour {
                 
                 if (m_charactersInDangerScript[0].gameObject.transform.position != hit.transform.position) //le chara se trouve derrière un obstacle et n'est pas visible par l'ennemi
                 {
-                    //Debug.Log("Oulala on ne voit pas le character derrière");
+                    Debug.Log("Oulala on ne voit pas le character derrière");
                 }
                 else //le chara est visible par l'ennemi
                 {
@@ -166,12 +217,16 @@ public class GuardBehavior : MonoBehaviour {
                         m_warningVibe = false;
                         m_intimidationVibe = true;
                         m_attackVibe = false;
-                        if (m_intimidationCor == null) StartCoroutine("Intimidate");
+                        if (m_intimidationCor == null) StartCoroutine(Intimidate());
                     }
                     
                     //Si le joueur est dans l'angle mort de l'ennemi
                     if (Mathf.Abs(angleForward) > m_angleUncertainty)
                     {
+                        m_warningVibe = true;
+                        m_intimidationVibe = false;
+                        m_attackVibe = false;
+                        
                         if (m_hasSeenPlayer)
                         {
                             m_nma.speed = m_attackSpeed;
@@ -205,7 +260,7 @@ public class GuardBehavior : MonoBehaviour {
                         //mort du joueur dès qu'il est assez proche
                         if (Vector3.Distance(m_charactersInDangerScript[0].transform.position, transform.position) < m_deathPos && !m_isKillingSomeone)
                         {
-                            //Debug.Log("J'AI TROUVE UNE VICTIME");
+                            Debug.Log($"J'AI TROUVE UNE VICTIME      :      {m_isKillingSomeone}");
                             StartCoroutine(DeathCoroutine());
                         }
                     }
@@ -215,25 +270,33 @@ public class GuardBehavior : MonoBehaviour {
             
             
 
-            if (m_gamepad != null) {
-                if (m_warningVibe && !m_intimidationVibe && !m_attackVibe && m_charactersInDangerScript.Count>0)
-                {
-                    Debug.Log(m_warningVibe);
-                    //m_gamepad.SetMotorSpeeds(m_lowWarningEnemy, m_highWarningEnemy);
-                }
-                else if (m_intimidationVibe && !m_warningVibe && !m_attackVibe)
-                {
-                    m_gamepad.SetMotorSpeeds(m_lowMonsterIntimidation, m_highMonsterIntimidation);
-                }
-                else if (m_attackVibe && !m_warningVibe && !m_intimidationVibe)
-                {
-                    m_gamepad.SetMotorSpeeds(m_lowAttackEnemy, m_highAttackEnemy);
-                }
-                else if (!m_warningVibe && !m_attackVibe && !m_intimidationVibe) {
-                    m_gamepad.SetMotorSpeeds(0, 0);
-                    m_gamepad.PauseHaptics();
-                }
-            }
+            
+        }
+        else {
+            m_warningVibe = false;
+            m_intimidationVibe = false;
+            m_attackVibe = false;
+        }
+        
+        
+        if (m_warningVibe && !m_intimidationVibe && !m_attackVibe && m_charactersInDangerScript.Count>0)
+        {
+            m_gamepad?.SetMotorSpeeds(m_lowWarningEnemy, m_highWarningEnemy);
+        }
+        else if (m_intimidationVibe && !m_warningVibe && !m_attackVibe)
+        {
+            if(m_animator != null)m_animator.SetBool("Stun", true);
+            m_gamepad?.SetMotorSpeeds(m_lowMonsterIntimidation, m_highMonsterIntimidation);
+        }
+        else if (m_attackVibe && !m_warningVibe && !m_intimidationVibe)
+        {
+            if(m_animator != null)m_animator.SetBool("IsChasing", true);
+            m_gamepad?.SetMotorSpeeds(m_lowAttackEnemy, m_highAttackEnemy);
+        }
+        else if (!m_warningVibe && !m_attackVibe && !m_intimidationVibe) {
+            if(m_animator != null)m_animator.SetBool("IsChasing", false);
+            m_gamepad?.SetMotorSpeeds(0, 0);
+            m_gamepad?.PauseHaptics();
         }
         
 
@@ -255,6 +318,7 @@ public class GuardBehavior : MonoBehaviour {
         yield return new WaitForSeconds(m_intimidationTime); //temps d'animation d'intimidation
         
         Debug.Log($" fin intimidation : {m_gamepad}");
+        if(m_animator != null)m_animator.SetBool("IsStun", false);
         if(m_gamepad != null) m_gamepad.SetMotorSpeeds(0.0f, 0.0f);
         
         scriptCharaWhoIsDying.m_isForbiddenToMove = false;
@@ -271,21 +335,23 @@ public class GuardBehavior : MonoBehaviour {
     IEnumerator DeathCoroutine()
     {
         m_isKillingSomeone = true;
+        m_animator.SetTrigger("Attack");
         PlayerController scriptCharaWhoIsDying = m_charactersInDangerScript[0];
         m_nma.isStopped = true;
         scriptCharaWhoIsDying.m_isForbiddenToMove = true;
         yield return new WaitForSeconds(m_deathTime); //temps d'animation de mort du monstre
         m_nma.isStopped = false;
-        scriptCharaWhoIsDying.Death();  //mort   // We will reset m_isForbiddenToMove and m_isKillingSomeone in there
-
-        m_isKillingSomeone = false;
-        
+        if(m_animator != null)m_animator.SetBool("IsChasing", false);
+        if(m_animator != null)m_animator.SetBool("IsWalking", false);
         //Debug.Log($" Mort joueur : {m_gamepad}");
         if (m_gamepad != null)
         {
             m_gamepad.PauseHaptics();
             m_gamepad.SetMotorSpeeds(0.0f, 0.0f);
         }
+        
+        scriptCharaWhoIsDying.Death();  //mort   // We will reset m_isForbiddenToMove and m_isKillingSomeone in there
+        
     }
     
     
@@ -361,7 +427,13 @@ public class GuardBehavior : MonoBehaviour {
                 m_warningVibe = false;
                 m_intimidationVibe = false;
 
-                m_gamepad = null;
+                if (m_gamepad != null) {
+                    Debug.Log("Exit gamepad");
+                    if(m_animator != null)m_animator.SetBool("IsChasing", false);
+                    m_gamepad.SetMotorSpeeds(0, 0);
+                    m_gamepad.PauseHaptics();
+                    m_gamepad = null;
+                }
             }
             
         }
