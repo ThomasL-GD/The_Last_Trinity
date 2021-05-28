@@ -53,7 +53,7 @@ public class HumanSubPuzzle : MonoBehaviour {
     [SerializeField] [Tooltip("The visual representation of the player\nMust be a Rect transform element")] private GameObject m_prefabPlayer = null;
     [SerializeField] [Tooltip("The prefab of the background\nMust be a Rect transform element")] private GameObject m_prefabBG = null;
     [SerializeField] [Tooltip("The visual representation of the path of the player\nMust be a Rect transform element")] private GameObject m_prefabPathVisualition = null;
-    [SerializeField] [Tooltip("List that shows the path of the player\nFor debug only I guess")] private List<RectTransform> m_playerPath = new List<RectTransform>();
+    [Tooltip("List that shows the path of the player\nFor debug only I guess")] private List<RectTransform> m_playerPath = new List<RectTransform>();
     [SerializeField] [Tooltip("The up wall\nMust be a Rect transform element")] private GameObject m_prefabUp = null;
     [SerializeField] [Tooltip("The left wall\nMust be a Rect transform element")] private GameObject m_prefabLeft = null;
     [SerializeField] [Tooltip("The right wall\nMust be a Rect transform element")] private GameObject m_prefabRight = null;
