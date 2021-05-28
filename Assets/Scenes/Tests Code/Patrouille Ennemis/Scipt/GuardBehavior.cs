@@ -15,7 +15,7 @@ public class GuardBehavior : MonoBehaviour {
     private Animator m_animator = null;
 
     //variables d'IA
-    public NavMeshAgent m_nma = null;
+    [HideInInspector] public NavMeshAgent m_nma = null;
     private int m_currentDestination = 0;
 
     [Header("Behavior")]
@@ -107,10 +107,10 @@ public class GuardBehavior : MonoBehaviour {
             }
 
             m_nma.speed = m_normalSpeed;
-        }
 
-        //The first position where the guard will aim at
-        m_nma.SetDestination(m_destinations[m_currentDestination]);
+            //The first position where the guard will aim at
+            m_nma.SetDestination(m_destinations[m_currentDestination]);
+        }
 
         
         if (m_humanSubPuzzle == null && m_monsterPuzzle == null) {
@@ -139,26 +139,46 @@ public class GuardBehavior : MonoBehaviour {
     void Update() {
 
         if (!m_isKillingSomeone) {
-            if(m_animator != null && !m_isStatic)m_animator.SetBool("IsWalking", true);
-            //If the guard is close enough to the point he was trying to reach
-            if (transform.position.x <= m_destinations[m_currentDestination].x + m_uncertainty &&
-                transform.position.x >= m_destinations[m_currentDestination].x - m_uncertainty &&
-                transform.position.z <= m_destinations[m_currentDestination].z + m_uncertainty &&
-                transform.position.z >= m_destinations[m_currentDestination].z - m_uncertainty) {
+            if(!m_isStatic){
+                if(m_animator != null)m_animator.SetBool("IsWalking", true);
+                //If the guard is close enough to the point he was trying to reach
+                if (transform.position.x <= m_destinations[m_currentDestination].x + m_uncertainty &&
+                    transform.position.x >= m_destinations[m_currentDestination].x - m_uncertainty &&
+                    transform.position.z <= m_destinations[m_currentDestination].z + m_uncertainty &&
+                    transform.position.z >= m_destinations[m_currentDestination].z - m_uncertainty) {
 
-                //if he was off his initial path we simply put him back on
-                if (m_isGoingTowardsPlayer) {
-                    m_isGoingTowardsPlayer = false;
-                    m_destinations.Remove(m_destinations[m_currentDestination]);
-                    m_nma.SetDestination(m_destinations[m_currentDestination]);
+                    //if he was off his initial path we simply put him back on
+                    if (m_isGoingTowardsPlayer) {
+                        m_isGoingTowardsPlayer = false;
+                        m_destinations.Remove(m_destinations[m_currentDestination]);
+                        m_nma.SetDestination(m_destinations[m_currentDestination]);
+                    }
+                    //If he reached a point on his initial path, the guard will aim at the next one
+                    else {
+                        m_currentDestination++;
+                        //If he reached the end of his path, we make him start over
+                        if (m_currentDestination >= m_destinations.Count) m_currentDestination = 0;
+                        m_nma.SetDestination(m_destinations[m_currentDestination]);
+                    }
                 }
-                //If he reached a point on his initial path, the guard will aim at the next one
-                else {
-                    m_currentDestination++;
-                    //If he reached the end of his path, we make him start over
-                    if (m_currentDestination >= m_destinations.Count) m_currentDestination = 0;
-                    m_nma.SetDestination(m_destinations[m_currentDestination]);
+            }
+            else if (m_isStatic) {
+                //If the guard is close enough to the point he was trying to reach
+                if (transform.position.x <= m_staticPos.x + m_uncertainty &&
+                    transform.position.x >= m_staticPos.x - m_uncertainty &&
+                    transform.position.z <= m_staticPos.z + m_uncertainty &&
+                    transform.position.z >= m_staticPos.z - m_uncertainty) {
+                    
+                    if(m_animator != null)m_animator.SetBool("IsWalking", false);
+
+                    if (Mathf.Abs(m_staticRotation.eulerAngles.y) <= Mathf.Abs(transform.rotation.eulerAngles.y) + 1f) {
+                        float angleRight = Mathf.Abs(m_staticRotation.eulerAngles.y) - Mathf.Abs(transform.rotation.eulerAngles.y);
+                        if (Mathf.Abs(angleRight) > 0) m_nma.transform.Rotate(Vector3.up, m_normalRotationSpeed * Time.deltaTime);
+                        else if (Mathf.Abs(angleRight) <= 0) m_nma.transform.Rotate(Vector3.up, -m_normalRotationSpeed * Time.deltaTime);
+                        
+                    }
                 }
+                else{if(m_animator != null)m_animator.SetBool("IsWalking", true);}
             }
         }
         
