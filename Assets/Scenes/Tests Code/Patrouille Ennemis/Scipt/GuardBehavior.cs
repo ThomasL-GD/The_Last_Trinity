@@ -23,6 +23,7 @@ public class GuardBehavior : MonoBehaviour {
     [Tooltip("If on, this ennemy will stay in place according to its initial position")] private bool m_isStatic = false;
     private Vector3 m_staticPos = Vector3.zero;
     private Quaternion m_staticRotation = new Quaternion(0,0,0,0);
+    private bool m_isOnTheirSpot = true;
 
     [Header("Metrics")] 
     [SerializeField] [Tooltip("Vitesse de déplacement normale")] [Range(0f,50f)] private float m_normalSpeed = 5.0f;
@@ -168,13 +169,18 @@ public class GuardBehavior : MonoBehaviour {
                     transform.position.x >= m_staticPos.x - m_uncertainty &&
                     transform.position.z <= m_staticPos.z + m_uncertainty &&
                     transform.position.z >= m_staticPos.z - m_uncertainty) {
-                    
-                    if(m_animator != null)m_animator.SetBool("IsWalking", false);
 
-                    if (Mathf.Abs(m_staticRotation.eulerAngles.y) <= Mathf.Abs(transform.rotation.eulerAngles.y) + 1f) {
-                        float angleRight = Mathf.Abs(m_staticRotation.eulerAngles.y) - Mathf.Abs(transform.rotation.eulerAngles.y);
-                        if (Mathf.Abs(angleRight) > 0) m_nma.transform.Rotate(Vector3.up, m_normalRotationSpeed * Time.deltaTime);
-                        else if (Mathf.Abs(angleRight) <= 0) m_nma.transform.Rotate(Vector3.up, -m_normalRotationSpeed * Time.deltaTime);
+                    m_isOnTheirSpot = true;
+
+                    if(m_animator != null)m_animator.SetBool("IsWalking", false);
+                    
+                    //Debug.Log($"ennnemy rotation {Mathf.Abs(Mathf.Abs(m_staticRotation.eulerAngles.y) - Mathf.Abs(transform.rotation.eulerAngles.y))}   warning : {!m_warningVibe}   attack : {!m_attackVibe}", this);
+
+                    if (Mathf.Abs(Mathf.Abs(m_staticRotation.eulerAngles.y) - Mathf.Abs(transform.rotation.eulerAngles.y)) > 1f && (!m_warningVibe && !m_attackVibe)) {
+                        float angle = Mathf.Abs(m_staticRotation.eulerAngles.y) - Mathf.Abs(transform.rotation.eulerAngles.y);
+                        //Debug.Log($"Angle   :  {angle}", this);
+                        if (angle > 0) m_nma.transform.Rotate(Vector3.up, m_normalRotationSpeed * Time.deltaTime);
+                        else if (angle <= 0) m_nma.transform.Rotate(Vector3.up, -m_normalRotationSpeed * Time.deltaTime);
                         
                     }
                 }
@@ -242,8 +248,8 @@ public class GuardBehavior : MonoBehaviour {
 
                     }
                     //si le joueur est visible par l'ennemi
-                    else if (angleForward <= m_angleUncertainty)
-                    {
+                    else if (angleForward <= m_angleUncertainty) {
+                        if(m_isStatic)m_isOnTheirSpot = false;
                         m_warningVibe = false;
                         m_intimidationVibe = false;
                         m_attackVibe = true;
@@ -266,16 +272,29 @@ public class GuardBehavior : MonoBehaviour {
                     }
                 }
             }
-            else {}//Debug.LogWarning("The raycast hit nothing nowhere");
-            
-            
+            else {
+                //Debug.LogWarning("The raycast hit nothing nowhere");
+                
+                //if he was off his initial path we simply put him back on
+                if (m_isGoingTowardsPlayer && m_isStatic) {
+                    m_isGoingTowardsPlayer = false;
+                    m_nma.SetDestination(m_staticPos);
+                }
+            }
 
-            
+
         }
-        else {
+        
+        if(!m_enterZone) {
             m_warningVibe = false;
             m_intimidationVibe = false;
             m_attackVibe = false;
+            
+            //if he was off his initial path we simply put him back on
+            if (m_isGoingTowardsPlayer && m_isStatic) {
+                m_isGoingTowardsPlayer = false;
+                m_nma.SetDestination(m_staticPos);
+            }
         }
         
         
@@ -340,7 +359,6 @@ public class GuardBehavior : MonoBehaviour {
         m_nma.isStopped = true;
         scriptCharaWhoIsDying.m_isForbiddenToMove = true;
         yield return new WaitForSeconds(m_deathTime); //temps d'animation de mort du monstre
-        m_nma.isStopped = false;
         if(m_animator != null)m_animator.SetBool("IsChasing", false);
         if(m_animator != null)m_animator.SetBool("IsWalking", false);
         //Debug.Log($" Mort joueur : {m_gamepad}");
@@ -470,6 +488,8 @@ public class GuardBehavior : MonoBehaviour {
     }
 
     private void Death() {
+        m_nma.isStopped = false;
+        m_nma.SetDestination(m_spawnPoint);
         m_isGoingTowardsPlayer = false;
         transform.position = m_spawnPoint;
     }

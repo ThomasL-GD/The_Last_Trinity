@@ -30,7 +30,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] [Tooltip("The character whom this script is on, SELECT ONLY ONE !")] public Charas m_chara = 0;
     [HideInInspector] [Tooltip("For Debug Only")] public bool m_isActive = false;
     private static bool s_inBetweenSwitching = false; //is Active when someone is switching character
-    [HideInInspector] [Tooltip("For Debug Only")] public bool m_isForbiddenToMove = false; 
+    /*[HideInInspector]*/ [Tooltip("For Debug Only")] public bool m_isForbiddenToMove = false; 
     [HideInInspector] [Tooltip("For Debug Only")] public bool m_isSwitchingChara = false;
 
     private CharacterController m_charaController = null;
@@ -69,14 +69,11 @@ public class PlayerController : MonoBehaviour
     [HideInInspector] public Vector3 m_spawnPoint = Vector3.zero;
 
     
-    //Cinemachine cameras des trois personnages
-    [HideInInspector] private static CinemachineVirtualCamera m_vCamH;
-    [HideInInspector] private static CinemachineVirtualCamera m_vCamM;
-    [HideInInspector] private static CinemachineVirtualCamera m_vCamR;
+    //Cinemachine cameras des trois personnages  en 0 l'humaine, en 1 le monstre et en 2 le robot
     private static CinemachineVirtualCamera[] m_allCameras = null;
     
     //String to hash conversion for the animator
-    private static readonly int IsRunning = Animator.StringToHash("isRunning");
+    private static readonly int IsRunning = Animator.StringToHash("IsRunning");
     private static readonly int death = Animator.StringToHash("Death");
     private static int IsSneaky = 0;
     private static int IsIntimidating = 0;
@@ -98,9 +95,9 @@ public class PlayerController : MonoBehaviour
         m_keyCodes[1] = m_selector.inputMonster;
         m_keyCodes[2] = m_selector.inputRobot;
 
-        m_vCamH = GameObject.FindGameObjectWithTag("Camera Humain")?.GetComponent<CinemachineVirtualCamera>();
-        m_vCamM = GameObject.FindGameObjectWithTag("Camera Monstre")?.GetComponent<CinemachineVirtualCamera>();
-        m_vCamR = GameObject.FindGameObjectWithTag("Camera Robot")?.GetComponent<CinemachineVirtualCamera>();
+        CinemachineVirtualCamera vCamH = GameObject.FindGameObjectWithTag("Camera Humain")?.GetComponent<CinemachineVirtualCamera>();
+        CinemachineVirtualCamera vCamM = GameObject.FindGameObjectWithTag("Camera Monstre")?.GetComponent<CinemachineVirtualCamera>();
+        CinemachineVirtualCamera vCamR = GameObject.FindGameObjectWithTag("Camera Robot")?.GetComponent<CinemachineVirtualCamera>();
         
         //We initialize different values depending on the chara we currently are
         switch (m_chara) {
@@ -126,9 +123,9 @@ public class PlayerController : MonoBehaviour
         m_spawnPoint = transform.position;
 
     #if UNITY_EDITOR
-        if(m_vCamH == null) Debug.LogError("Aucune caméra avec le tag Camera Humain");
-        if(m_vCamM == null) Debug.LogError("Aucune caméra avec le tag Camera Monstre");
-        if(m_vCamR == null) Debug.LogError("Aucune caméra avec le tag Camera Robot");
+        if(vCamH == null) Debug.LogError("Aucune caméra avec le tag Camera Humain");
+        if(vCamM == null) Debug.LogError("Aucune caméra avec le tag Camera Monstre");
+        if(vCamR == null) Debug.LogError("Aucune caméra avec le tag Camera Robot");
 
         if (m_soul == null) {
             Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT A PREFAB FOR THE SOUL ! WHERE DID HE GOT HIS FAKE DIPLOMA ?!");
@@ -139,7 +136,7 @@ public class PlayerController : MonoBehaviour
         }
     #endif
         
-        if (m_vCamH != null && m_vCamM != null && m_vCamR != null) m_allCameras = new CinemachineVirtualCamera[3] {m_vCamH, m_vCamM, m_vCamR};
+        if (vCamH != null && vCamM != null && vCamR != null) m_allCameras = new CinemachineVirtualCamera[3] {vCamH, vCamM, vCamR};
         
 
         if (TryGetComponent(out Animator animator)) m_animator = animator;
@@ -206,28 +203,25 @@ public class PlayerController : MonoBehaviour
                 //We activate this chara if its corresponding input is pressed
                 if (Input.GetKeyDown(m_keyCodes[(int)m_chara])) {
                     if (!m_isActive && !s_inBetweenSwitching) {
-                        
-                        //TODO convert those with the m_allCameras
+
                         switch (m_chara) {
                             case Charas.Human:
-                                m_vCamH.Priority = 2;
-                                m_vCamM.Priority = 1;
-                                m_vCamR.Priority = 0;
+                                m_s_charasScripts.currentIndex = 0;
                                 break;
                             case Charas.Monster:
-                                m_vCamH.Priority = 1;
-                                m_vCamM.Priority = 2;
-                                m_vCamR.Priority = 0;
+                                m_s_charasScripts.currentIndex = 1;
                                 break;
                             case Charas.Robot:
-                                m_vCamH.Priority = 0;
-                                m_vCamM.Priority = 1;
-                                m_vCamR.Priority = 2;
-                                break;
-                            default:
-                                Debug.LogError("Incorrect parameter on m_chara");
+                                m_s_charasScripts.currentIndex = 2;
                                 break;
                         }
+                        
+                        //We set the highest camera priority on this chara
+                        for (int i = 0; i < m_allCameras.Length; i++) {
+                            if (i == m_s_charasScripts.currentIndex) m_allCameras[i].Priority = 2; // we active the new character's camera
+                            else m_allCameras[i].Priority = 0;
+                        }
+                        
                         m_isSwitchingChara = true;
                         s_inBetweenSwitching = true;
                         StartCoroutine(SwitchTimer());
@@ -239,18 +233,17 @@ public class PlayerController : MonoBehaviour
                     //If this character was active, we create a soul and send it to the next selected character
                     if (m_isActive) {
                         m_soulScript.gameObject.transform.position = transform.position + m_soulOffset;
-                        //TODO convert those with the m_allCameras
                         if (Input.GetKeyDown(m_keyCodes[(int) Charas.Human])) {
-                            m_soulScript.m_target = m_vCamH.LookAt;
-                            m_soulScript.m_offsetTarget = m_vCamH.LookAt.gameObject.GetComponent<PlayerController>().m_soulOffset;
+                            m_soulScript.m_target = m_allCameras[0].LookAt;
+                            m_soulScript.m_offsetTarget = m_allCameras[0].LookAt.gameObject.GetComponent<PlayerController>().m_soulOffset;
                         }
                         if (Input.GetKeyDown(m_keyCodes[(int) Charas.Monster])) {
-                            m_soulScript.m_target = m_vCamM.LookAt;
-                            m_soulScript.m_offsetTarget = m_vCamM.LookAt.gameObject.GetComponent<PlayerController>().m_soulOffset;
+                            m_soulScript.m_target = m_allCameras[1].LookAt;
+                            m_soulScript.m_offsetTarget = m_allCameras[1].LookAt.gameObject.GetComponent<PlayerController>().m_soulOffset;
                         }
                         if (Input.GetKeyDown(m_keyCodes[(int) Charas.Robot])) {
-                            m_soulScript.m_target = m_vCamR.LookAt;
-                            m_soulScript.m_offsetTarget = m_vCamR.LookAt.gameObject.GetComponent<PlayerController>().m_soulOffset;
+                            m_soulScript.m_target = m_allCameras[2].LookAt;
+                            m_soulScript.m_offsetTarget = m_allCameras[2].LookAt.gameObject.GetComponent<PlayerController>().m_soulOffset;
                         }
                     }
                     m_isActive = false;
@@ -362,29 +355,25 @@ public class PlayerController : MonoBehaviour
     /// <param name="p_newCamera">The new camera you want to have focus from</param>
     public void SetNewCamera(CinemachineVirtualCamera p_newCamera)
     {
-        //TODO convert those with the m_allCameras
         int oldPriority = 0;
+        int index = 0;
         switch (m_chara)
         {
             case Charas.Human:
-                oldPriority = m_vCamH.Priority;
-                m_vCamH.Priority = 0;
-                m_vCamH = p_newCamera;
-                m_vCamH.Priority = oldPriority;
+                index = 0;
                 break;
             case Charas.Monster:
-                oldPriority = m_vCamM.Priority;
-                m_vCamM.Priority = 0;
-                m_vCamM = p_newCamera;
-                m_vCamM.Priority = oldPriority;
+                index = 1;
                 break;
             case Charas.Robot:
-                oldPriority = m_vCamR.Priority;
-                m_vCamR.Priority = 0;
-                m_vCamR = p_newCamera;
-                m_vCamR.Priority = oldPriority;
+                index = 2;
                 break;
         }
+        
+        oldPriority = m_allCameras[index].Priority;
+        m_allCameras[index].Priority = 0;
+        m_allCameras[index] = p_newCamera;
+        m_allCameras[index].Priority = oldPriority;
     }
 
     /// <summary>
@@ -393,15 +382,14 @@ public class PlayerController : MonoBehaviour
     /// <returns>Returns the camera focusing this character</returns>
     public CinemachineVirtualCamera GetCurrentCamera()
     {
-        //TODO convert those with the m_allCameras
         switch (m_chara)
         {
             case Charas.Human:
-                return m_vCamH;
+                return m_allCameras[0];
             case Charas.Monster:
-                return m_vCamM;
+                return m_allCameras[1];
             case Charas.Robot:
-                return m_vCamR;
+                return m_allCameras[2];
             default:
                 return null;
         }
@@ -413,17 +401,16 @@ public class PlayerController : MonoBehaviour
     /// <param name="p_newCamera">The new camera you want to have focus from</param>
     public void LookSomewhere(Transform p_lookAt)
     {
-        //TODO convert those with the m_allCameras
         switch (m_chara)
         {
             case Charas.Human:
-                m_vCamH.LookAt = p_lookAt;
+                m_allCameras[0].LookAt = p_lookAt;
                 break;
             case Charas.Monster:
-                m_vCamM.LookAt = p_lookAt;
+                m_allCameras[1].LookAt = p_lookAt;
                 break;
             case Charas.Robot:
-                m_vCamR.LookAt = p_lookAt;
+                m_allCameras[2].LookAt = p_lookAt;
                 break;
         }
     }
@@ -433,17 +420,16 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     public void Refocus()
     {
-        //TODO convert those with the m_allCameras
         switch (m_chara)
         {
             case Charas.Human:
-                m_vCamH.LookAt = gameObject.transform;
+                m_allCameras[0].LookAt = gameObject.transform;
                 break;
             case Charas.Monster:
-                m_vCamM.LookAt = gameObject.transform;
+                m_allCameras[1].LookAt = gameObject.transform;
                 break;
             case Charas.Robot:
-                m_vCamR.LookAt = gameObject.transform;
+                m_allCameras[2].LookAt = gameObject.transform;
                 break;
         }
     }

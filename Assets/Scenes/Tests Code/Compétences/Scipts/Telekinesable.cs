@@ -66,10 +66,7 @@ public class Telekinesable : MonoBehaviour
             m_isInBetweenTravel = false;
             m_activeTelekinesie = false;
         }
-        
-        //Stop l'effet des cubes
-        //m_cube.Stop();
-        
+
         if (m_telekinesieOpen)
         {
             if (Input.GetKeyDown(m_selector.inputRobot) && !m_isInBetweenTravel && m_robotScript.m_isActive)
