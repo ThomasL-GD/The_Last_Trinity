@@ -9,14 +9,17 @@ public class Faufilable : MonoBehaviour
     public bool m_isIntoWall= false; //Est en standby dans l'autre mur
     private bool m_isTeleporting= false; //Bloquage du teleport si deja un en cours
 
-    [SerializeField] private GameObject m_exit = null;
 
     [Header("Travel")]
     [SerializeField] [Tooltip("Time of travel between the two exits")] [Range(0.1f, 3f)] private float m_travelTime = 1f; //Temps avant que le joueur se téléporte vers la sortie
+    [SerializeField] [Tooltip("The game object where the human will be sent at\n must be inside the collide boxes of another faufilable")] private GameObject m_exit = null;
 
+    [Header("Human Properties")]
     public Transform m_human = null;
     private PlayerController m_humanScript = null;//Script de l'humain, obtenir la touche d'activation de la compétence
     private Vector3 m_travel = Vector3.zero;
+    [SerializeField] [Tooltip("The speed multiplier that will be applied to the human once she's on hands and knees")] [Range(0.1f, 1f)] private float m_speedMultiplier = 0.5f;
+    [SerializeField] [Tooltip("The size multiplier that will be applied to the human once she's on hands and knees")] [Range(0.1f, 1f)] private float m_sizeMultiplier = 0.3f;
 
     void Start()
     {
@@ -71,10 +74,11 @@ public class Faufilable : MonoBehaviour
             if (player.m_chara == Charas.Human && !m_exit.GetComponent<Faufilable>().m_isIntoWall) {
                 m_human = p_other.gameObject.transform;
                 m_humanScript = player;
+                UpdateSize(player.gameObject, true);
                 player.AbilityAnim(true);
                 
                 m_isSneaky = true;
-                m_humanScript.m_speed /= 2;
+                m_humanScript.m_speed *= m_speedMultiplier;
             }
         }
     }
@@ -87,9 +91,34 @@ public class Faufilable : MonoBehaviour
     {
         if (p_other.gameObject.TryGetComponent(out PlayerController player)) {
             if (player.m_chara == Charas.Human) {
+                UpdateSize(player.gameObject, false);
                 RemoveSneakiness();
             }
         }
+    }
+
+    /// <summary>
+    /// Is used to replace the size of the human's collider and charaController
+    /// </summary>
+    /// <param name="p_player">The game object of the chara to update size of</param>
+    /// <param name="p_isShrinking">if on, their collider will shrink, else, it will grow back</param>
+    private void UpdateSize(GameObject p_player, bool p_isShrinking) {
+        float sizeMultiplier = m_sizeMultiplier;
+        //If we wanna grow instead of shrink, we just revert the multiplier
+        if (!p_isShrinking) {
+            sizeMultiplier = 1 / m_sizeMultiplier;
+        }
+        
+        //Capsule collider size update
+        CapsuleCollider capsule = p_player.GetComponent<CapsuleCollider>();
+        capsule.height *= sizeMultiplier;
+        capsule.center *= sizeMultiplier;
+        
+        //CharaController size update
+        CharacterController charaController = p_player.GetComponent<CharacterController>();
+        charaController.height *= sizeMultiplier;
+        charaController.center *= sizeMultiplier;
+
     }
 
     /// <summary>
@@ -98,6 +127,6 @@ public class Faufilable : MonoBehaviour
     private void RemoveSneakiness() {
         if(!m_isTeleporting) m_humanScript.AbilityAnim(false);
         m_isSneaky = false;
-        m_humanScript.m_speed *= 2;
+        m_humanScript.m_speed /= m_speedMultiplier;
     }
 }
