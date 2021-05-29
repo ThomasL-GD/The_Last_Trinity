@@ -170,11 +170,13 @@ public class GuardBehavior : MonoBehaviour {
                     transform.position.z >= m_staticPos.z - m_uncertainty) {
                     
                     if(m_animator != null)m_animator.SetBool("IsWalking", false);
+                    
+                    Debug.Log($"ennnemy rotation {Mathf.Abs(m_staticRotation.eulerAngles.y)}   <=    {Mathf.Abs(transform.rotation.eulerAngles.y)}");
 
                     if (Mathf.Abs(m_staticRotation.eulerAngles.y) <= Mathf.Abs(transform.rotation.eulerAngles.y) + 1f) {
                         float angleRight = Mathf.Abs(m_staticRotation.eulerAngles.y) - Mathf.Abs(transform.rotation.eulerAngles.y);
-                        if (Mathf.Abs(angleRight) > 0) m_nma.transform.Rotate(Vector3.up, m_normalRotationSpeed * Time.deltaTime);
-                        else if (Mathf.Abs(angleRight) <= 0) m_nma.transform.Rotate(Vector3.up, -m_normalRotationSpeed * Time.deltaTime);
+                        if (Mathf.Abs(angleRight) > 0) m_nma.transform.Rotate(Vector3.up, -m_normalRotationSpeed * Time.deltaTime);
+                        else if (Mathf.Abs(angleRight) <= 0) m_nma.transform.Rotate(Vector3.up, m_normalRotationSpeed * Time.deltaTime);
                         
                     }
                 }
@@ -340,7 +342,6 @@ public class GuardBehavior : MonoBehaviour {
         m_nma.isStopped = true;
         scriptCharaWhoIsDying.m_isForbiddenToMove = true;
         yield return new WaitForSeconds(m_deathTime); //temps d'animation de mort du monstre
-        m_nma.isStopped = false;
         if(m_animator != null)m_animator.SetBool("IsChasing", false);
         if(m_animator != null)m_animator.SetBool("IsWalking", false);
         //Debug.Log($" Mort joueur : {m_gamepad}");
@@ -470,6 +471,8 @@ public class GuardBehavior : MonoBehaviour {
     }
 
     private void Death() {
+        m_nma.isStopped = false;
+        m_nma.SetDestination(m_spawnPoint);
         m_isGoingTowardsPlayer = false;
         transform.position = m_spawnPoint;
     }
