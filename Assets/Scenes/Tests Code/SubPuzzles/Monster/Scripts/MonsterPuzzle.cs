@@ -311,11 +311,12 @@ public class MonsterPuzzle : MonoBehaviour
 
                 if (m_errorDone != m_errorAllowed)
                 {
-                    Rumbler.Instance.MonsterPuzzle(m_lowA, m_highA, m_rumbleDuration);
-                    //StartCoroutine("Rumble"); //Vibration
+                    Rumbler.Instance.Rumble(m_lowA, m_highA, m_rumbleDuration);
                 }
                 else if (m_errorDone >= m_errorAllowed)
                 {
+                    
+                    Rumbler.Instance.Rumble(m_lowA, m_highA, m_rumbleDuration);
                     if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
                 }
             }
@@ -323,13 +324,10 @@ public class MonsterPuzzle : MonoBehaviour
         
 
         //Sortie du subPuzzle en cas de changement de personnage
-        ///////////////////////////////
-        ///////////////////////////////                          A CHECKER
-        ///////////////////////////////
-        // if (m_interactDetection.m_isInSubPuzzle && (m_gamepad.buttonEast.isPressed || m_gamepad.buttonWest.isPressed || m_gamepad.buttonSouth.isPressed))    //(m_interactDetection.m_isInSubPuzzle && Input.GetKeyDown(m_inputs.inputHuman) || Input.GetKeyDown(m_inputs.inputRobot))
-        // {
-        //     if (m_interactDetection.enabled) m_interactDetection.PuzzleDeactivation();
-        // }
+        if (m_interactDetection.m_isInSubPuzzle && Input.GetKeyDown(m_inputs.inputHuman) || Input.GetKeyDown(m_inputs.inputRobot))
+        {
+            if (m_interactDetection.enabled) m_interactDetection.PuzzleDeactivation();
+        }
     }
 
 
@@ -359,8 +357,12 @@ public class MonsterPuzzle : MonoBehaviour
     {
         m_errorDone = 0;
         m_findPiece = 0;
+
+        //Remise à 0 de la position du sélecteur
+        m_selectorX = 0; 
+        m_selectorY = 0; 
+        SetRectPosition(m_prefabSelector.gameObject, 0, 0);
         
-        m_selectorTransform = null;
         
         m_stockPieces.Clear();
         m_potentialPieces.Clear();

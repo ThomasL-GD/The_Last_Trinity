@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -7,7 +9,7 @@ public class Rumbler : MonoBehaviour
 {
     [HideInInspector] public PlayerInput m_playerInput;
     Gamepad m_gamepad = Gamepad.current;
-     
+    
     // private void OnEnable()
     // {
     //     Gamepad m_gamepad = Gamepad.current;
@@ -53,77 +55,30 @@ public class Rumbler : MonoBehaviour
         {
             if (!string.IsNullOrWhiteSpace(m_objectName)) gameObject.name = m_objectName;
         }
-
-
-
-
-
-    /// <summary>
-    /// Fonction de vibration lors de compétence du monstre allié dans le script GuardBehavior
-    /// </summary>
-    /// <param name="p_low"> vitesse de vibration moteur bas</param>
-    /// <param name="p_high">vitesse de vibration moteur haut</param>
-    /// <param name="p_duration"></param>
-    public void Intimidate(float p_low, float p_high) {
-        m_gamepad.SetMotorSpeeds(p_low, p_high);
         
-        //insérer timer et appel StopRumble
-    }
-
-    /// <summary>
-    /// Fonction de vibration de détection mais pas de vision dans le script GuardBehavior
-    /// </summary>
-    /// <param name="p_low"> vitesse de vibration moteur bas</param>
-    /// <param name="p_high">vitesse de vibration moteur haut</param>
-    /// <param name="p_duration"></param>
-    public void Warning(float p_low, float p_high)
+        
+    
+    public void Rumble(float p_low, float p_high)
     {
+        Debug.Log("Fonction A");
         m_gamepad.SetMotorSpeeds(p_low, p_high);
-        
-        Debug.Log($"valeur du moteur bas lors d'une détection proche: {p_low}");
-        //insérer timer et appel StopRumble
     }
     
-    /// <summary>
-    /// Fonction de vibration d'attaque de monstre ennemi dans le script GuardBehavior
-    /// </summary>
-    /// <param name="p_low"> vitesse de vibration moteur bas</param>
-    /// <param name="p_high">vitesse de vibration moteur haut</param>
-    public void Attack(float p_low, float p_high)
+    public void Rumble(float p_low, float p_high, float p_rumbleTime)
     {
+        Debug.Log($"Fonction B   :      {p_high}   {p_low}      {m_gamepad}");
         m_gamepad.SetMotorSpeeds(p_low, p_high);
-        
-        Debug.Log($"valeur du moteur bas lors d'une attaque: {p_low}");
-        //insérer timer et appel StopRumble
-    }
-    
-    /// <summary>
-    /// Fonction de vibration lors de fonçage dans un mur dans le script HumanSubPuzzle
-    /// </summary>
-    /// <param name="p_low"> vitesse de vibration moteur bas</param>
-    /// <param name="p_high">vitesse de vibration moteur haut</param>
-    public void HumanSubPuzzle(float p_low, float p_high)
-    {
-        m_gamepad.SetMotorSpeeds(p_low, p_high);
-        
-        Debug.Log($"valeur du moteur bas lors d'une erreur dans subPuzzle humaine: {p_low}");
-        //insérer timer et appel StopRumble
-    }
-    
-    /// <summary>
-    /// Fonction de vibration lors d'échec dans le script MonsterSubPuzzle
-    /// </summary>
-    /// <param name="p_low"> vitesse de vibration moteur bas</param>
-    /// <param name="p_high">vitesse de vibration moteur haut</param>
-    public void MonsterPuzzle(float p_low, float p_high, float p_vibeTime)
-    {
-        m_gamepad.SetMotorSpeeds(p_low, p_high);
-        
-        //insérer timer et appel StopRumble
+        StartCoroutine(RumbleDuration(p_rumbleTime));
+
     }
 
+    IEnumerator RumbleDuration(float p_rumbleTime)
+    {
+        yield return new WaitForSeconds(p_rumbleTime);
+        Debug.Log("Fonction STOP");
+        StopRumble();
+    }
 
-    
 
     public void StopRumble()
     {
@@ -141,16 +96,7 @@ public class Rumbler : MonoBehaviour
 
     private void Update()
     {
-        /*
-        if (Time.time > m_rumbleDurration)
-        {
-            StopRumble();
-            return;
-        }
         
-        if (m_gamepad == null) return;
-        m_gamepad.SetMotorSpeeds(m_lowA, m_highA);
-        */
     }
 
 
