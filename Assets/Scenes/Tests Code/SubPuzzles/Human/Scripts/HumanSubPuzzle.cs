@@ -536,7 +536,7 @@ public class HumanSubPuzzle : MonoBehaviour {
             //First we verify the player has no wall blocking the way he wants to go;
             if (attemptedMovement == Directions.None || m_maze[m_selector.y, m_selector.x].HasFlag(attemptedMovement)) {
                 Debug.Log("Nah bro, you cannot go this way");
-                Rumbler.Instance.HumanSubPuzzle(m_lowA, m_highA);
+                Rumbler.Instance.Rumble(m_lowA, m_highA, m_rumbleDuration);
                 //StartCoroutine(Rumble());   //Vibration
             }
             else {
@@ -574,7 +574,7 @@ public class HumanSubPuzzle : MonoBehaviour {
         }
         
         //Sortie du subPuzzle en cas de changement de personnage
-        if (m_interactDetection.m_isInSubPuzzle && (Input.GetKeyDown(m_inputs.inputMonster) || Input.GetKeyDown(m_inputs.inputRobot))) {    // || m_gamepad.buttonSouth.isPressed
+        if (m_interactDetection.m_isInSubPuzzle && (Input.GetKeyDown(m_inputs.inputMonster) || Input.GetKeyDown(m_inputs.inputRobot))) {
             if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
         }
 
@@ -601,17 +601,7 @@ public class HumanSubPuzzle : MonoBehaviour {
         
     }
 
-    /*
-    IEnumerator Rumble()
-    {
-        //Debug.Log($" human gamepad : {m_gamepad.name}");
-        m_gamepad.SetMotorSpeeds(m_lowA, m_highA);
-        yield return new WaitForSeconds(m_rumbleDuration);
-        m_gamepad.SetMotorSpeeds(0, 0);
-    }
-    */
-    
-    
+
     /// <summary>
     /// Fonction d'ajout ou d'enlèvement de case déjà traversée
     /// </summary>
@@ -678,10 +668,9 @@ public class HumanSubPuzzle : MonoBehaviour {
         if(!m_debugMode) GenerateVisualRepresentation();
         if(m_interactDetection.enabled) m_interactDetection.PuzzleDeactivation();
     }
-	
-	
-   
-    
+
+
+
     /// <summary>
     /// Is called when this gameObject is setActive(false)
     /// Is used to destroy everything it created
