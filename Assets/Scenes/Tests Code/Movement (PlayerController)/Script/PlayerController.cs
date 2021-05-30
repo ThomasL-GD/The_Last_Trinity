@@ -28,7 +28,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] [Tooltip("Vitesse du joueur")] public float m_speed = 5f;
     [SerializeField] [Tooltip("Vitesse de Rotation du Quaternion")] private float m_rotationSpeed = 700f;
     [SerializeField] [Tooltip("The character whom this script is on, SELECT ONLY ONE !")] public Charas m_chara = 0;
-    [HideInInspector] [Tooltip("For Debug Only")] public bool m_isActive = false;
+    [Tooltip("The character who will be selected at the beginnig\nSELECT ONLY ONE")] public bool m_isActive = false;
     private static bool s_inBetweenSwitching = false; //is Active when someone is switching character
     /*[HideInInspector]*/ [Tooltip("For Debug Only")] public bool m_isForbiddenToMove = false; 
     [HideInInspector] [Tooltip("For Debug Only")] public bool m_isSwitchingChara = false;
@@ -147,9 +147,24 @@ public class PlayerController : MonoBehaviour
 
         m_soulScript = m_soul.GetComponent<AutoRotation>();
         
-        if (m_chara == Charas.Human) {
-            m_isActive = true;
+        // if (m_chara == Charas.Human) {
+        //     m_isActive = true;
+        //     m_soulScript.gameObject.transform.position = transform.position;
+        // }
+
+        if (m_isActive) {
             m_soulScript.gameObject.transform.position = transform.position;
+            switch (m_chara) {
+                case Charas.Human:
+                    m_s_charasScripts.currentIndex = 0;
+                    break;
+                case Charas.Monster:
+                    m_s_charasScripts.currentIndex = 1;
+                    break;
+                case Charas.Robot:
+                    m_s_charasScripts.currentIndex = 2;
+                    break;
+            }
         }
     }
 
