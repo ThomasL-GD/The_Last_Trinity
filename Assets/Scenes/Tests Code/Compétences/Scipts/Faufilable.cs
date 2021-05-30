@@ -5,8 +5,8 @@ using UnityEngine;
 public class Faufilable : MonoBehaviour
 {
     [SerializeField] [Tooltip("The input used to select this character")] private SOInputMultiChara m_selector = null;
-    private bool m_isSneaky = false; //Possibilité d'activer le Faufilage avec la touche de compétence du Humain
-    public bool m_isIntoWall= false; //Est en standby dans l'autre mur
+    //private bool m_isSneaky = false; //Possibilité d'activer le Faufilage avec la touche de compétence du Humain
+    public bool m_isIntoWall= false; //Possibilité d'activer le Faufilage avec la touche de compétence du Humain
     private bool m_isTeleporting= false; //Bloquage du teleport si deja un en cours
 
 
@@ -83,7 +83,7 @@ public class Faufilable : MonoBehaviour
                 UpdateSize(player.gameObject, true);
                 player.AbilityAnim(true);
                 
-                m_isSneaky = true;
+                //m_isSneaky = true;
                 m_humanScript.m_speed *= m_speedMultiplier;
             }
         }
@@ -132,7 +132,7 @@ public class Faufilable : MonoBehaviour
     /// </summary>
     private void RemoveSneakiness() {
         if(!m_isTeleporting) m_humanScript.AbilityAnim(false);
-        m_isSneaky = false;
+        //m_isSneaky = false;
         m_humanScript.m_speed /= m_speedMultiplier;
     }
 }
