@@ -3,9 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(BoxCollider))]
 public class Checkpoint : MonoBehaviour
 {
     [SerializeField] [Tooltip("The chara this checkpoint is used for")] private Charas m_chara = Charas.Human;
+
+    private void Start() {
+        //Just making sure...
+        gameObject.GetComponent<BoxCollider>().isTrigger = true;
+    }
 
     /// <summary>
     /// Is called when a gameObject enters the trigger zone of this game object
