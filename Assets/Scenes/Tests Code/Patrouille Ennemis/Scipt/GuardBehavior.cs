@@ -46,8 +46,7 @@ public class GuardBehavior : MonoBehaviour {
     [SerializeField] [Tooltip("distance d'élimination")] [Range(0f,10f)] private float m_deathPos = 1.0f;
     [SerializeField] [Tooltip("temps d'animation de mort")] [Range(0f,10f)] private float m_deathTime = 3.0f;
 
-    [SerializeField]
-    [Tooltip("The gameobject of the hit FX, must be already placed in a good position and setActive(false)\nMust be a child of this object\nCan be null")] private GameObject m_hitFX = null;
+    [SerializeField] [Tooltip("The gameobject of the hit FX, must be already placed in a good position and setActive(false)\nMust be a child of this object\nCan be null")] private GameObject m_hitFX = null;
     private Vector3 m_spawnPoint = Vector3.zero;
     
     [Header("Monster Ability")]
@@ -59,8 +58,9 @@ public class GuardBehavior : MonoBehaviour {
     [SerializeField] [Tooltip("valeur de la vibration forte lorsque le character entre dans la zone de l'ennemi")] [Range(0f,1f)] private float m_highWarningEnemy =0f;
     [SerializeField] [Tooltip("valeur de la vibration faible lorsque le character est visible par l'ennemi")] [Range(0f,1f)] private float m_lowAttackEnemy =0f;
     [SerializeField] [Tooltip("valeur de la vibration forte lorsque le character est visible par l'ennemi")] [Range(0f,1f)] private float m_highAttackEnemy =0f;
-    [Tooltip("valeur de la vibration faible lorsque le character monstre utilise sa compétence")] [Range(0f,1f)] private float m_lowMonsterIntimidation =0.5f;
-    [Tooltip("valeur de la vibration forte lorsque le character monstre utilise sa compétence")] [Range(0f,1f)] private float m_highMonsterIntimidation =0.5f;
+    [SerializeField] [Tooltip("valeur de la vibration faible lorsque le character monstre utilise sa compétence")] [Range(0f,1f)] private float m_lowMonsterIntimidation =0.5f;
+    [SerializeField] [Tooltip("valeur de la vibration forte lorsque le character monstre utilise sa compétence")] [Range(0f,1f)] private float m_highMonsterIntimidation =0.5f;
+    [SerializeField] [Tooltip("valeur de la vibration forte lorsque le character monstre utilise sa compétence")] [Range(0f,10f)] private float m_rumbleDuration =0.5f;
     
     [SerializeField] [Tooltip("For Debug Only")] bool m_warningVibe = false; //présence d'un character dans la zone de l'ennemi
     [SerializeField] [Tooltip("For Debug Only")] bool m_intimidationVibe = false;   //utilisation de la compétence du monstre dans la zone de l'ennemi
@@ -74,8 +74,7 @@ public class GuardBehavior : MonoBehaviour {
     [Tooltip("For Debug Only")] private List<PlayerController> m_charactersInDangerScript = new List<PlayerController>(); //Liste des scripts sur les character qui entrent et sortent de la zone de l'ennemi
 
 
-    private HumanSubPuzzle m_humanSubPuzzle;
-    private MonsterPuzzle m_monsterPuzzle;
+    
     
     // Start is called before the first frame update
     void Start() {
@@ -285,30 +284,26 @@ public class GuardBehavior : MonoBehaviour {
         }
         
         
-        if (m_warningVibe && !m_intimidationVibe && !m_attackVibe && m_charactersInDangerScript.Count>0)
-        {
+        if (m_warningVibe && !m_intimidationVibe && !m_attackVibe && m_charactersInDangerScript.Count>0){
             //Vibration de détection proche
-            Rumbler.Instance.Warning(m_lowWarningEnemy, m_highWarningEnemy);
+            Rumbler.Instance.Rumble(m_lowWarningEnemy, m_highWarningEnemy);
         }
-        else if (m_intimidationVibe && !m_warningVibe && !m_attackVibe)
-        {
+        else if (m_intimidationVibe && !m_warningVibe && !m_attackVibe){
             if(m_animator != null)m_animator.SetBool("Stun", true);
             //Vibration d'intimidation du monstre allié
-            Rumbler.Instance.Intimidate(m_lowMonsterIntimidation, m_highMonsterIntimidation);
+            Rumbler.Instance.Rumble(m_lowMonsterIntimidation, m_highMonsterIntimidation);
         }
-        else if (m_attackVibe && !m_warningVibe && !m_intimidationVibe)
-        {
+        else if (m_attackVibe && !m_warningVibe && !m_intimidationVibe){
             if(m_animator != null)m_animator.SetBool("IsChasing", true);
             //vibration d'attaque ennemie
-            Rumbler.Instance.Attack(m_lowAttackEnemy, m_highAttackEnemy);
+            Rumbler.Instance.Rumble(m_lowAttackEnemy, m_highAttackEnemy);
         }
-        else if (!m_warningVibe && !m_attackVibe && !m_intimidationVibe) {
+        else if (!m_warningVibe && !m_attackVibe && !m_intimidationVibe && !m_isKillingSomeone){
             if(m_animator != null)m_animator.SetBool("IsChasing", false);
             //arrêt de vibration
-            Rumbler.Instance.StopRumble();
+            //Debug.Log("Stop vibration !");
+            //Rumbler.Instance.StopRumble();
         }
-        
-
     }
 
 
@@ -318,7 +313,7 @@ public class GuardBehavior : MonoBehaviour {
     {
 
         //appel singleton vibe
-        Rumbler.Instance.Intimidate(m_lowMonsterIntimidation, m_highMonsterIntimidation);
+        Rumbler.Instance.Rumble(m_lowMonsterIntimidation, m_highMonsterIntimidation, m_rumbleDuration);
 
         m_nma.isStopped = true;
         PlayerController scriptCharaWhoIsDying = m_charactersInDangerScript[0];
@@ -338,7 +333,6 @@ public class GuardBehavior : MonoBehaviour {
         yield return new WaitForSeconds(m_stunTime); //durée de stun
         m_nma.isStopped = false;
     }
-
     IEnumerator DeathCoroutine()
     {
         m_isKillingSomeone = true;
@@ -431,7 +425,14 @@ public class GuardBehavior : MonoBehaviour {
 
     private void Death() {
         m_nma.isStopped = false;
-        m_nma.SetDestination(m_spawnPoint);
+        
+        //if he was off his initial path we simply put him back on
+        if (m_isGoingTowardsPlayer && !m_isStatic) {
+            m_isGoingTowardsPlayer = false;
+            m_destinations.Remove(m_destinations[m_currentDestination]);
+            m_nma.SetDestination(m_destinations[m_currentDestination]);
+        }
+        
         m_isGoingTowardsPlayer = false;
         transform.position = m_spawnPoint;
     }
