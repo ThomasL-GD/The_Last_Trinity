@@ -541,12 +541,4 @@ public class PlayerController : MonoBehaviour
             Debug.LogWarning("You tried to restore the gravity of a chara who already had their gravity !");
         }
     }
-    //
-    // /// <summary>
-    // /// Allow the player to call the move function from its characterController without having it in a variable
-    // /// </summary>
-    // /// <param name="p_movementDirection">The direction and length of the move</param>
-    // public void Move(Vector3 p_movementDirection) {
-    //     m_charaController.Move(p_movementDirection);
-    // }
 }
