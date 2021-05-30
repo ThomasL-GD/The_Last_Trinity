@@ -16,13 +16,19 @@ public class Start_Manager : MonoBehaviour {
     
     [Header("Menu Selector")] 
     [SerializeField] [Tooltip("Selecteur du menu")] private GameObject m_menuSelector;
+    private int m_sceneIndex = 0;
     
     [Header("Animations")]
     [SerializeField] [Tooltip("vitesse d'alternance d'opacité du bouton de lancement de menu")] [Range(0f, 5f)] private float m_launchOpacitySpeed = 1.0f;
     [SerializeField] [Tooltip("vitesse d'apparition for the title (unit : seconds)")] [Range(0f, 10f)] private float m_opacityDuration = 1.0f;
+    [SerializeField] [Tooltip("The time taken by the fade in black to occur\nUnit : seconds")] [Range(0.5f, 10f)] private float m_fadeTime = 4f;
+    [SerializeField] [Tooltip("The canvas of the scene")] private GameObject m_canvas = null;
+    private Image m_image = null;
     private bool m_isFading = true;
     private bool m_englishMenuIsActive = false;  //indique si le menu anglais est visible ou non
     private bool m_frenchMenuIsActive = false;  //indique si le menu français est visible ou non
+    private bool m_isLaunchingGame = false;
+    private Vector3 m_travelToBack = Vector3.zero; //The vector that represents the travel from original to back position
     
     [Header("Move")]
     [Tooltip("position limite de joystick")] private float m_limitPosition = 0.5f;
@@ -33,12 +39,16 @@ public class Start_Manager : MonoBehaviour {
     [SerializeField] [Tooltip("The list of points the guard will travel to, in order from up to down and cycling")] private List<GameObject> m_destinationsTransforms = new List<GameObject>();
     private List<Vector3> m_destinations = new List<Vector3>();
     [SerializeField] [Tooltip("camera principale")] private GameObject m_camera;
-    [SerializeField] [Tooltip("vitesse de déplacement de la camera jusqu'à la position de recul")] [Range(0.0f,50.0f)]private float m_backSpeedCamera = 1.0f;
+    [SerializeField] [Tooltip("Temps de déplacement de la camera jusqu'à la position de recul")] [Range(0.0f,50.0f)]private float m_backTimeCamera = 1.0f;
     [SerializeField] [Tooltip("vitesse de rotation de la camera jusqu'à la position de recul")] [Range(0.0f,500.0f)] private float m_backSpeedRotationCamera = 100.0f;
     [SerializeField] [Tooltip("vitesse de déplacement de la camera")] [Range(0.0f,50.0f)] private float m_endSpeedCamera = 1.0f;
     [SerializeField] [Tooltip("vitesse de déplacement de la camera")] [Range(0.0f,1000.0f)] private float m_endSpeedRotationCamera = 100.0f;
     
     private float m_timer = 0f;  //temps qui s'écoule à chaque frame
+    private float m_timerBackCamera = 0f;  //temps qui s'écoule à chaque frame pendant le travelling vers l'arrière
+    private float m_cosine = 0f;  //temps qui s'écoule à chaque frame pendant le travelling vers l'arrière
+
+    [SerializeField] [Tooltip("not supposed to exist")] [Range(0.0f,1.0f)] private float m_multiplier = 2f;
 
     
     // Start is called before the first frame update
@@ -70,6 +80,29 @@ public class Start_Manager : MonoBehaviour {
         
         //La camera se positionne au même emplacement que le premier GameObject de la liste créée au-dessus
         m_camera.transform.position = m_destinationsTransforms[2].transform.position;
+
+        m_travelToBack = m_destinationsTransforms[1].transform.position - transform.position;
+        
+        ////PANEL FOR FADE IN BLACK//////
+        if (m_canvas == null) {
+            Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO SERIALIZE THE CANVAS ON THE END OF THE LEVEL");
+        }
+        
+        //We create a panel that we will fade in black
+        GameObject child = Instantiate(new GameObject(), m_canvas.transform);
+        child.name = "Fade in Black";
+        RectTransform rect = child.AddComponent<RectTransform>();
+        Image image = child.AddComponent<Image>();
+        
+        //We set the rect transform in order to cover the whole screen
+        rect.anchorMin = new Vector2(0f, 0f);
+        rect.anchorMax = new Vector2(1f, 1f);
+        rect.localPosition = Vector3.zero;
+        rect.anchoredPosition = Vector2.zero;
+        
+        //We make the panel fully transparent... for now...
+        image.color = new Color(0f,0f,0f, 0f);
+        m_image = image;
 
     }
 
@@ -175,9 +208,11 @@ public class Start_Manager : MonoBehaviour {
 
             switch (m_selectorIndex) {
                 case 0: //Continue
+                    m_isLaunchingGame = true;
                     break;
                 case 1: //New Game
-                    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+                    m_isLaunchingGame = true;
+                    m_sceneIndex = SceneManager.GetActiveScene().buildIndex + 1;
                     break;
                 case 2: //Language
                     if (m_englishMenuIsActive)
@@ -204,8 +239,21 @@ public class Start_Manager : MonoBehaviour {
 
 
         if (!m_englishMenuIsActive && !m_frenchMenuIsActive) {
-            //déplacement de la caméra de la position initiale à la position de recul   (les deux points sont dans la liste m_destinationsTransform)
-            m_camera.transform.position = Vector3.MoveTowards(m_camera.transform.position, m_destinationsTransforms[1].transform.position, m_backSpeedCamera * Time.deltaTime);
+            
+            //we cap the movement and replace it with a ping-pong once we reached the target position
+            if (m_timerBackCamera < m_backTimeCamera) {
+                //déplacement de la caméra de la position initiale à la position de recul
+                m_camera.transform.position += m_travelToBack * (Time.deltaTime/m_backTimeCamera);
+
+                m_timerBackCamera += Time.deltaTime;
+            }
+            else { //Once we've reached the back point, we just hang in there
+                m_cosine += Time.deltaTime * m_multiplier;
+                m_camera.transform.position += m_travelToBack * ((Time.deltaTime/m_backTimeCamera) * Mathf.Cos(m_cosine));
+                Debug.Log(Mathf.Cos(m_cosine));
+            }
+            
+            
             //rotation de la caméra sur la durée pour avoir la même que la rotation de la vue de recul
             if (m_camera.transform.rotation.x >= m_destinationsTransforms[1].transform.rotation.x) {
                 m_camera.transform.Rotate(Vector3.left * (m_backSpeedRotationCamera * Time.deltaTime));
@@ -228,6 +276,21 @@ public class Start_Manager : MonoBehaviour {
                 m_camera.transform.Rotate(Vector3.left * (m_endSpeedRotationCamera * Time.deltaTime));
             }
 
+        }
+        
+        
+        //////////FADING/////////
+
+        //If the player has reached the end, we fade in black and once it's faded, we start the next scene
+        if (m_isLaunchingGame) {
+            float newAlpha = m_image.color.a + Time.deltaTime / m_fadeTime;
+
+            if (newAlpha >= 1f) {
+                //If the color will go above one, we set it to one instead and launch the next scene
+                m_image.color = new Color(0f,0f,0f, 1f);
+                SceneManager.LoadScene(m_sceneIndex);
+            }
+            else m_image.color = new Color(0f,0f,0f, newAlpha);
         }
         
     }
