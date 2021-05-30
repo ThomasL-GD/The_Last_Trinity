@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8797895659316522246}
   - component: {fileID: 5600152368131613347}
   - component: {fileID: 7661550548174034537}
+  - component: {fileID: 849911532}
   m_Layer: 0
   m_Name: P_M_Mur
   m_TagString: Untagged
@@ -31,7 +32,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: -180}
 --- !u!33 &5600152368131613347
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -81,3 +82,16 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &849911532
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8166072660618606524}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 6.500135, y: 0.4313096, z: 3.9000008}
+  m_Center: {x: -0.00006473067, y: -0.00000046491627, z: 1.9500004}
