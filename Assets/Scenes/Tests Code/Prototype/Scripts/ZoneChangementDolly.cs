@@ -41,7 +41,6 @@ public class ZoneChangementDolly : MonoBehaviour {
     /// <param name="p_other">Collider du joueur entrant dans la zone</param>
     private void OnTriggerEnter(Collider p_other)
     {
-        Debug.Log("Ok");
         if (p_other.gameObject.TryGetComponent(out PlayerController charaScript))
         {
             if(!m_isTheRobotAlone){
@@ -75,7 +74,6 @@ public class ZoneChangementDolly : MonoBehaviour {
     /// <param name="p_other">Collider du joueur entrant dans la zone</param>
     private void OnTriggerExit(Collider p_other)
     {
-        Debug.Log("Ko");
         if (p_other.gameObject.TryGetComponent(out PlayerController charaScript))
         {
             if(!m_isTheRobotAlone){
