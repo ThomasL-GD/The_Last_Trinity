@@ -68,7 +68,6 @@ public class HumanSubPuzzle : MonoBehaviour {
     [SerializeField] [Range(0f,10f)] private float m_rumbleDuration = 0f;
     [SerializeField] [Range(0f,1f)] private float m_lowA =0f;
     [SerializeField] [Range(0f,1f)] private float m_highA =0f;
-    public static Gamepad m_gamepad = DualShockGamepad.current;
     
     [Header("Debug")]
     [SerializeField] [Tooltip("If on, the walls will be displayed for debug")] private bool m_debugMode = false;
@@ -119,9 +118,6 @@ public class HumanSubPuzzle : MonoBehaviour {
         }
 
         MazeInitialization();
-
-        m_gamepad = GetGamepad();
-        //Debug.Log($" human gamepad : {m_gamepad.name}");
 
         m_elapsedTime = 0.0f;
     }
@@ -526,25 +522,22 @@ public class HumanSubPuzzle : MonoBehaviour {
             //We first stocks the way the player wants to go if he's not blocked by the limits of the maze
             if (m_interactDetection.m_canMove && horizontalAxis < -m_limitPosition && m_selector.x > 0) {
                 attemptedMovement = Directions.Left;
-                
             }
             else if (m_interactDetection.m_canMove && horizontalAxis > m_limitPosition && m_selector.x < m_maze.GetLength(1) - 1) {
                 attemptedMovement = Directions.Right;
-                
             }
             else if (m_interactDetection.m_canMove && verticalAxis > m_limitPosition && m_selector.y < m_maze.GetLength(0) - 1) {
                 attemptedMovement = Directions.Up;
-                
             }
             else if (m_interactDetection.m_canMove && verticalAxis < -m_limitPosition && m_selector.y > 0) {
                 attemptedMovement = Directions.Down;
-                
             }
 
             //First we verify the player has no wall blocking the way he wants to go;
             if (attemptedMovement == Directions.None || m_maze[m_selector.y, m_selector.x].HasFlag(attemptedMovement)) {
-                //Debug.Log("Nah bro, you cannot go this way");
-                StartCoroutine(Rumble());   //Vibration
+                Debug.Log("Nah bro, you cannot go this way");
+                Rumbler.Instance.HumanSubPuzzle(m_lowA, m_highA);
+                //StartCoroutine(Rumble());   //Vibration
             }
             else {
                 //If the movement is not blocked by a wall, we update the selector coordinates according to the wanted direction
@@ -581,7 +574,7 @@ public class HumanSubPuzzle : MonoBehaviour {
         }
         
         //Sortie du subPuzzle en cas de changement de personnage
-        if (m_interactDetection.m_isInSubPuzzle && (Input.GetKeyDown(m_inputs.inputMonster) || Input.GetKeyDown(m_inputs.inputRobot) || m_gamepad.buttonSouth.isPressed)) {
+        if (m_interactDetection.m_isInSubPuzzle && (Input.GetKeyDown(m_inputs.inputMonster) || Input.GetKeyDown(m_inputs.inputRobot))) {    // || m_gamepad.buttonSouth.isPressed
             if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
         }
 
@@ -608,7 +601,7 @@ public class HumanSubPuzzle : MonoBehaviour {
         
     }
 
-    
+    /*
     IEnumerator Rumble()
     {
         //Debug.Log($" human gamepad : {m_gamepad.name}");
@@ -616,6 +609,7 @@ public class HumanSubPuzzle : MonoBehaviour {
         yield return new WaitForSeconds(m_rumbleDuration);
         m_gamepad.SetMotorSpeeds(0, 0);
     }
+    */
     
     
     /// <summary>
@@ -679,7 +673,6 @@ public class HumanSubPuzzle : MonoBehaviour {
         m_lightObject.GetComponentInChildren<Light>().color = m_soLight.colorFinished;
         m_lightObject.GetComponent<Renderer>().material = m_soLight.materialFinished;
         
-        m_gamepad.SetMotorSpeeds(0.0f,0.0f);
         m_interactDetection.m_achieved = true;  //le joueur est arrivé au bout
         m_interactDetection.m_canMove = false; //le joueur ne peut plus bouger le sélecteur
         if(!m_debugMode) GenerateVisualRepresentation();
@@ -687,34 +680,7 @@ public class HumanSubPuzzle : MonoBehaviour {
     }
 	
 	
-    // Private helpers
-    private Gamepad GetGamepad()
-    {
-        //return Gamepad.all.FirstOrDefault(g => m_playerInput.devices.Any(d => d.deviceId == g.deviceId));
-        return DualShockGamepad.current;
-
-        #region Linq Query Equivalent Logic
-
-        //Gamepad gamepad = null;
-        //foreach (var g in Gamepad.all)
-        //{
-        //    foreach (var d in _playerInput.devices)
-        //    {
-        //        if(d.deviceId == g.deviceId)
-        //        {
-        //            gamepad = g;
-        //            break;
-        //        }
-        //    }
-        //    if(gamepad != null)
-        //    {
-        //        break;
-        //    }
-        //}
-        //return gamepad;
-
-        #endregion
-    }
+   
     
     /// <summary>
     /// Is called when this gameObject is setActive(false)
@@ -730,8 +696,6 @@ public class HumanSubPuzzle : MonoBehaviour {
             Destroy(child.gameObject);
         }
 
-        //Debug.Log($"Debug fermeture subPuzzle 1 :{m_gamepad}");
-        m_gamepad = null;
     }
     
 }
