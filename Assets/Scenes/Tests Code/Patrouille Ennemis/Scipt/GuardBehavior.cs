@@ -260,6 +260,13 @@ public class GuardBehavior : MonoBehaviour {
                 }
             }
             else {
+                //if he was off his initial path we simply put him back on
+                if (m_isGoingTowardsPlayer && !m_isStatic) {
+                    m_isGoingTowardsPlayer = false;
+                    m_destinations.Remove(m_destinations[m_currentDestination]);
+                    m_nma.SetDestination(m_destinations[m_currentDestination]);
+                }
+                
                 //Debug.LogWarning("The raycast hit nothing nowhere");
                 
                 //if he was off his initial path we simply put him back on
@@ -281,6 +288,14 @@ public class GuardBehavior : MonoBehaviour {
             if (m_isGoingTowardsPlayer && m_isStatic) {
                 m_isGoingTowardsPlayer = false;
                 m_nma.SetDestination(m_staticPos);
+            }
+            
+            
+            //if he was off his initial path we simply put him back on
+            if (m_isGoingTowardsPlayer && !m_isStatic) {
+                m_isGoingTowardsPlayer = false;
+                m_destinations.Remove(m_destinations[m_currentDestination]);
+                m_nma.SetDestination(m_destinations[m_currentDestination]);
             }
         }
         
