@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// Script du mouvement du player controller
@@ -35,6 +36,7 @@ public class PlayerController : MonoBehaviour
 
     private CharacterController m_charaController = null;
     [SerializeField] [Tooltip("Gravity strength on this character")] private float m_gravity = -9.81f;
+    private float m_effectiveGravity = 0f;
     private Vector3 m_charaVelocity = Vector3.zero;
     private Animator m_animator = null;
     
@@ -151,6 +153,8 @@ public class PlayerController : MonoBehaviour
             m_isActive = true;
             m_soulScript.gameObject.transform.position = transform.position;
         }
+
+        m_effectiveGravity = m_gravity;
     }
 
     void Update()
@@ -164,7 +168,7 @@ public class PlayerController : MonoBehaviour
             m_charaVelocity.y = 0.0f;
         }
         else if (!m_charaController.isGrounded) {
-            m_charaVelocity.y += m_gravity * Time.deltaTime;
+            m_charaVelocity.y += m_effectiveGravity * Time.deltaTime;
             m_charaController.Move(m_charaVelocity * Time.deltaTime);
         }
         //Debug.Log(m_charaController.isGrounded);
@@ -500,4 +504,34 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+
+    /// <summary>
+    /// Will cancel the gravity effect on this character
+    /// </summary>
+    public void StopGravity() {
+        if (m_effectiveGravity != 0f) {
+            m_effectiveGravity = 0f;
+        }else {
+            Debug.LogWarning("You tried to cancel the gravity of a chara who already had no gravity !");
+        }
+    }
+    
+    /// <summary>
+    /// Will resume the gravity effect on this character
+    /// </summary>
+    public void RestoreGravity() {
+        if (m_effectiveGravity != m_gravity) {
+            m_effectiveGravity = m_gravity;
+        }else {
+            Debug.LogWarning("You tried to restore the gravity of a chara who already had their gravity !");
+        }
+    }
+    //
+    // /// <summary>
+    // /// Allow the player to call the move function from its characterController without having it in a variable
+    // /// </summary>
+    // /// <param name="p_movementDirection">The direction and length of the move</param>
+    // public void Move(Vector3 p_movementDirection) {
+    //     m_charaController.Move(p_movementDirection);
+    // }
 }
