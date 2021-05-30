@@ -38,7 +38,7 @@ public class Faufilable : MonoBehaviour
             StartCoroutine(Teleport());
         }
 
-        //During teleportation, we move the player (who is unable) to let the camera follow their way
+        //During teleportation, we move the player to let the camera follow their way
         if (m_isTeleporting) {
             m_human.position += m_travel * Time.deltaTime / m_travelTime;
         }
@@ -48,7 +48,11 @@ public class Faufilable : MonoBehaviour
     /// Teleporte le joueur sur la sortie sérialisé
     /// </summary>
     /// <returns></returns>
-    IEnumerator Teleport() {
+    IEnumerator Teleport()
+    {
+        SkinnedMeshRenderer meshRenderer = m_human.gameObject.GetComponentInChildren<SkinnedMeshRenderer>();
+        meshRenderer.enabled = false;
+        m_humanScript.StopGravity();
         m_isTeleporting = true;
         m_travel = m_exit.transform.position - m_human.position;
         m_humanScript.m_isForbiddenToMove = true;
@@ -57,6 +61,8 @@ public class Faufilable : MonoBehaviour
         yield return new WaitForSeconds(m_travelTime);
         
         //m_human.gameObject.SetActive(true);
+        m_humanScript.RestoreGravity();
+        meshRenderer.enabled = true;
         Faufilable exitScript = m_exit.GetComponent<Faufilable>();
         if (exitScript.m_human == null) exitScript.m_human = m_human;
         m_human.transform.position = m_exit.transform.position;
