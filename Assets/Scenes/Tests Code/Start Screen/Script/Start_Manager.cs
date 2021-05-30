@@ -177,6 +177,7 @@ public class Start_Manager : MonoBehaviour {
                 case 0: //Continue
                     break;
                 case 1: //New Game
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
                     break;
                 case 2: //Language
                     if (m_englishMenuIsActive)
