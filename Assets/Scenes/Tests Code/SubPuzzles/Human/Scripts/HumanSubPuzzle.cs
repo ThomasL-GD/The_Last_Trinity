@@ -23,7 +23,6 @@ public class HumanSubPuzzle : MonoBehaviour {
     
     private Selector m_selector = new Selector(0,0); //Contains the coordinates of our selector aka the position of th player
     private GameObject m_player = null; //Contains the coordinates of our selector aka the position of the player
-    private GameObject m_pathVisualisation = null; //Contains the coordinates of our
     [HideInInspector] [Tooltip("Script d'intéraction entre le personnage et l'objet comprenant le subpuzzle")] public Interact_Detection m_interactDetection = null;
     
     /*Contains every cell of the maze and if each cell have a wall above, under, on the right or on the left of itself*/private Directions[,] m_maze = null;
