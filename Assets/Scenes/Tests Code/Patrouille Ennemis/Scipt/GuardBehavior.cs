@@ -23,7 +23,7 @@ public class GuardBehavior : MonoBehaviour {
     [Tooltip("If on, this ennemy will stay in place according to its initial position")] private bool m_isStatic = false;
     private Vector3 m_staticPos = Vector3.zero;
     private Quaternion m_staticRotation = new Quaternion(0,0,0,0);
-    private bool m_isOnTheirSpot = true;
+    //private bool m_isOnTheirSpot = true;
 
     [Header("Metrics")] 
     [SerializeField] [Tooltip("Vitesse de déplacement normale")] [Range(0f,50f)] private float m_normalSpeed = 5.0f;
@@ -79,7 +79,9 @@ public class GuardBehavior : MonoBehaviour {
     // Start is called before the first frame update
     void Start() {
         
-        if(m_destinationsTransforms.Count < 1) Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT DESTINATIONS IN THE ENNEMY !");
+        if(m_destinationsTransforms.Count < 1) Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT DESTINATIONS IN THE ENNEMY !", this);
+        
+        if(m_hitFX == null) Debug.LogWarning("There's no FX for the hit of this ennemy, it's still gonna work thought", this);
 
         //We adapt the collider to the Serialized value we have
         m_sphereCol = gameObject.GetComponent<SphereCollider>();
@@ -159,7 +161,7 @@ public class GuardBehavior : MonoBehaviour {
                     transform.position.z <= m_staticPos.z + m_uncertainty &&
                     transform.position.z >= m_staticPos.z - m_uncertainty) {
 
-                    m_isOnTheirSpot = true;
+                    //m_isOnTheirSpot = true;
 
                     if(m_animator != null)m_animator.SetBool("IsWalking", false);
                     
@@ -238,7 +240,7 @@ public class GuardBehavior : MonoBehaviour {
                     }
                     //si le joueur est visible par l'ennemi
                     else if (angleForward <= m_angleUncertainty) {
-                        if(m_isStatic)m_isOnTheirSpot = false;
+                        //if(m_isStatic)m_isOnTheirSpot = false;
                         m_warningVibe = false;
                         m_intimidationVibe = false;
                         m_attackVibe = true;
@@ -356,6 +358,9 @@ public class GuardBehavior : MonoBehaviour {
         m_nma.isStopped = true;
         scriptCharaWhoIsDying.m_isForbiddenToMove = true;
         yield return new WaitForSeconds(m_deathTime); //temps d'animation de mort du monstre
+        
+        m_hitFX.GetComponent<ParticleSystem>().Play();
+        
         if(m_animator != null)m_animator.SetBool("IsChasing", false);
         if(m_animator != null)m_animator.SetBool("IsWalking", false);
 
