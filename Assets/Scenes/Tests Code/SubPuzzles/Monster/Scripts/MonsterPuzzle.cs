@@ -56,7 +56,6 @@ public class MonsterPuzzle : MonoBehaviour
     [SerializeField] [Range(0f,10f)] private float m_rumbleDuration = 0f;
     [SerializeField] [Range(0f,1f)] private float m_lowA =0f;
     [SerializeField] [Range(0f,1f)] private float m_highA =0f;
-    public static Gamepad m_gamepad = DualShockGamepad.current;
     
     [HideInInspector] [Tooltip("Script d'intéraction entre le personnage et l'objet comprenant le subpuzzle")] public Interact_Detection m_interactDetection = null;
     
@@ -89,10 +88,6 @@ public class MonsterPuzzle : MonoBehaviour
         RectTransform rect = gameObject.GetComponent<RectTransform>();
         rect.localPosition = Vector3.zero;
         rect.anchoredPosition = Vector2.zero;
-        
-        m_gamepad = GetGamepad();
-        
-        //Debug.Log($" monster gamepad : {m_gamepad.name}");
     }
     
 
@@ -242,7 +237,6 @@ public class MonsterPuzzle : MonoBehaviour
             bool isCorrectPiece = false;    //variable booléènne qui indique si le joueur est sur une bonne pièce
             bool isAlreadyFound = false;    //Variable booléènne qui indique si la pièce a déjà été trouvée
             
-            
             /////////////// VERIFICATION SI C'EST UNE PIECE CORRECTE /////////////
             for (int i = 0; i < m_correctPieces.Count; i++) //pour chaque pièce dans les pièces correctes
             {
@@ -315,33 +309,30 @@ public class MonsterPuzzle : MonoBehaviour
             {
                 m_errorDone++;   //nombre d'erreurs possibles avant défaite diminue
 
-                if(m_errorDone != m_errorAllowed) StartCoroutine("Rumble");   //Vibration
+                if (m_errorDone != m_errorAllowed)
+                {
+                    Rumbler.Instance.MonsterPuzzle(m_lowA, m_highA, m_rumbleDuration);
+                    //StartCoroutine("Rumble"); //Vibration
+                }
                 else if (m_errorDone >= m_errorAllowed)
                 {
                     if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
                 }
             }
-            selectorValidation = false;
         }
         
 
         //Sortie du subPuzzle en cas de changement de personnage
-        if (m_interactDetection.m_isInSubPuzzle && (m_gamepad.buttonEast.isPressed || m_gamepad.buttonWest.isPressed || m_gamepad.buttonSouth.isPressed))    //(m_interactDetection.m_isInSubPuzzle && Input.GetKeyDown(m_inputs.inputHuman) || Input.GetKeyDown(m_inputs.inputRobot))
-        {
-            if (m_interactDetection.enabled) m_interactDetection.PuzzleDeactivation();
-        }
+        ///////////////////////////////
+        ///////////////////////////////                          A CHECKER
+        ///////////////////////////////
+        // if (m_interactDetection.m_isInSubPuzzle && (m_gamepad.buttonEast.isPressed || m_gamepad.buttonWest.isPressed || m_gamepad.buttonSouth.isPressed))    //(m_interactDetection.m_isInSubPuzzle && Input.GetKeyDown(m_inputs.inputHuman) || Input.GetKeyDown(m_inputs.inputRobot))
+        // {
+        //     if (m_interactDetection.enabled) m_interactDetection.PuzzleDeactivation();
+        // }
     }
 
 
-    IEnumerator Rumble()
-    {
-        //Debug.Log($" monster gamepad : {m_gamepad.name}");
-        m_gamepad.SetMotorSpeeds(m_lowA, m_highA);
-        yield return new WaitForSeconds(m_rumbleDuration);
-        m_gamepad.SetMotorSpeeds(0, 0);
-    }
-    
-    
     /// <summary>
     /// Place correctly an element with its rect transform
     /// </summary>
@@ -381,38 +372,7 @@ public class MonsterPuzzle : MonoBehaviour
         foreach(Transform child in gameObject.transform) {
             Destroy(child.gameObject);
         }
-        
-        //Debug.Log($"Debug fermeture subPuzzle 1 :{m_gamepad}");
-        m_gamepad = null;
-        //Debug.Log($"Debug fermeture subPuzzle 2 :{m_gamepad}");
-        
+
     }
     
-    
-    // Private helpers
-    private Gamepad GetGamepad()
-    {
-        //return Gamepad.all.FirstOrDefault(g => m_playerInput.devices.Any(d => d.deviceId == g.deviceId));
-        return DualShockGamepad.current;
-        
-        #region Linq Query Equivalent Logic
-        //Gamepad gamepad = null;
-        //foreach (var g in Gamepad.all)
-        //{
-        //    foreach (var d in _playerInput.devices)
-        //    {
-        //        if(d.deviceId == g.deviceId)
-        //        {
-        //            gamepad = g;
-        //            break;
-        //        }
-        //    }
-        //    if(gamepad != null)
-        //    {
-        //        break;
-        //    }
-        //}
-        //return gamepad;
-        #endregion
-    }
 }
