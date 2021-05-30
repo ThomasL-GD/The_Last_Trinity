@@ -31,8 +31,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] [Tooltip("The character whom this script is on, SELECT ONLY ONE !")] public Charas m_chara = 0;
     [Tooltip("The character who will be selected at the beginnig\nSELECT ONLY ONE")] public bool m_isActive = false;
     private static bool s_inBetweenSwitching = false; //is Active when someone is switching character
-    /*[HideInInspector]*/ [Tooltip("For Debug Only")] public bool m_isForbiddenToMove = false; 
-    [HideInInspector] [Tooltip("For Debug Only")] public bool m_isSwitchingChara = false;
+    [Tooltip("For Debug Only")] public bool m_isForbiddenToMove = false; 
+    [HideInInspector] public bool m_isSwitchingChara = false;
 
     private CharacterController m_charaController = null;
     [SerializeField] [Tooltip("Gravity strength on this character")] private float m_gravity = -9.81f;
@@ -97,9 +97,9 @@ public class PlayerController : MonoBehaviour
         m_keyCodes[1] = m_selector.inputMonster;
         m_keyCodes[2] = m_selector.inputRobot;
 
-        CinemachineVirtualCamera vCamH = GameObject.FindGameObjectWithTag("Camera Humain")?.GetComponent<CinemachineVirtualCamera>();
-        CinemachineVirtualCamera vCamM = GameObject.FindGameObjectWithTag("Camera Monstre")?.GetComponent<CinemachineVirtualCamera>();
-        CinemachineVirtualCamera vCamR = GameObject.FindGameObjectWithTag("Camera Robot")?.GetComponent<CinemachineVirtualCamera>();
+        CinemachineVirtualCamera vCamH = GameObject.FindGameObjectWithTag("Camera Humain Depart")?.GetComponent<CinemachineVirtualCamera>();
+        CinemachineVirtualCamera vCamM = GameObject.FindGameObjectWithTag("Camera Monstre Depart")?.GetComponent<CinemachineVirtualCamera>();
+        CinemachineVirtualCamera vCamR = GameObject.FindGameObjectWithTag("Camera Robot Depart")?.GetComponent<CinemachineVirtualCamera>();
         
         //We initialize different values depending on the chara we currently are
         switch (m_chara) {

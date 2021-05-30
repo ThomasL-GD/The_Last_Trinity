@@ -9748,7 +9748,7 @@ GameObject:
   - component: {fileID: 205744754}
   m_Layer: 0
   m_Name: "Cam\xE9ra Robot"
-  m_TagString: Camera Robot
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -11064,7 +11064,7 @@ GameObject:
   - component: {fileID: 238031184}
   m_Layer: 0
   m_Name: "Cam\xE9ra  Depart(1)"
-  m_TagString: Camera Humain
+  m_TagString: Camera Monstre Depart
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12363,7 +12363,7 @@ GameObject:
   - component: {fileID: 267661912}
   m_Layer: 0
   m_Name: "Cam\xE9ra Robot Area (2)"
-  m_TagString: Camera Monstre
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -16911,7 +16911,7 @@ GameObject:
   - component: {fileID: 377989022}
   m_Layer: 0
   m_Name: "Cam\xE9ra Robot Area"
-  m_TagString: Camera Robot
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -24063,7 +24063,7 @@ GameObject:
   - component: {fileID: 567984707}
   m_Layer: 0
   m_Name: "Cam\xE9ra Robot (2)"
-  m_TagString: Camera Monstre
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -30128,7 +30128,7 @@ GameObject:
   - component: {fileID: 736797081}
   m_Layer: 0
   m_Name: "Cam\xE9ra Robot (1)"
-  m_TagString: Camera Humain
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -36138,7 +36138,7 @@ GameObject:
   - component: {fileID: 865705167}
   m_Layer: 0
   m_Name: "Cam\xE9ra Depart"
-  m_TagString: Camera Robot
+  m_TagString: Camera Robot Depart
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -42358,7 +42358,7 @@ GameObject:
   - component: {fileID: 1006883622}
   m_Layer: 0
   m_Name: "Cam\xE9ra Robot Zoom (1)"
-  m_TagString: Camera Humain
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -49588,7 +49588,7 @@ GameObject:
   - component: {fileID: 1226572862}
   m_Layer: 0
   m_Name: "Cam\xE9ra Robot Zoom"
-  m_TagString: Camera Robot
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -52910,7 +52910,7 @@ GameObject:
   - component: {fileID: 1296010791}
   m_Layer: 0
   m_Name: "Cam\xE9ra Robot Area (1)"
-  m_TagString: Camera Humain
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -65128,7 +65128,7 @@ GameObject:
   - component: {fileID: 1599753657}
   m_Layer: 0
   m_Name: "Cam\xE9ra Robot Zoom (2)"
-  m_TagString: Camera Monstre
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -73380,7 +73380,7 @@ GameObject:
   - component: {fileID: 1787261971}
   m_Layer: 0
   m_Name: "Debug Cam\xE9ra Shader"
-  m_TagString: Camera Robot
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -80176,6 +80176,18 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: 9b5ebd315aada6a4ba2c5d3263597f4c, type: 3}
+    - target: {fileID: 1047692316512132336, guid: 06ba45be42bc0e940949ed6b96d10ec6, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1047692316512132336, guid: 06ba45be42bc0e940949ed6b96d10ec6, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1047692316512132336, guid: 06ba45be42bc0e940949ed6b96d10ec6, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1047692316512132342, guid: 06ba45be42bc0e940949ed6b96d10ec6, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -87480,7 +87492,7 @@ GameObject:
   - component: {fileID: 2147392157}
   m_Layer: 0
   m_Name: "Cam\xE9ra  Depart (2)"
-  m_TagString: Camera Monstre
+  m_TagString: Camera Humain Depart
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -87882,6 +87894,67 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b8128b74defaa1942bbd38c4f2aecee6, type: 3}
+--- !u!1001 &5561100308618952084
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2037081927436777236, guid: 4cfa337fe9f235d43a996ba206459fae, type: 3}
+      propertyPath: m_charaNeeded
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3793290852983777637, guid: 4cfa337fe9f235d43a996ba206459fae, type: 3}
+      propertyPath: m_RootOrder
+      value: 26
+      objectReference: {fileID: 0}
+    - target: {fileID: 3793290852983777637, guid: 4cfa337fe9f235d43a996ba206459fae, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 148.44
+      objectReference: {fileID: 0}
+    - target: {fileID: 3793290852983777637, guid: 4cfa337fe9f235d43a996ba206459fae, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.87
+      objectReference: {fileID: 0}
+    - target: {fileID: 3793290852983777637, guid: 4cfa337fe9f235d43a996ba206459fae, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 3.06
+      objectReference: {fileID: 0}
+    - target: {fileID: 3793290852983777637, guid: 4cfa337fe9f235d43a996ba206459fae, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3793290852983777637, guid: 4cfa337fe9f235d43a996ba206459fae, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3793290852983777637, guid: 4cfa337fe9f235d43a996ba206459fae, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3793290852983777637, guid: 4cfa337fe9f235d43a996ba206459fae, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3793290852983777637, guid: 4cfa337fe9f235d43a996ba206459fae, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3793290852983777637, guid: 4cfa337fe9f235d43a996ba206459fae, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3793290852983777637, guid: 4cfa337fe9f235d43a996ba206459fae, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4039495411128001801, guid: 4cfa337fe9f235d43a996ba206459fae, type: 3}
+      propertyPath: m_Name
+      value: LEVEL END
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 4cfa337fe9f235d43a996ba206459fae, type: 3}
 --- !u!1001 &5754112640655535580
 PrefabInstance:
   m_ObjectHideFlags: 0
