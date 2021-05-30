@@ -11,20 +11,25 @@ public class EndLevelZone : MonoBehaviour {
     
     [SerializeField] [Tooltip("The chara who ill trigger the end of the level\nMost likely to be the human for every non-special level")] private Charas m_charaNeeded = Charas.Human;
     [SerializeField] [Tooltip("The time taken by the fade in black to occur\nUnit : seconds")] [Range(0.5f, 10f)] private float m_fadeTime = 4f;
+    [SerializeField] [Tooltip("The canvas of the scene")] private GameObject m_canvas = null;
     private Image m_image = null;
     private bool m_levelIsCompleted = false;
     
     // Start is called before the first frame update
     void Awake() {
-        //We create a canvas and a panel inside that we will fade in black
-        Canvas parent = Instantiate(new Canvas());
-        GameObject child = Instantiate(new GameObject(), parent.transform);
+        if (m_canvas == null) {
+            Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO SERIALIZE THE CANVAS ON THE END OF THE LEVEL");
+        }
+        
+        //We create a panel that we will fade in black
+        GameObject child = Instantiate(new GameObject(), m_canvas.transform);
+        child.name = "Fade in Black";
         RectTransform rect = child.AddComponent<RectTransform>();
         Image image = child.AddComponent<Image>();
         
         //We set the rect transform in order to cover the whole screen
-        rect.anchorMax = new Vector2(0f, 0f);
-        rect.anchorMin = new Vector2(1f, 1f);
+        rect.anchorMin = new Vector2(0f, 0f);
+        rect.anchorMax = new Vector2(1f, 1f);
         rect.localPosition = Vector3.zero;
         rect.anchoredPosition = Vector2.zero;
         
