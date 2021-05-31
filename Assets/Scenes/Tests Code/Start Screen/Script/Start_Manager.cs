@@ -113,6 +113,91 @@ public class Start_Manager : MonoBehaviour {
         float verticalAxis = Input.GetAxis("Vertical");
         bool selectorValidation = Input.GetKeyDown(KeyCode.JoystickButton1);   //Joystick1Button1 est le bouton croix manette PS4
 
+        
+        /////////////////////////////       MENU MOVEMENTS        /////////////////////////////
+        
+        
+        //DEPLACEMENT DU CURSEUR si le menu adequat est actif
+        if (m_englishMenuIsActive || m_frenchMenuIsActive) {
+            if (!m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis > m_limitPosition || verticalAxis < -m_limitPosition)
+            {
+                //déplacement du sélecteur avec le joystick gauche
+                if (!m_hasMoved && verticalAxis > m_limitPosition && m_selectorIndex > 0) //Déplacement sur le bouton au-dessus de celui actuellement
+                {
+                    m_selectorIndex--;
+                    m_menuSelector.transform.position = m_test[m_selectorIndex].transform.position;
+                    m_hasMoved = true;
+                }
+                else if (!m_hasMoved && verticalAxis < -m_limitPosition && m_selectorIndex < 3) //Déplacement sur le bouton en-dessous de celui actuellement
+                {
+                    m_selectorIndex++;
+                    m_menuSelector.transform.position = m_test[m_selectorIndex].transform.position;
+                    m_hasMoved = true;
+                }
+            }
+
+            //RESET POUR DEPLACEMENT PAR A COUPS
+            if (horizontalAxis < m_limitPosition && horizontalAxis > -m_limitPosition && verticalAxis < m_limitPosition && verticalAxis > -m_limitPosition)
+            {
+                m_hasMoved = false;
+            }
+
+            //ALTERNANCE ENTRE LE MENU FRANCAIS ET LE MENU ANGLAIS
+            if (m_englishMenuIsActive)
+            {
+                for (int i = 4; i < m_test.Count; i++)
+                {
+                    if(i<4) m_test[i].gameObject.SetActive(true);
+                    else m_test[i].gameObject.SetActive(false);
+                }
+                    
+            }
+            else if (m_frenchMenuIsActive)
+            {
+                for (int i = 4; i < m_test.Count; i++)
+                {
+                    if(i>3) m_test[i].gameObject.SetActive(true);
+                    else m_test[i].gameObject.SetActive(false);
+                }
+            }
+            
+            //INPUT D'ACTIVATION A L'ENDROIT OU LE CURSEUR SE SITUE
+            if (selectorValidation) {
+
+                switch (m_selectorIndex) {
+                    case 0: //Continue
+                        Debug.LogWarning("Not implemented yet");
+                        //m_isLaunchingGame = true;
+                        break;
+                    case 1: //New Game
+                        m_isLaunchingGame = true;
+                        m_sceneIndex = SceneManager.GetActiveScene().buildIndex + 1;
+                        break;
+                    case 2: //Language
+                        if (m_englishMenuIsActive)
+                        {
+                            Debug.Log("Vers le francais");
+                            m_englishMenuIsActive = false;
+                            m_frenchMenuIsActive = true;
+                        }
+                        else if (m_frenchMenuIsActive)
+                        {
+                            Debug.Log("Vers l'anglais");
+                            m_frenchMenuIsActive = false;
+                            m_englishMenuIsActive = true;
+                        }
+                        break;
+                    case 3:
+                        Application.Quit();
+                        break;
+                    default: 
+                        Debug.LogError("AAAAAAAAAAAAAAHHHHHHHHH   (contact niels if this error occurs)"); 
+                        break;
+                }
+            }
+        }
+        
+        //////////////////Animations Ecran/////////////////////////
         if (m_isFading) m_timer += Time.deltaTime; //récupération du temps qui s'écoule
         else if(m_timer < m_opacityDuration) m_timer = m_opacityDuration;   //Arrêt du timer après visibilité totale
 
@@ -153,87 +238,6 @@ public class Start_Manager : MonoBehaviour {
                     m_test[i].gameObject.SetActive(false);
                 }
                 m_pressStartButton.gameObject.SetActive(false);
-            }
-        }
-
-        
-        /////////////////////////////       MENU MOVEMENTS        /////////////////////////////
-        
-        
-        //DEPLACEMENT DU CURSEUR
-        if (!m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis > m_limitPosition || verticalAxis < -m_limitPosition)
-        {
-            //déplacement du sélecteur avec le joystick gauche
-            if (!m_hasMoved && verticalAxis > m_limitPosition && m_selectorIndex > 0) //Déplacement sur le bouton au-dessus de celui actuellement
-            {
-                m_selectorIndex--;
-                m_menuSelector.transform.position = m_test[m_selectorIndex].transform.position;
-                m_hasMoved = true;
-            }
-            else if (!m_hasMoved && verticalAxis < -m_limitPosition && m_selectorIndex < 3) //Déplacement sur le bouton en-dessous de celui actuellement
-            {
-                m_selectorIndex++;
-                m_menuSelector.transform.position = m_test[m_selectorIndex].transform.position;
-                m_hasMoved = true;
-            }
-        }
-
-        //RESET POUR DEPLACEMENT PAR A COUPS
-        if (horizontalAxis < m_limitPosition && horizontalAxis > -m_limitPosition && verticalAxis < m_limitPosition && verticalAxis > -m_limitPosition)
-        {
-            m_hasMoved = false;
-        }
-
-        //ALTERNANCE ENTRE LE MENU FRANCAIS ET LE MENU ANGLAIS
-        if (m_englishMenuIsActive)
-        {
-            for (int i = 4; i < m_test.Count; i++)
-            {
-                if(i<4) m_test[i].gameObject.SetActive(true);
-                else m_test[i].gameObject.SetActive(false);
-            }
-                
-        }
-        else if (m_frenchMenuIsActive)
-        {
-            for (int i = 4; i < m_test.Count; i++)
-            {
-                if(i>3) m_test[i].gameObject.SetActive(true);
-                else m_test[i].gameObject.SetActive(false);
-            }
-        }
-        
-        //INPUT D'ACTIVATION A L'ENDROIT OU LE CURSEUR SE SITUE
-        if (selectorValidation && !m_isLaunchingGame) {
-
-            switch (m_selectorIndex) {
-                case 0: //Continue
-                    m_isLaunchingGame = true;
-                    break;
-                case 1: //New Game
-                    m_isLaunchingGame = true;
-                    m_sceneIndex = SceneManager.GetActiveScene().buildIndex + 1;
-                    break;
-                case 2: //Language
-                    if (m_englishMenuIsActive)
-                    {
-                        Debug.Log("Vers le francais");
-                        m_englishMenuIsActive = false;
-                        m_frenchMenuIsActive = true;
-                    }
-                    else if (m_frenchMenuIsActive)
-                    {
-                        Debug.Log("Vers l'anglais");
-                        m_frenchMenuIsActive = false;
-                        m_englishMenuIsActive = true;
-                    }
-                    break;
-                case 3:
-                    Application.Quit();
-                    break;
-                default: 
-                    Debug.LogError("AAAAAAAAAAAAAAHHHHHHHHH   (contact niels if this error occurs)"); 
-                    break;
             }
         }
         
