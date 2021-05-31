@@ -200,11 +200,23 @@ public class GuardBehavior : MonoBehaviour {
             //Debug du raycast dans la scène
             if (raycastHasHit)
             {
-                //Debug.DrawRay(transform.position, targetDir * hit.distance, Color.magenta, 10f);
+                Debug.DrawRay(transform.position, targetDir * hit.distance, Color.magenta, 10f);
                 
                 if (m_charactersInDangerScript[0].gameObject.transform.position != hit.transform.position) //le chara se trouve derrière un obstacle et n'est pas visible par l'ennemi
                 {
                     Debug.Log("Oulala on ne voit pas le character derrière");
+                    
+                    if (m_hasSeenPlayer) {
+                        m_nma.speed = m_attackSpeed;
+                        m_nma.acceleration = m_attackAcceleration;
+                        m_nma.angularSpeed = m_attackRotationSpeed;
+                    }
+                    else {
+                        m_nma.speed = m_normalSpeed;
+                        m_nma.acceleration = m_normalAcceleration;
+                        m_nma.angularSpeed = m_normalRotationSpeed;
+                    }
+                    
                 }
                 else //le chara est visible par l'ennemi
                 {
@@ -261,6 +273,7 @@ public class GuardBehavior : MonoBehaviour {
                 }
             }
             else {
+                
                 //if he was off his initial path we simply put him back on
                 if (m_isGoingTowardsPlayer && !m_isStatic) {
                     m_isGoingTowardsPlayer = false;
@@ -405,6 +418,7 @@ public class GuardBehavior : MonoBehaviour {
             if(!isAlreadyInList) m_charactersInDangerScript.Add(charaScript);
             
             m_enterZone = true;
+            Debug.Log("OnTriggerExit", this);
         }
     }
     

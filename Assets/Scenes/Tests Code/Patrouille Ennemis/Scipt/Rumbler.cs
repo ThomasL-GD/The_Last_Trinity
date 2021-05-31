@@ -60,13 +60,11 @@ public class Rumbler : MonoBehaviour
     
     public void Rumble(float p_low, float p_high)
     {
-        Debug.Log("Fonction A");
         m_gamepad.SetMotorSpeeds(p_low, p_high);
     }
     
     public void Rumble(float p_low, float p_high, float p_rumbleTime)
     {
-        Debug.Log($"Fonction B   :      {p_high}   {p_low}      {m_gamepad}");
         m_gamepad.SetMotorSpeeds(p_low, p_high);
         StartCoroutine(RumbleDuration(p_rumbleTime));
 

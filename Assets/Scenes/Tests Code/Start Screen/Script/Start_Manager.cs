@@ -204,7 +204,7 @@ public class Start_Manager : MonoBehaviour {
         }
         
         //INPUT D'ACTIVATION A L'ENDROIT OU LE CURSEUR SE SITUE
-        if (selectorValidation) {
+        if (selectorValidation && !m_isLaunchingGame) {
 
             switch (m_selectorIndex) {
                 case 0: //Continue
@@ -227,6 +227,9 @@ public class Start_Manager : MonoBehaviour {
                         m_frenchMenuIsActive = false;
                         m_englishMenuIsActive = true;
                     }
+                    break;
+                case 3:
+                    Application.Quit();
                     break;
                 default: 
                     Debug.LogError("AAAAAAAAAAAAAAHHHHHHHHH   (contact niels if this error occurs)"); 
