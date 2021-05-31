@@ -277,10 +277,12 @@ public class MonsterPuzzle : MonoBehaviour
             
             
             /////////////// VERIFICATION SI C'EST UNE PIECE INCORRECTE /////////////
+            isCorrectPiece = true;
             for (int i = 0; i < m_potentialPieces.Count; i++) //pour chaque pièce dans les pièces correctes
             {
                 if (m_prefabStock[m_selectorY, m_selectorX] == m_potentialPieces[i]) //si le sélecteur est à la même position que la pièce actuelle de correct pieces
                 {
+                    isAlreadyFound = false;
                     for (int j = 0; j < m_incorrectPieces.Count; j++)   //Pour chaque pièces dans les pièces trouvées
                     {
                         if (m_prefabStock[m_selectorY, m_selectorX] == m_incorrectPieces[j])    //Si le sélecteur est à la même position que la pièce actuelle dans foundPiece
@@ -305,11 +307,11 @@ public class MonsterPuzzle : MonoBehaviour
             }
             
             
-            if(isCorrectPiece == false && isAlreadyFound == false) //compteur de défaite s'incrémente de 1
+            if(isCorrectPiece == false) //compteur de défaite s'incrémente de 1
             {
                 m_errorDone++;   //nombre d'erreurs possibles avant défaite diminue
 
-                if (m_errorDone != m_errorAllowed)
+                if (m_errorDone < m_errorAllowed)
                 {
                     Rumbler.Instance.Rumble(m_lowA, m_highA, m_rumbleDuration);
                 }
@@ -317,7 +319,7 @@ public class MonsterPuzzle : MonoBehaviour
                 {
                     
                     Rumbler.Instance.Rumble(m_lowA, m_highA, m_rumbleDuration);
-                    if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
+                    m_interactDetection.PuzzleDeactivation();
                 }
             }
         }
