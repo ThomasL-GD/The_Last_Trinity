@@ -405,6 +405,7 @@ public class GuardBehavior : MonoBehaviour {
             if(!isAlreadyInList) m_charactersInDangerScript.Add(charaScript);
             
             m_enterZone = true;
+            Debug.Log("OnTriggerExit", this);
         }
     }
     
@@ -429,6 +430,7 @@ public class GuardBehavior : MonoBehaviour {
                 m_nma.speed = m_normalSpeed;
                 m_nma.acceleration = m_normalAcceleration;
                 m_nma.angularSpeed = m_normalRotationSpeed;
+                Debug.Log("OnTriggerExit", this);
                 m_enterZone = false;
 
                 m_attackVibe = false;
