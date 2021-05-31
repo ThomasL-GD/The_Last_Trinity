@@ -74,7 +74,7 @@ public class Interact_Detection : MonoBehaviour
         if (m_isInSubPuzzle && GuardBehavior.m_isKillingSomeone)
         {
             Debug.Log("Tue moi ce type qui est dans le subpuzzle");
-            this.PuzzleDeactivation();
+            PuzzleDeactivation();
         }
         
         if (m_buttonActivate || m_isInSubPuzzle) {
