@@ -49,7 +49,7 @@ public class HumanSubPuzzle : MonoBehaviour {
     private float m_elapsedTime = 0.0f; //The time passed since the subPuzzle Started
     
     [Header("Prefabs for visual representation")]
-    [SerializeField] [Tooltip("The visual representation of the player\nMust be a Rect transform element")] private GameObject m_prefabPlayer = null;
+    [SerializeField] [Tooltip("The visual representation of the player\nMust be a Rect transform element\nMUST FACE TO THE RIGHT")] private GameObject m_prefabPlayer = null;
     [SerializeField] [Tooltip("The prefab of the background\nMust be a Rect transform element")] private GameObject m_prefabBG = null;
     [SerializeField] [Tooltip("The visual representation of the path of the player\nMust be a Rect transform element")] private GameObject m_prefabPathVisualition = null;
     [Tooltip("List that shows the path of the player\nFor debug only I guess")] private List<RectTransform> m_playerPath = new List<RectTransform>();
@@ -543,18 +543,22 @@ public class HumanSubPuzzle : MonoBehaviour {
                 switch (attemptedMovement) {
                     case Directions.Left:
                         m_selector.x--;
+                        m_player.GetComponent<RectTransform>().rotation = Quaternion.Euler(new Vector3(0f, 0f, 180f));
                         break;
                     
                     case Directions.Right:
                         m_selector.x++;
+                        m_player.GetComponent<RectTransform>().rotation = Quaternion.Euler(new Vector3(0f, 0f, 0f));
                         break;
                     
                     case Directions.Up:
                         m_selector.y++;
+                        m_player.GetComponent<RectTransform>().rotation = Quaternion.Euler(new Vector3(0f, 0f, 90f));
                         break;
                     
                     case Directions.Down:
                         m_selector.y--;
+                        m_player.GetComponent<RectTransform>().rotation = Quaternion.Euler(new Vector3(0f, 0f, -90f));
                         break;
                 }
 
