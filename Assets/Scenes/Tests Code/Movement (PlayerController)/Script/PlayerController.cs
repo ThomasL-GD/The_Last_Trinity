@@ -313,8 +313,7 @@ public class PlayerController : MonoBehaviour
         else if (m_isDying) {
             m_deathCounter += Time.deltaTime;
             if (m_deathCounter > m_timeBeforeDying) {
-                //The line below means that if the delegator is NOT empty, we invoke it.
-                DeathManager.DeathDelegator?.Invoke();
+                Death();
             }
         }
         

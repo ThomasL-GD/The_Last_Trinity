@@ -69,7 +69,6 @@ public class Rumbler : MonoBehaviour
     IEnumerator RumbleDuration(float p_rumbleTime)
     {
         yield return new WaitForSeconds(p_rumbleTime);
-        Debug.Log("Fonction STOP");
         StopRumble();
     }
 
