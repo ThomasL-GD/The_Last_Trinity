@@ -13,11 +13,11 @@ public class CameraMovement : MonoBehaviour
     
     [Header("Caméra Clamp & Value")]
     
-    [SerializeField][Range(-5, 5)]private float m_clamp = 2.5f; //Clamp de la caméra sur le rail de dolly
+    [SerializeField][Range(-5, 5)] [Tooltip("The value ")] private float m_clamp = 2.5f; //Clamp de la caméra sur le rail de dolly
     [SerializeField][Range(0, 3)] private float m_lookSpeed = 0f; //Vitesse de déplacement du look sur le côté
     [SerializeField][Range(0, 6)] private float m_returnSpeed = 0f; //Vitesse de déplacement du retour de la caméra
-    [SerializeField][Range(-1, 1)] private float m_globalOffset = 0f; //Vitesse de déplacement du retour de la caméra
-    private float m_incertitude = 0.1f; //Valeur d'incertitude de la distance de l'offset
+    private float m_globalOffset = 0f; //Vitesse de déplacement du retour de la caméra
+    [SerializeField][Range(0f, 1f)] private float m_incertitude = 0.1f; //Valeur d'incertitude de la distance de l'offset
 
     void Start()
     {
