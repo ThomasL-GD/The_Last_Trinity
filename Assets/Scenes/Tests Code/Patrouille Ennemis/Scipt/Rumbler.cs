@@ -4,18 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 
 public class Rumbler : MonoBehaviour
 {
     [HideInInspector] public PlayerInput m_playerInput;
     Gamepad m_gamepad = Gamepad.current;
-    
-    // private void OnEnable()
-    // {
-    //     Gamepad m_gamepad = Gamepad.current;
-    // }
+    private DpadControl m_dpad = Gamepad.current.dpad;
 
-    
     //All of the tabulated code under is what it takes to make a singleton
     [HideInInspector] [SerializeField] private string m_objectName = "";
     private static Rumbler m_instance;
@@ -77,6 +73,7 @@ public class Rumbler : MonoBehaviour
         StopRumble();
     }
 
+    
 
     public void StopRumble()
     {
@@ -91,15 +88,11 @@ public class Rumbler : MonoBehaviour
         m_playerInput = GetComponent<PlayerInput>();
         m_gamepad = GetGamepad();
     }
-
-    private void Update()
-    {
-        
-    }
+    
 
 
     // Private helpers
-    private Gamepad GetGamepad()
+    public Gamepad GetGamepad()
     {
         //return Gamepad.all.FirstOrDefault(g => m_playerInput.devices.Any(d => d.deviceId == g.deviceId));
         return Gamepad.current;
@@ -124,4 +117,10 @@ public class Rumbler : MonoBehaviour
         //return gamepad;
         #endregion
     }
+
+    public DpadControl GetDpad()
+    {
+        return m_dpad;
+    }
+    
 }
