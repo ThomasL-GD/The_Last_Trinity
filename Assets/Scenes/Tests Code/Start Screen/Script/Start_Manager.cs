@@ -137,28 +137,8 @@ public class Start_Manager : MonoBehaviour {
             }
 
             //RESET POUR DEPLACEMENT PAR A COUPS
-            if (horizontalAxis < m_limitPosition && horizontalAxis > -m_limitPosition && verticalAxis < m_limitPosition && verticalAxis > -m_limitPosition)
-            {
+            if (horizontalAxis < m_limitPosition && horizontalAxis > -m_limitPosition && verticalAxis < m_limitPosition && verticalAxis > -m_limitPosition) {
                 m_hasMoved = false;
-            }
-
-            //ALTERNANCE ENTRE LE MENU FRANCAIS ET LE MENU ANGLAIS
-            if (m_englishMenuIsActive)
-            {
-                for (int i = 4; i < m_test.Count; i++)
-                {
-                    if(i<4) m_test[i].gameObject.SetActive(true);
-                    else m_test[i].gameObject.SetActive(false);
-                }
-                    
-            }
-            else if (m_frenchMenuIsActive)
-            {
-                for (int i = 4; i < m_test.Count; i++)
-                {
-                    if(i>3) m_test[i].gameObject.SetActive(true);
-                    else m_test[i].gameObject.SetActive(false);
-                }
             }
             
             //INPUT D'ACTIVATION A L'ENDROIT OU LE CURSEUR SE SITUE
@@ -179,12 +159,22 @@ public class Start_Manager : MonoBehaviour {
                             Debug.Log("Vers le francais");
                             m_englishMenuIsActive = false;
                             m_frenchMenuIsActive = true;
+                            for (int i = 4; i < m_test.Count; i++)
+                            {
+                                if(i>3) m_test[i].gameObject.SetActive(true);
+                                else m_test[i].gameObject.SetActive(false);
+                            }
                         }
                         else if (m_frenchMenuIsActive)
                         {
                             Debug.Log("Vers l'anglais");
                             m_frenchMenuIsActive = false;
                             m_englishMenuIsActive = true;
+                            for (int i = 4; i < m_test.Count; i++)
+                            {
+                                if(i<4) m_test[i].gameObject.SetActive(true);
+                                else m_test[i].gameObject.SetActive(false);
+                            }
                         }
                         break;
                     case 3:
