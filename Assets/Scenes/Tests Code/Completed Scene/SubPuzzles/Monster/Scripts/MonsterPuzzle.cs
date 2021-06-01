@@ -8,6 +8,7 @@ using Random = UnityEngine.Random;
 using UnityEngine.InputSystem;
 using System.Linq;
 using UnityEngine.InputSystem.DualShock;
+using UnityEngine.UI;
 
 public class MonsterPuzzle : MonoBehaviour
 {
@@ -198,6 +199,9 @@ public class MonsterPuzzle : MonoBehaviour
 
         if (!m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis >m_limitPosition || verticalAxis < -m_limitPosition) {
             
+            //We unselect the last piece we were selecting
+            m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color = Color.black;
+            
             //déplacement du sélecteur avec le joystick gauche
             if (m_interactDetection.m_canMove && !m_hasMoved && horizontalAxis < -m_limitPosition && m_selectorX > 0)   //Déplacement a gauche si position X sélecteur > position  X  première prefab instanciée
             {
@@ -221,7 +225,8 @@ public class MonsterPuzzle : MonoBehaviour
             }
 
             //nouvelle position du sélecteur
-            SetRectPosition(m_selectorTransform.gameObject, m_selectorX, m_selectorY);
+            //SetRectPosition(m_selectorTransform.gameObject, m_selectorX, m_selectorY);
+            m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color = new Color(0f,0.2f,8f,1f);
         }
 
         //Joystick se recentre sur la manette
