@@ -30,8 +30,8 @@ public class Telekinesable : MonoBehaviour
 
     private VisualEffect m_cube; //Visual effect en enfant de l'objet Telekinesable
     
-    void Start()
-    {
+    void Start() {
+        DeathManager.DeathDelegator += Reset;
         m_originalPos = transform.position;
         // Define a target position above the object transform
         m_targetPos = new Vector3(m_originalPos.x, m_originalPos.y + m_teleVal, m_originalPos.z);
@@ -135,5 +135,14 @@ public class Telekinesable : MonoBehaviour
     {
         float pow = Mathf.Pow(10, m_unSliderDint);
         return new Vector3(Mathf.Round((p_pos.x * pow)/pow), Mathf.Round((p_pos.y * pow)/pow), Mathf.Round((p_pos.z * pow)/pow));
+    }
+
+    public void Reset() {
+        transform.position = m_originalPos;
+        m_cube.Stop();
+        m_telekinesieOpen = false;
+        m_activeTelekinesie = false;
+        m_robotScript = null;
+        m_isInBetweenTravel = false;
     }
 }
