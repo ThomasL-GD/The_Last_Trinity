@@ -142,6 +142,7 @@ public class Telekinesable : MonoBehaviour
         m_cube.Stop();
         m_telekinesieOpen = false;
         m_activeTelekinesie = false;
+        if (m_robotScript != null) m_robotScript.AbilityAnim(false);
         m_robotScript = null;
         m_isInBetweenTravel = false;
     }
