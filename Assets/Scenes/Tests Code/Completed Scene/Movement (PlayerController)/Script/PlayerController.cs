@@ -4,6 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
 using UnityEngine.EventSystems;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Cinemachine;
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// Script du mouvement du player controller
@@ -65,6 +71,7 @@ public class PlayerController : MonoBehaviour
     [Header("Death Manager")]
     [SerializeField] [Range(0.2f, 5f)] [Tooltip("The time the player is allowed to stay in this death zone (unit : seconds)")] private float m_timeBeforeDying = 0.5f;
     [SerializeField] [Range(0.2f, 5f)] [Tooltip("The time of the death animation (must be longer than the death animation time) (unit : seconds)")] private float m_deathAnimTime = 1.5f;
+    [SerializeField] [Range(0.2f, 5f)] [Tooltip("The time of the fade in black after death (unit : seconds)")] private float m_deathFadeTime = 1.5f;
     private float m_deathCounter = 0.0f;
     private bool m_isDying = false; //If the chara is in a death zone
     private bool m_isPlayingDead = false; //If the chara is currently playing their death animation
@@ -313,7 +320,7 @@ public class PlayerController : MonoBehaviour
         else if (m_isDying) {
             m_deathCounter += Time.deltaTime;
             if (m_deathCounter > m_timeBeforeDying) {
-                Death();
+                if (!m_isPlayingDead)Death();
             }
         }
         
@@ -470,7 +477,17 @@ public class PlayerController : MonoBehaviour
     /// <returns></returns>
     IEnumerator DeathTimer() {
         yield return new WaitForSeconds(m_deathAnimTime);
-        DeathManager.DeathDelegator();
+        //We add the function that will respawn the charas to the OnBlackScreen delegator so the next level will be launched once the screen is fully black
+        DeathManager.OnBlackScreen += DeathDelegatorCall;
+        DeathManager.Instance.DeathFade(false, m_deathFadeTime);
+    }
+
+    /// <summary>
+    /// ...Must I really explain this ?
+    /// It will just call the deathdelegator there's absolutely no surprise in that...
+    /// </summary>
+    public static void DeathDelegatorCall() {
+        DeathManager.DeathDelegator?.Invoke();
     }
     
     /// <summary>
@@ -484,6 +501,10 @@ public class PlayerController : MonoBehaviour
 
         //We teleport the player to their spawnpoint
         transform.SetPositionAndRotation(m_spawnPoint, transform.rotation);
+        
+        //We remove it to let others use it without killing the chara
+        DeathManager.Instance.DeathFade(true, m_deathFadeTime);
+        DeathManager.OnBlackScreen -= DeathDelegatorCall;
         
         GuardBehavior.m_isKillingSomeone = false;
         DeathAnim(false);
