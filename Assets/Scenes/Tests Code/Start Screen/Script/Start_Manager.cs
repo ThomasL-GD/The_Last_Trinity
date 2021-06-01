@@ -41,8 +41,9 @@ public class Start_Manager : MonoBehaviour {
     [SerializeField] [Tooltip("camera principale")] private GameObject m_camera;
     [SerializeField] [Tooltip("Temps de déplacement de la camera jusqu'à la position de recul")] [Range(0.0f,50.0f)]private float m_backTimeCamera = 1.0f;
     [SerializeField] [Tooltip("vitesse de rotation de la camera jusqu'à la position de recul")] [Range(0.0f,500.0f)] private float m_backSpeedRotationCamera = 100.0f;
-    [SerializeField] [Tooltip("vitesse de déplacement de la camera")] [Range(0.0f,50.0f)] private float m_endSpeedCamera = 1.0f;
-    [SerializeField] [Tooltip("vitesse de déplacement de la camera")] [Range(0.0f,1000.0f)] private float m_endSpeedRotationCamera = 100.0f;
+    [SerializeField] [Tooltip("temps de déplacement de la camera")] [Range(5.0f,60.0f)] private float m_endTimeCamera = 10.0f;
+    private Vector3 m_distance = Vector3.zero;
+    private Vector3 m_angle = Vector3.zero;
     
     private float m_timer = 0f;  //temps qui s'écoule à chaque frame
     private float m_timerBackCamera = 0f;  //temps qui s'écoule à chaque frame pendant le travelling vers l'arrière
@@ -228,6 +229,11 @@ public class Start_Manager : MonoBehaviour {
                     m_test[i].gameObject.SetActive(false);
                 }
                 m_pressStartButton.gameObject.SetActive(false);
+                
+                //Prearation for the next travelling
+                m_distance = m_destinationsTransforms[2].transform.position - m_camera.transform.position;
+                m_angle = m_destinationsTransforms[2].transform.rotation.eulerAngles - m_camera.transform.rotation.eulerAngles;
+                m_timerBackCamera = 0.0f;
             }
         }
         
@@ -256,22 +262,13 @@ public class Start_Manager : MonoBehaviour {
                 m_camera.transform.Rotate(Vector3.left * (m_backSpeedRotationCamera * Time.deltaTime));
             }
         }
-        else if(m_englishMenuIsActive || m_frenchMenuIsActive){
-            //déplacement de la caméra de la position initiale à la position de recul   (les deux points sont dans la liste m_destinationsTransform)
-            m_camera.transform.position = Vector3.MoveTowards(m_camera.transform.position,m_destinationsTransforms[2].transform.position, m_endSpeedCamera*Time.deltaTime);
-            //rotation de la caméra sur la durée pour avoir la même que la rotation de la vue de recul
-            if(m_camera.transform.rotation.z <= m_destinationsTransforms[2].transform.rotation.z)
-            {
-                m_camera.transform.Rotate(Vector3.forward * (m_endSpeedRotationCamera * Time.deltaTime));
-            }
-            if (m_camera.transform.rotation.y <= m_destinationsTransforms[2].transform.rotation.y)
-            {
-                m_camera.transform.Rotate(Vector3.up * (m_endSpeedRotationCamera * Time.deltaTime));
-            }
-            if (m_camera.transform.rotation.x >= m_destinationsTransforms[2].transform.rotation.x)
-            {
-                m_camera.transform.Rotate(Vector3.left * (m_endSpeedRotationCamera * Time.deltaTime));
-            }
+        else if((m_englishMenuIsActive || m_frenchMenuIsActive) && m_timerBackCamera < m_endTimeCamera){ // If the main menu is active and the camera still have travel to do to go to its target position
+            m_timerBackCamera += Time.deltaTime;
+            
+            //déplacement de la caméra vers la position souhaitée
+            m_camera.transform.position += m_distance * (Time.deltaTime/m_endTimeCamera);
+            //rotation de la caméra vers la position souhaitée
+            m_camera.transform.rotation = Quaternion.Euler(m_camera.transform.rotation.eulerAngles     +    m_angle * (Time.deltaTime/m_endTimeCamera));
 
         }
         
