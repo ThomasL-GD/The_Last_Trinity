@@ -180,7 +180,7 @@ public class GuardBehavior : MonoBehaviour {
         }
         
 
-        if (m_enterZone && !m_isKillingSomeone) {
+        if (m_enterZone && !m_isKillingSomeone && !m_intimidationVibe) {
             m_warningVibe = true;
             m_intimidationVibe = false;
             m_attackVibe = false;
@@ -220,14 +220,6 @@ public class GuardBehavior : MonoBehaviour {
                 }
                 else //le chara est visible par l'ennemi
                 {
-                    //INTIMIDATION DU MONSTRE
-                    if (Input.GetKeyDown(m_charactersInDangerScript[0].m_selector.inputMonster))
-                    {
-                        m_warningVibe = false;
-                        m_intimidationVibe = true;
-                        m_attackVibe = false;
-                        if (m_intimidationCor == null) StartCoroutine(Intimidate());
-                    }
                     
                     //Si le joueur est dans l'angle mort de l'ennemi
                     if (Mathf.Abs(angleForward) > m_angleUncertainty)
@@ -288,6 +280,15 @@ public class GuardBehavior : MonoBehaviour {
                     m_isGoingTowardsPlayer = false;
                     m_nma.SetDestination(m_staticPos);
                 }
+            }
+                
+            //INTIMIDATION DU MONSTRE
+            if (Input.GetKeyDown(m_charactersInDangerScript[0].m_selector.inputMonster))
+            {
+                m_warningVibe = false;
+                m_intimidationVibe = true;
+                m_attackVibe = false;
+                if (m_intimidationCor == null) StartCoroutine(Intimidate());
             }
 
 
@@ -362,6 +363,7 @@ public class GuardBehavior : MonoBehaviour {
     {
         yield return new WaitForSeconds(m_stunTime); //durée de stun
         m_nma.isStopped = false;
+        m_intimidationVibe = false;
     }
     IEnumerator DeathCoroutine()
     {
