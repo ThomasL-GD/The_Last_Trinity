@@ -14,7 +14,8 @@ public class MonsterPuzzle : MonoBehaviour
 {
     [Header("Prefabs")]
     [SerializeField] [Tooltip("Liste des pièces qui vont spawn")] private GameObject[] m_piecePrefab;
-    [SerializeField] [Tooltip("Carré de selection qui se déplace entre les différentes instances de pièces présentes")] private GameObject m_prefabSelector = null;
+    [SerializeField] [Tooltip("Couleur pour une pièce qui est sélectionnée")] private Color m_colorSelector = new Color(0f, 0.2f, 0.8f, 1f);
+    [SerializeField] [Tooltip("Couleur pour une pièce qui est validée")] private Color m_colorValidation = new Color(0.6f, 0.8f, 1f, 1f);
     
     [Header("Listes")]
     [Tooltip("liste des pièces qui peuvent apparaitre")]private List<GameObject> m_stockPieces = new List<GameObject>();
@@ -84,8 +85,6 @@ public class MonsterPuzzle : MonoBehaviour
         }
         else PuzzleGenerate();
 
-        if(m_prefabSelector == null) Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE PREFAB OF THE SELECTOR !");
-
         RectTransform rect = gameObject.GetComponent<RectTransform>();
         rect.localPosition = Vector3.zero;
         rect.anchoredPosition = Vector2.zero;
@@ -143,14 +142,7 @@ public class MonsterPuzzle : MonoBehaviour
         
         
         /////////////////////////////////////////////////////////////////////////////   SELECTEUR   /////////////////////////////////////////////////////////////////////////////
-        
-        
-        //création du selecteur dans la scène
-        GameObject instance = Instantiate(m_prefabSelector, m_initialPos, transform.rotation, gameObject.transform);
-        SetRectPosition(instance, 0, 0);
-        
-        //transform du sélecteur récupéré à l'instanciation
-        m_selectorTransform = instance.transform;
+        m_prefabStock[0, 0].GetComponent<Image>().color = m_colorSelector;
 
 
         /////////////////////////////////////////////////////////////////////////////   CORRECT PIECES   /////////////////////////////////////////////////////////////////////////////
@@ -200,7 +192,8 @@ public class MonsterPuzzle : MonoBehaviour
         if (!m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis >m_limitPosition || verticalAxis < -m_limitPosition) {
             
             //We unselect the last piece we were selecting
-            m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color = Color.black;
+            Color colorPiece = m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color;
+            if(colorPiece != m_colorValidation) m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color = Color.black;
             
             //déplacement du sélecteur avec le joystick gauche
             if (m_interactDetection.m_canMove && !m_hasMoved && horizontalAxis < -m_limitPosition && m_selectorX > 0)   //Déplacement a gauche si position X sélecteur > position  X  première prefab instanciée
@@ -226,7 +219,8 @@ public class MonsterPuzzle : MonoBehaviour
 
             //nouvelle position du sélecteur
             //SetRectPosition(m_selectorTransform.gameObject, m_selectorX, m_selectorY);
-            m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color = new Color(0f,0.2f,8f,1f);
+            colorPiece = m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color;
+            if(colorPiece != m_colorValidation)m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color = m_colorSelector;
         }
 
         //Joystick se recentre sur la manette
@@ -273,7 +267,7 @@ public class MonsterPuzzle : MonoBehaviour
                             if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
                         }
 
-                        Instantiate(m_selectorTransform, m_prefabStock[m_selectorY, m_selectorX].transform.position, m_prefabStock[m_selectorY, m_selectorX].transform.rotation, gameObject.transform);  //feedback de trouvage de pièce
+                        m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color = m_colorValidation;  //feedback de trouvage de pièce
                         
                         i = m_correctPieces.Count; //Arrête la boucle for dès trouvaille de pièce correcte
                     }
@@ -367,8 +361,7 @@ public class MonsterPuzzle : MonoBehaviour
 
         //Remise à 0 de la position du sélecteur
         m_selectorX = 0; 
-        m_selectorY = 0; 
-        SetRectPosition(m_prefabSelector.gameObject, 0, 0);
+        m_selectorY = 0;
         
         
         m_stockPieces.Clear();
