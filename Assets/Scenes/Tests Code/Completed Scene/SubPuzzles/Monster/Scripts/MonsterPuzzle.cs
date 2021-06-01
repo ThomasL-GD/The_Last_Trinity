@@ -85,6 +85,8 @@ public class MonsterPuzzle : MonoBehaviour
         }
         else PuzzleGenerate();
 
+        m_prefabStock[0, 0].GetComponent<Image>().color = m_colorSelector;
+
         RectTransform rect = gameObject.GetComponent<RectTransform>();
         rect.localPosition = Vector3.zero;
         rect.anchoredPosition = Vector2.zero;
@@ -142,7 +144,6 @@ public class MonsterPuzzle : MonoBehaviour
         
         
         /////////////////////////////////////////////////////////////////////////////   SELECTEUR   /////////////////////////////////////////////////////////////////////////////
-        m_prefabStock[0, 0].GetComponent<Image>().color = m_colorSelector;
 
 
         /////////////////////////////////////////////////////////////////////////////   CORRECT PIECES   /////////////////////////////////////////////////////////////////////////////
