@@ -324,7 +324,6 @@ public class GuardBehavior : MonoBehaviour {
             Rumbler.Instance.Rumble(m_lowWarningEnemy, m_highWarningEnemy);
         }
         else if (m_intimidationVibe && !m_warningVibe && !m_attackVibe){
-            if(m_animator != null)m_animator.SetBool(IsStun, true);
             //Vibration d'intimidation du monstre allié
             Rumbler.Instance.Rumble(m_lowMonsterIntimidation, m_highMonsterIntimidation);
         }
@@ -349,6 +348,7 @@ public class GuardBehavior : MonoBehaviour {
 
         //appel singleton vibe
         Rumbler.Instance.Rumble(m_lowMonsterIntimidation, m_highMonsterIntimidation, m_rumbleDuration);
+        if(m_animator != null)m_animator.SetBool(IsStun, true);
 
         m_nma.isStopped = true;
         PlayerController scriptCharaWhoIsDying = m_charactersInDangerScript[0];
@@ -366,6 +366,7 @@ public class GuardBehavior : MonoBehaviour {
     IEnumerator Stun()
     {
         yield return new WaitForSeconds(m_stunTime); //durée de stun
+        if(m_animator != null)m_animator.SetBool(IsStun, false);
         m_nma.isStopped = false;
         m_intimidationVibe = false;
     }
@@ -471,6 +472,10 @@ public class GuardBehavior : MonoBehaviour {
             m_isGoingTowardsPlayer = false;
             m_destinations.Remove(m_destinations[m_currentDestination]);
             m_nma.SetDestination(m_destinations[m_currentDestination]);
+        }
+
+        if (m_isStatic) {
+            m_nma.SetDestination(m_staticPos);
         }
         
         m_isGoingTowardsPlayer = false;
