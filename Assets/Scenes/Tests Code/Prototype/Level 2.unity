@@ -13571,6 +13571,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 562095315}
+  - component: {fileID: 562095316}
   m_Layer: 0
   m_Name: Mur Porteur
   m_TagString: Untagged
@@ -13615,6 +13616,19 @@ Transform:
   m_Father: {fileID: 1234555918}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &562095316
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 562095314}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!4 &564271426 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6718000191195612998, guid: 53fdf3e871cc20c48babc5ad84bd7079, type: 3}
@@ -27552,7 +27566,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5360481821891176001, guid: 9aa6cc17c6d613f4c8751797c37c9a12, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.19941539
       objectReference: {fileID: 0}
     - target: {fileID: 5360481821891176001, guid: 9aa6cc17c6d613f4c8751797c37c9a12, type: 3}
       propertyPath: m_LocalRotation.x
@@ -27560,7 +27574,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5360481821891176001, guid: 9aa6cc17c6d613f4c8751797c37c9a12, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.0000029504295
+      value: -0.9799151
       objectReference: {fileID: 0}
     - target: {fileID: 5360481821891176001, guid: 9aa6cc17c6d613f4c8751797c37c9a12, type: 3}
       propertyPath: m_LocalRotation.z
@@ -27572,7 +27586,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5360481821891176001, guid: 9aa6cc17c6d613f4c8751797c37c9a12, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 180
+      value: 203.006
       objectReference: {fileID: 0}
     - target: {fileID: 5360481821891176001, guid: 9aa6cc17c6d613f4c8751797c37c9a12, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
