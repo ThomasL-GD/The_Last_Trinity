@@ -175,11 +175,12 @@ public class Interact_Detection : MonoBehaviour
     /// <returns></returns>
     IEnumerator DoorTimer() {
         m_openDoor = true;
-        m_playerController.LookSomewhere(m_doorSub[0].m_door.transform);
+        PlayerController playerCon = m_playerController;
+        playerCon.LookSomewhere(m_doorSub[0].m_door.transform);
         
         yield return new WaitForSeconds(m_doorOpeningTime);
         
-        m_playerController.Refocus();
+        playerCon.Refocus();
         this.enabled = false;
     }
     
