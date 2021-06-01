@@ -353,6 +353,7 @@ public class GuardBehavior : MonoBehaviour {
         m_nma.isStopped = true;
         PlayerController scriptCharaWhoIsDying = m_charactersInDangerScript[0];
         scriptCharaWhoIsDying.m_isForbiddenToMove = true;
+        scriptCharaWhoIsDying.AbilityAnim(true);
         
         yield return new WaitForSeconds(m_intimidationTime); //temps d'animation d'intimidation
         
@@ -360,6 +361,7 @@ public class GuardBehavior : MonoBehaviour {
         Rumbler.Instance.StopRumble();
         
         scriptCharaWhoIsDying.m_isForbiddenToMove = false;
+        scriptCharaWhoIsDying.AbilityAnim(false);
         StartCoroutine(Stun());
         m_intimidationCor = null;
     }
