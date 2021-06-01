@@ -16,12 +16,13 @@ public class MonsterPuzzle : MonoBehaviour
     [SerializeField] [Tooltip("Liste des pièces qui vont spawn")] private GameObject[] m_piecePrefab;
     [SerializeField] [Tooltip("Couleur pour une pièce qui est sélectionnée")] private Color m_colorSelector = new Color(0f, 0.2f, 0.8f, 1f);
     [SerializeField] [Tooltip("Couleur pour une pièce qui est validée")] private Color m_colorValidation = new Color(0.6f, 0.8f, 1f, 1f);
+    [SerializeField] [Tooltip("Couleur pour une pièce qui est fausse")] private Color m_colorError = new Color(1f, 0.1f, 0.1f, 1f);
     
     [Header("Listes")]
     [Tooltip("liste des pièces qui peuvent apparaitre")]private List<GameObject> m_stockPieces = new List<GameObject>();
     [Tooltip("liste des pièces dans la scène")] private List<GameObject> m_potentialPieces = new List<GameObject>();
     [Tooltip("liste des pièces correctes")] private List<GameObject> m_correctPieces = new List<GameObject>();
-    [Tooltip("liste des pièces Incorrectes")] private List<GameObject> m_incorrectPieces = new List<GameObject>();
+    [Tooltip("liste des pièces Incorrectes déjà trouvées")] private List<GameObject> m_incorrectPieces = new List<GameObject>();
     [Tooltip("List des pièces trouvées")] private List<GameObject> m_foundPieces = new List<GameObject>();
 
     //Décalage
@@ -51,7 +52,7 @@ public class MonsterPuzzle : MonoBehaviour
 
     [Header("Joystick Manager")]
     [SerializeField] public SOInputMultiChara m_inputs = null;
-    [Tooltip("position limite de joystick")] private float m_limitPosition = 0.5f;
+    [SerializeField] [Tooltip("position limite de joystick")] [Range(0.1f, 1f)] private float m_limitPosition = 0.5f;
     [HideInInspector] [Tooltip("variable de déplacement en points par points du sélecteur")] private bool m_hasMoved = false;
 
     [Header("Rumble")]
@@ -84,6 +85,8 @@ public class MonsterPuzzle : MonoBehaviour
             Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO MODIFY THE HEIGHT AND THE WIDTH OF THE ARRAY ACCORDING TO THE NUMBER OF DIFFERENT SYMBOLS !");
         }
         else PuzzleGenerate();
+
+        m_prefabStock[0, 0].GetComponent<Image>().color = m_colorSelector;
 
         RectTransform rect = gameObject.GetComponent<RectTransform>();
         rect.localPosition = Vector3.zero;
@@ -142,7 +145,6 @@ public class MonsterPuzzle : MonoBehaviour
         
         
         /////////////////////////////////////////////////////////////////////////////   SELECTEUR   /////////////////////////////////////////////////////////////////////////////
-        m_prefabStock[0, 0].GetComponent<Image>().color = m_colorSelector;
 
 
         /////////////////////////////////////////////////////////////////////////////   CORRECT PIECES   /////////////////////////////////////////////////////////////////////////////
@@ -193,7 +195,7 @@ public class MonsterPuzzle : MonoBehaviour
             
             //We unselect the last piece we were selecting
             Color colorPiece = m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color;
-            if(colorPiece != m_colorValidation) m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color = Color.black;
+            if(colorPiece != m_colorValidation && colorPiece != m_colorError) m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color = Color.black;
             
             //déplacement du sélecteur avec le joystick gauche
             if (m_interactDetection.m_canMove && !m_hasMoved && horizontalAxis < -m_limitPosition && m_selectorX > 0)   //Déplacement a gauche si position X sélecteur > position  X  première prefab instanciée
@@ -220,7 +222,7 @@ public class MonsterPuzzle : MonoBehaviour
             //nouvelle position du sélecteur
             //SetRectPosition(m_selectorTransform.gameObject, m_selectorX, m_selectorY);
             colorPiece = m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color;
-            if(colorPiece != m_colorValidation)m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color = m_colorSelector;
+            if(colorPiece != m_colorValidation && colorPiece != m_colorError)m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color = m_colorSelector;
         }
 
         //Joystick se recentre sur la manette
@@ -241,6 +243,8 @@ public class MonsterPuzzle : MonoBehaviour
             {
                 if (m_prefabStock[m_selectorY, m_selectorX] == m_correctPieces[i]) //si le sélecteur est à la même position que la pièce actuelle de correct pieces
                 {
+                    isCorrectPiece = true;
+                    
                     for (int j = 0; j < m_foundPieces.Count; j++)   //Pour chaque pièces dans les pièces trouvées
                     {
                         if (m_prefabStock[m_selectorY, m_selectorX] == m_foundPieces[j])    //Si le sélecteur est à la même position que la pièce actuelle dans foundPiece
@@ -255,7 +259,6 @@ public class MonsterPuzzle : MonoBehaviour
                     {
                         m_foundPieces.Add(m_correctPieces[i]); //ajout d'une pièce correcte à pièce trouvé
                         
-                        isCorrectPiece = true; //indique qu'une pièce est bonne
                         m_findPiece++; //incrémentation des bonnes pièces trouvées
 
                         if (m_findPiece == m_nbAmalgamePieces) //Si le nombre de pièces trouvées = nombre de pièces à trouver
@@ -273,52 +276,47 @@ public class MonsterPuzzle : MonoBehaviour
                     }
                 }
             }
-            
-            
-            /////////////// VERIFICATION SI C'EST UNE PIECE INCORRECTE /////////////
-            isCorrectPiece = true;
-            for (int i = 0; i < m_potentialPieces.Count; i++) //pour chaque pièce dans les pièces correctes
-            {
-                if (m_prefabStock[m_selectorY, m_selectorX] == m_potentialPieces[i]) //si le sélecteur est à la même position que la pièce actuelle de correct pieces
-                {
-                    isAlreadyFound = false;
-                    for (int j = 0; j < m_incorrectPieces.Count; j++)   //Pour chaque pièces dans les pièces trouvées
-                    {
-                        if (m_prefabStock[m_selectorY, m_selectorX] == m_incorrectPieces[j])    //Si le sélecteur est à la même position que la pièce actuelle dans foundPiece
-                        {
-                            isAlreadyFound = true;  //la pièce en question a déjà été trouvé
-                            j = m_foundPieces.Count;
-                        }
-                    }
 
-                    //PIECE PAS ENCORE TROUVEE ET INCORRECTE
-                    if (!isAlreadyFound)    
+            if (!isCorrectPiece) {
+                isAlreadyFound = false;
+                /////////////// VERIFICATION SI C'EST UNE PIECE INCORRECTE /////////////
+                for (int i = 0; i < m_potentialPieces.Count; i++) //pour chaque pièce dans les pièces incorrectes
+                {
+                    if (m_prefabStock[m_selectorY, m_selectorX] == m_potentialPieces[i]) //si le sélecteur est à la même position que la pièce actuelle de potential pieces
                     {
-                        m_incorrectPieces.Add(m_potentialPieces[i]); //ajout d'une pièce incorrecte aux pièces incorrectes
+                        isAlreadyFound = false;
+                        for (int j = 0; j < m_incorrectPieces.Count; j++)   //Pour chaque pièces dans les pièces trouvées
+                        {
+                            if (m_potentialPieces[i] == m_incorrectPieces[j])    //Si le sélecteur est à la même position que la pièce actuelle dans foundPiece
+                            {
+                                isAlreadyFound = true;  //la pièce en question a déjà été trouvé
+                                j = m_foundPieces.Count;
+                            }
+                        }
+
+                        //PIECE PAS ENCORE TROUVEE ET INCORRECTE
+                        if (!isAlreadyFound)    
+                        {
+                            m_incorrectPieces.Add(m_potentialPieces[i]); //ajout d'une pièce incorrecte aux pièces incorrectes
                         
-                        isCorrectPiece = false; //indique qu'une pièce est incorrecte
-                        
-                        m_prefabStock[m_selectorY, m_selectorX].SetActive(false);   //désactive la pièce
+                            m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color = m_colorError;   //désactive la pièce
+                            
+                            m_errorDone++;   //nombre d'erreurs possibles avant défaite diminue
+
+                            if (m_errorDone < m_errorAllowed)
+                            {
+                                Rumbler.Instance.Rumble(m_lowA, m_highA, m_rumbleDuration);
+                            }
+                            else if (m_errorDone >= m_errorAllowed)
+                            {
+                    
+                                Rumbler.Instance.Rumble(m_lowA, m_highA, m_rumbleDuration);
+                                m_interactDetection.PuzzleDeactivation();
+                            }
+                        }
                         
                         i = m_potentialPieces.Count; //Arrête la boucle for dès trouvaille de pièce incorrecte
                     }
-                }
-            }
-            
-            
-            if(isCorrectPiece == false) //compteur de défaite s'incrémente de 1
-            {
-                m_errorDone++;   //nombre d'erreurs possibles avant défaite diminue
-
-                if (m_errorDone < m_errorAllowed)
-                {
-                    Rumbler.Instance.Rumble(m_lowA, m_highA, m_rumbleDuration);
-                }
-                else if (m_errorDone >= m_errorAllowed)
-                {
-                    
-                    Rumbler.Instance.Rumble(m_lowA, m_highA, m_rumbleDuration);
-                    m_interactDetection.PuzzleDeactivation();
                 }
             }
         }

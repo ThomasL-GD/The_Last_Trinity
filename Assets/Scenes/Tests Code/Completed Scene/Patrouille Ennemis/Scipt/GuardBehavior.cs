@@ -74,6 +74,9 @@ public class GuardBehavior : MonoBehaviour {
     [Tooltip("For Debug Only")] private List<PlayerController> m_charactersInDangerScript = new List<PlayerController>(); //Liste des scripts sur les character qui entrent et sortent de la zone de l'ennemi
 
 
+    private static readonly int IsStun = Animator.StringToHash("IsStun");
+    private static readonly int IsChasing = Animator.StringToHash("IsChasing");
+    private static readonly int IsWalking = Animator.StringToHash("IsWalking");
     
     
     // Start is called before the first frame update
@@ -97,10 +100,10 @@ public class GuardBehavior : MonoBehaviour {
             Transform transform1 = transform;
             m_staticPos = transform1.position;
             m_staticRotation = transform1.rotation;
-            if(m_animator != null)m_animator.SetBool("IsWalking", false);
+            if(m_animator != null)m_animator.SetBool(IsWalking, false);
         }
         else {
-            if(m_animator != null)m_animator.SetBool("IsWalking", true);
+            if(m_animator != null)m_animator.SetBool(IsWalking, true);
             //We transform the list of Transforms (easier to serialize) into a list of Vector3 (easier to manipulate)
             for (int i = 0; i < m_destinationsTransforms.Count; i++) {
                 m_destinations.Add(m_destinationsTransforms[i].position);
@@ -125,14 +128,15 @@ public class GuardBehavior : MonoBehaviour {
 
 
     private Coroutine m_intimidationCor = null;
-    
+    private static readonly int Attack = Animator.StringToHash("Attack");
+
 
     // Update is called once per frame
     void Update() {
 
         if (!m_isKillingSomeone) {
             if(!m_isStatic){
-                if(m_animator != null)m_animator.SetBool("IsWalking", true);
+                if(m_animator != null)m_animator.SetBool(IsWalking, true);
                 //If the guard is close enough to the point he was trying to reach
                 if (transform.position.x <= m_destinations[m_currentDestination].x + m_uncertainty &&
                     transform.position.x >= m_destinations[m_currentDestination].x - m_uncertainty &&
@@ -163,7 +167,7 @@ public class GuardBehavior : MonoBehaviour {
 
                     //m_isOnTheirSpot = true;
 
-                    if(m_animator != null)m_animator.SetBool("IsWalking", false);
+                    if(m_animator != null)m_animator.SetBool(IsWalking, false);
                     
                     //Debug.Log($"ennnemy rotation {Mathf.Abs(Mathf.Abs(m_staticRotation.eulerAngles.y) - Mathf.Abs(transform.rotation.eulerAngles.y))}   warning : {!m_warningVibe}   attack : {!m_attackVibe}", this);
 
@@ -175,12 +179,12 @@ public class GuardBehavior : MonoBehaviour {
                         
                     }
                 }
-                else{if(m_animator != null)m_animator.SetBool("IsWalking", true);}
+                else{if(m_animator != null)m_animator.SetBool(IsWalking, true);}
             }
         }
         
 
-        if (m_enterZone && !m_isKillingSomeone) {
+        if (m_enterZone && !m_isKillingSomeone && !m_intimidationVibe) {
             m_warningVibe = true;
             m_intimidationVibe = false;
             m_attackVibe = false;
@@ -220,14 +224,6 @@ public class GuardBehavior : MonoBehaviour {
                 }
                 else //le chara est visible par l'ennemi
                 {
-                    //INTIMIDATION DU MONSTRE
-                    if (Input.GetKeyDown(m_charactersInDangerScript[0].m_selector.inputMonster))
-                    {
-                        m_warningVibe = false;
-                        m_intimidationVibe = true;
-                        m_attackVibe = false;
-                        if (m_intimidationCor == null) StartCoroutine(Intimidate());
-                    }
                     
                     //Si le joueur est dans l'angle mort de l'ennemi
                     if (Mathf.Abs(angleForward) > m_angleUncertainty)
@@ -289,6 +285,15 @@ public class GuardBehavior : MonoBehaviour {
                     m_nma.SetDestination(m_staticPos);
                 }
             }
+                
+            //INTIMIDATION DU MONSTRE
+            if (Input.GetKeyDown(m_charactersInDangerScript[0].m_selector.inputMonster))
+            {
+                m_warningVibe = false;
+                m_intimidationVibe = true;
+                m_attackVibe = false;
+                if (m_intimidationCor == null) StartCoroutine(Intimidate());
+            }
 
 
         }
@@ -319,17 +324,17 @@ public class GuardBehavior : MonoBehaviour {
             Rumbler.Instance.Rumble(m_lowWarningEnemy, m_highWarningEnemy);
         }
         else if (m_intimidationVibe && !m_warningVibe && !m_attackVibe){
-            if(m_animator != null)m_animator.SetBool("Stun", true);
+            if(m_animator != null)m_animator.SetBool(IsStun, true);
             //Vibration d'intimidation du monstre allié
             Rumbler.Instance.Rumble(m_lowMonsterIntimidation, m_highMonsterIntimidation);
         }
         else if (m_attackVibe && !m_warningVibe && !m_intimidationVibe){
-            if(m_animator != null)m_animator.SetBool("IsChasing", true);
+            if(m_animator != null)m_animator.SetBool(IsChasing, true);
             //vibration d'attaque ennemie
             Rumbler.Instance.Rumble(m_lowAttackEnemy, m_highAttackEnemy);
         }
         else if (!m_warningVibe && !m_attackVibe && !m_intimidationVibe && !m_isKillingSomeone){
-            if(m_animator != null)m_animator.SetBool("IsChasing", false);
+            if(m_animator != null)m_animator.SetBool(IsChasing, false);
             //arrêt de vibration
             //Debug.Log("Stop vibration !");
             //Rumbler.Instance.StopRumble();
@@ -362,11 +367,12 @@ public class GuardBehavior : MonoBehaviour {
     {
         yield return new WaitForSeconds(m_stunTime); //durée de stun
         m_nma.isStopped = false;
+        m_intimidationVibe = false;
     }
     IEnumerator DeathCoroutine()
     {
         m_isKillingSomeone = true;
-        m_animator.SetTrigger("Attack");
+        m_animator.SetTrigger(Attack);
         PlayerController scriptCharaWhoIsDying = m_charactersInDangerScript[0];
         m_nma.isStopped = true;
         scriptCharaWhoIsDying.m_isForbiddenToMove = true;
@@ -374,8 +380,8 @@ public class GuardBehavior : MonoBehaviour {
         
         m_hitFX.GetComponent<ParticleSystem>().Play();
         
-        if(m_animator != null)m_animator.SetBool("IsChasing", false);
-        if(m_animator != null)m_animator.SetBool("IsWalking", false);
+        if(m_animator != null)m_animator.SetBool(IsChasing, false);
+        if(m_animator != null)m_animator.SetBool(IsWalking, false);
 
         scriptCharaWhoIsDying.Death();  //mort   // We will reset m_isForbiddenToMove and m_isKillingSomeone in there
     }
