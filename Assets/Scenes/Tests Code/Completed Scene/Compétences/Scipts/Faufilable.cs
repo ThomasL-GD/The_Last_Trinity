@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.VFX;
 
 public class Faufilable : MonoBehaviour
 {
@@ -21,6 +22,10 @@ public class Faufilable : MonoBehaviour
     [SerializeField] [Tooltip("The speed multiplier that will be applied to the human once she's on hands and knees")] [Range(0.1f, 1f)] private float m_speedMultiplier = 0.5f;
     [SerializeField] [Tooltip("The size multiplier that will be applied to the human once she's on hands and knees")] [Range(0.1f, 1f)] private float m_sizeMultiplier = 0.3f;
 
+    [Header("Effects")]
+    [SerializeField] [Tooltip("Effect of the Duct when player is near")] private VisualEffect m_ductEffect = null;
+    [SerializeField] [Tooltip("The Smoke effect when the player leave the duct")] private GameObject m_smokeObject = null;
+    private ParticleSystem m_smokeParticle; //Particle system of the smoke object
     void Start()
     {
         if (m_selector == null) {
@@ -30,6 +35,17 @@ public class Faufilable : MonoBehaviour
         if (m_exit == null) {
             Debug.LogError("Le Transform n'est pas sérialisé");
         }
+        
+        if (m_ductEffect == null) {
+            Debug.LogError("L'effet de la duct n'est pas sérialisé");
+        }
+        
+        if (m_smokeObject == null) {
+            Debug.LogError("L'effet de la fumée n'est pas sérialisé");
+        }
+
+        m_smokeParticle = m_smokeObject.GetComponent<ParticleSystem>();
+        m_ductEffect.Stop();
     }
 
     private void Update() {
@@ -66,6 +82,7 @@ public class Faufilable : MonoBehaviour
         Faufilable exitScript = m_exit.GetComponent<Faufilable>();
         if (exitScript.m_human == null) exitScript.m_human = m_human;
         m_human.transform.position = m_exit.transform.position;
+        m_smokeParticle.Play();
         m_humanScript.m_isForbiddenToMove = false;
         m_isTeleporting = false;
     }
@@ -78,6 +95,7 @@ public class Faufilable : MonoBehaviour
         
         if (p_other.gameObject.TryGetComponent(out PlayerController player)) {
             if (player.m_chara == Charas.Human && !m_exit.GetComponent<Faufilable>().m_isIntoWall) {
+                m_ductEffect.Play();
                 m_human = p_other.gameObject.transform;
                 m_humanScript = player;
                 UpdateSize(player.gameObject, true);
@@ -97,6 +115,7 @@ public class Faufilable : MonoBehaviour
     {
         if (p_other.gameObject.TryGetComponent(out PlayerController player)) {
             if (player.m_chara == Charas.Human) {
+                m_ductEffect.Stop();
                 UpdateSize(player.gameObject, false);
                 RemoveSneakiness();
             }
