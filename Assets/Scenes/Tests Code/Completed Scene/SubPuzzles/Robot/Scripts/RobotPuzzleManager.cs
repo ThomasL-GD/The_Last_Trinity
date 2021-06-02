@@ -84,12 +84,12 @@ public class RobotPuzzleManager : MonoBehaviour {
 		{
 			if (m_piecePrefabs[i] == null)
 			{
-				Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE PREFABS FOR THE PIECES !");
+				Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE PREFABS FOR THE PIECES !", this);
 				gameObject.SetActive(false);
 			}
 			else if (!m_piecePrefabs[i].TryGetComponent<PieceBehaviour>(out PieceBehaviour pb))
 			{
-				Debug.LogError("JEEZ ! THE GAME DESIGNER PUT PREFABS FOR PIECES THAT DOESN'T HAVE THE RIGHT SCRIPT ON THEM !");
+				Debug.LogError("JEEZ ! THE GAME DESIGNER PUT PREFABS FOR PIECES THAT DOESN'T HAVE THE RIGHT SCRIPT ON THEM !", this);
 				gameObject.SetActive(false);
 			}
 		}
@@ -110,7 +110,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 		m_interactDetection.SquarePanelToScreen();
 		
 		if (m_puzzle.m_width == 0 || m_puzzle.m_height == 0) {
-			Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE DIMENSIONS OF THE ARRAY !");
+			Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE DIMENSIONS OF THE ARRAY !", this);
 			Debug.Break ();
 		}
 		
@@ -141,7 +141,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 			m_selector = new Selector(0, 0) {rect = rectT};
 		}
 		else {
-			Debug.LogError ("JEEZ ! THE GAME DESIGNER PUT A WRONG PREFAB FOR THE SELECTOR, IT MUST BE A UI ELEMENT WITH A RECT TRANSFORM !");
+			Debug.LogError ("JEEZ ! THE GAME DESIGNER PUT A WRONG PREFAB FOR THE SELECTOR, IT MUST BE A UI ELEMENT WITH A RECT TRANSFORM !", this);
 		}
 	}
 
@@ -376,38 +376,36 @@ public class RobotPuzzleManager : MonoBehaviour {
 		bool selectorValidation = false;
 		if(!m_cycle) selectorValidation = Input.GetKeyDown(m_inputs.inputRobot);
 		else if(m_cycle) selectorValidation = Rumbler.Instance.m_gamepad.buttonSouth.wasPressedThisFrame;
+
+		bool left = ((!m_hasMoved && horizontalAxis < -m_limitPosition) || Rumbler.Instance.GetDpad().left.wasPressedThisFrame);
+		bool right = ((!m_hasMoved && horizontalAxis > m_limitPosition) || Rumbler.Instance.GetDpad().right.wasPressedThisFrame);
+		bool up = ((!m_hasMoved && verticalAxis > m_limitPosition) || Rumbler.Instance.GetDpad().up.wasPressedThisFrame);
+		bool down = ((!m_hasMoved && verticalAxis < -m_limitPosition) || Rumbler.Instance.GetDpad().down.wasPressedThisFrame);
 		
 
-		if (!m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis >m_limitPosition || verticalAxis < -m_limitPosition)
+		if (m_interactDetection.m_canMove && (down || left || right || up))
 		{
 			
 			//déplacement du sélecteur
-			if (m_interactDetection.m_canMove && !m_hasMoved && (horizontalAxis < -m_limitPosition || Rumbler.Instance.GetDpad().left.wasPressedThisFrame) && m_selector.x > 0) //Déplacement a gauche si position X sélecteur > position  X  première prefab instanciée
+			if (m_interactDetection.m_canMove && left && m_selector.x > 0) //Déplacement a gauche si position X sélecteur > position  X  première prefab instanciée
 			{
-				//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
-				if(m_puzzle.m_pieces[m_selector.x, m_selector.y].m_isEmptyPiece == false || m_canMoveOnEmpty) m_selector.x--;
+				if(m_puzzle.m_pieces[m_selector.x, m_selector.y].m_isEmptyPiece == false || m_canMoveOnEmpty) m_selector.x--; //vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
 				m_hasMoved = true;
 			}
-			else if (m_interactDetection.m_canMove && !m_hasMoved && (horizontalAxis > m_limitPosition) && m_selector.x < m_puzzle.m_width - 1) //Déplacement à droite si position  X sélecteur < valeur largeur tableau prefab
+			else if (m_interactDetection.m_canMove && right && m_selector.x < m_puzzle.m_width - 1) //Déplacement à droite si position  X sélecteur < valeur largeur tableau prefab
 			{
-				if(m_puzzle.m_pieces[m_selector.x, m_selector.y].m_isEmptyPiece == false || m_canMoveOnEmpty) m_selector.x++;		//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
+				if(m_puzzle.m_pieces[m_selector.x, m_selector.y].m_isEmptyPiece == false || m_canMoveOnEmpty) m_selector.x++;  //vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
 				m_hasMoved = true;
 			}
-			else if (m_interactDetection.m_canMove && !m_hasMoved && (verticalAxis > m_limitPosition || Rumbler.Instance.GetDpad().up.wasPressedThisFrame) && m_selector.y < m_puzzle.m_height - 1) //Déplacement en haut si position Y sélecteur > position Y dernière prefab
+			else if (m_interactDetection.m_canMove && up && m_selector.y < m_puzzle.m_height - 1) //Déplacement en haut si position Y sélecteur > position Y dernière prefab
 			{
-				if (m_puzzle.m_pieces[m_selector.x, m_selector.y].m_isEmptyPiece == false || m_canMoveOnEmpty)
-				{
-					m_selector.y++; //vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
-					m_hasMoved = true;
-				}
+				if (m_puzzle.m_pieces[m_selector.x, m_selector.y].m_isEmptyPiece == false || m_canMoveOnEmpty) m_selector.y++; //vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
+				m_hasMoved = true;
 			}
-			else if (m_interactDetection.m_canMove && !m_hasMoved && (verticalAxis < -m_limitPosition || Rumbler.Instance.GetDpad().left.wasPressedThisFrame) && m_selector.y > 0) //Déplacement en bas si position Y sélecteur < 0
+			else if (m_interactDetection.m_canMove && down && m_selector.y > 0) //Déplacement en bas si position Y sélecteur < 0
 			{
-				if (m_puzzle.m_pieces[m_selector.x, m_selector.y].m_isEmptyPiece == false || m_canMoveOnEmpty)
-				{
-					m_selector.y--; //vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
-					m_hasMoved = true;
-				}
+				if (m_puzzle.m_pieces[m_selector.x, m_selector.y].m_isEmptyPiece == false || m_canMoveOnEmpty) m_selector.y--; //vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
+				m_hasMoved = true;
 			}
 
 
@@ -437,11 +435,6 @@ public class RobotPuzzleManager : MonoBehaviour {
 		{
 			if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
 		}
-
-		Debug.Log(Rumbler.Instance.GetDpad().down.wasPressedThisFrame);
-		Debug.Log(Rumbler.Instance.GetDpad().up.wasPressedThisFrame);
-		Debug.Log(Rumbler.Instance.GetDpad().left.wasPressedThisFrame);
-		Debug.Log(Rumbler.Instance.GetDpad().right.wasPressedThisFrame);
 	}
 	
 

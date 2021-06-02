@@ -83,21 +83,21 @@ public class HumanSubPuzzle : MonoBehaviour {
         m_interactDetection.SquarePanelToScreen();
 
         if (m_mazeHeight < 2 || m_mazeWidth < 2) {
-            Debug.LogError("Invalid size of the maze ! each dimension must be 2 or more cell long");
+            Debug.LogError("Invalid size of the maze ! each dimension must be 2 or more cell long", this);
         }
         if (m_wallsToRemove + m_wallsToRemoveAfterBreaking >= m_mazeHeight * m_mazeWidth * 4) {
-            Debug.LogWarning("Warning ! You want to remove to many random walls from the maze, it's gonna be either way too easy or completely fucked up");
+            Debug.LogWarning("Warning ! You want to remove to many random walls from the maze, it's gonna be either way too easy or completely fucked up", this);
         }
         
-        if(m_prefabDown == null) Debug.LogError("JEEZ ! THERE IS NO PREFAB FOR THE DOWN WALL !");
-        if(m_prefabLeft == null) Debug.LogError("JEEZ ! THERE IS NO PREFAB FOR THE LEFT WALL !");
-        if(m_prefabRight == null) Debug.LogError("JEEZ ! THERE IS NO PREFAB FOR THE RIGHT WALL !");
-        if(m_prefabUp == null) Debug.LogError("JEEZ ! THERE IS NO PREFAB FOR THE UP WALL !");
-        if(m_prefabPlayer == null) Debug.LogError("JEEZ ! THERE IS NO PREFAB FOR THE PLAYER !");
-        if(m_prefabBG == null) Debug.LogError("JEEZ ! THERE IS NO PREFAB FOR THE BACKGROUND !");
-        if(m_prefabTimer == null) Debug.LogError("JEEZ ! THERE IS NO OBJECT FOR THE TIMER !");
-        if(m_lightObject == null) Debug.LogError("JEEZ ! THERE IS NO OBJECT FOR THE Light !");
-        if(m_soLight == null) Debug.LogError("JEEZ ! THERE IS NO SOLIGHT IN THE HUMAN SUBPUZZLE !");
+        if(m_prefabDown == null) Debug.LogError("JEEZ ! THERE IS NO PREFAB FOR THE DOWN WALL !", this);
+        if(m_prefabLeft == null) Debug.LogError("JEEZ ! THERE IS NO PREFAB FOR THE LEFT WALL !", this);
+        if(m_prefabRight == null) Debug.LogError("JEEZ ! THERE IS NO PREFAB FOR THE RIGHT WALL !", this);
+        if(m_prefabUp == null) Debug.LogError("JEEZ ! THERE IS NO PREFAB FOR THE UP WALL !", this);
+        if(m_prefabPlayer == null) Debug.LogError("JEEZ ! THERE IS NO PREFAB FOR THE PLAYER !", this);
+        if(m_prefabBG == null) Debug.LogError("JEEZ ! THERE IS NO PREFAB FOR THE BACKGROUND !", this);
+        if(m_prefabTimer == null) Debug.LogError("JEEZ ! THERE IS NO OBJECT FOR THE TIMER !", this);
+        if(m_lightObject == null) Debug.LogError("JEEZ ! THERE IS NO OBJECT FOR THE Light !", this);
+        if(m_soLight == null) Debug.LogError("JEEZ ! THERE IS NO SOLIGHT IN THE HUMAN SUBPUZZLE !", this);
         
         //We calculate the size of each cell
         m_offset = 0f;
@@ -514,22 +514,27 @@ public class HumanSubPuzzle : MonoBehaviour {
             m_hasMoved = false;
         }
 
-        if (!m_hasMoved && (horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis > m_limitPosition || verticalAxis < -m_limitPosition)) {
+        bool left = ((!m_hasMoved && horizontalAxis < -m_limitPosition) || Rumbler.Instance.GetDpad().left.wasPressedThisFrame);
+        bool right = ((!m_hasMoved && horizontalAxis > m_limitPosition) || Rumbler.Instance.GetDpad().right.wasPressedThisFrame);
+        bool up = ((!m_hasMoved && verticalAxis > m_limitPosition) || Rumbler.Instance.GetDpad().up.wasPressedThisFrame);
+        bool down = ((!m_hasMoved && verticalAxis < -m_limitPosition) || Rumbler.Instance.GetDpad().down.wasPressedThisFrame);
+
+        if (m_interactDetection.m_canMove && (down || right || up || left)) {
             
             Directions attemptedMovement = Directions.None;
             m_hasMoved = true;
             
             //We first stocks the way the player wants to go if he's not blocked by the limits of the maze
-            if (m_interactDetection.m_canMove && horizontalAxis < -m_limitPosition && m_selector.x > 0) {
+            if (left && m_selector.x > 0) {
                 attemptedMovement = Directions.Left;
             }
-            else if (m_interactDetection.m_canMove && horizontalAxis > m_limitPosition && m_selector.x < m_maze.GetLength(1) - 1) {
+            else if (right && m_selector.x < m_maze.GetLength(1) - 1) {
                 attemptedMovement = Directions.Right;
             }
-            else if (m_interactDetection.m_canMove && verticalAxis > m_limitPosition && m_selector.y < m_maze.GetLength(0) - 1) {
+            else if (up && m_selector.y < m_maze.GetLength(0) - 1) {
                 attemptedMovement = Directions.Up;
             }
-            else if (m_interactDetection.m_canMove && verticalAxis < -m_limitPosition && m_selector.y > 0) {
+            else if (down && m_selector.y > 0) {
                 attemptedMovement = Directions.Down;
             }
 

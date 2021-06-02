@@ -45,27 +45,27 @@ public class Interact_Detection : MonoBehaviour
     
     private void Start()
     {
-        if (m_puzzle == null) { Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO ADD A SUBPUZZLE IN INTERACT_DETECTION !");
+        if (m_puzzle == null) { Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO ADD A SUBPUZZLE IN INTERACT_DETECTION !", this);
         }
         else {
             switch (m_chara) {
                 case Charas.Human:
-                    if (!m_puzzle.TryGetComponent(out HumanSubPuzzle hsb)) Debug.LogError("JEEZ ! THE GAME DESIGNER PUT A SUBPUZZLE DIFFERENT FROM THE CHARA CHOOSED ABOVE IN INTERACT_DETECTION !");
+                    if (!m_puzzle.TryGetComponent(out HumanSubPuzzle hsb)) Debug.LogError("JEEZ ! THE GAME DESIGNER PUT A SUBPUZZLE DIFFERENT FROM THE CHARA CHOOSED ABOVE IN INTERACT_DETECTION !", this);
                     break;
                 case Charas.Monster:
-                    if (!m_puzzle.TryGetComponent(out MonsterPuzzle msb)) Debug.LogError("JEEZ ! THE GAME DESIGNER PUT A SUBPUZZLE DIFFERENT FROM THE CHARA CHOOSED ABOVE IN INTERACT_DETECTION !");
+                    if (!m_puzzle.TryGetComponent(out MonsterPuzzle msb)) Debug.LogError("JEEZ ! THE GAME DESIGNER PUT A SUBPUZZLE DIFFERENT FROM THE CHARA CHOOSED ABOVE IN INTERACT_DETECTION !", this);
                     break;
                 case Charas.Robot:
-                    if (!m_puzzle.TryGetComponent(out RobotPuzzleManager rsb)) Debug.LogError("JEEZ ! THE GAME DESIGNER PUT A SUBPUZZLE DIFFERENT FROM THE CHARA CHOOSED ABOVE IN INTERACT_DETECTION !");
+                    if (!m_puzzle.TryGetComponent(out RobotPuzzleManager rsb)) Debug.LogError("JEEZ ! THE GAME DESIGNER PUT A SUBPUZZLE DIFFERENT FROM THE CHARA CHOOSED ABOVE IN INTERACT_DETECTION !", this);
                     break;
             }
         }
         
-        if(m_timer > m_doorOpeningTime) Debug.LogError ($"JEEZ ! THE M_TIMER ({m_timer}) MUST BE SHORTER THAN THE M_DOOROPENINGTIME ({m_doorOpeningTime}) YOU FREAKING RETARDED !");
+        if(m_timer > m_doorOpeningTime) Debug.LogError ($"JEEZ ! THE M_TIMER ({m_timer}) MUST BE SHORTER THAN THE M_DOOROPENINGTIME ({m_doorOpeningTime}) YOU FREAKING RETARDED !", this);
 
-        if (m_camera == null) Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE CAMERA IN INTERACT_DETECTION !");
-        if (m_inputs == null) Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO ADD THE INPUTS IN INTERACT_DETECTION !");
-        if(m_doorSub.Length == 0) Debug.LogWarning("BE CAREFUL ! THERE IS NO DOOR FOR ANIMATION IN INTERACT_DETECTION !");
+        if (m_camera == null) Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE CAMERA IN INTERACT_DETECTION !", this);
+        if (m_inputs == null) Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO ADD THE INPUTS IN INTERACT_DETECTION !", this);
+        if(m_doorSub.Length == 0) Debug.LogWarning("BE CAREFUL ! THERE IS NO DOOR FOR ANIMATION IN INTERACT_DETECTION !", this);
         
     }
 
