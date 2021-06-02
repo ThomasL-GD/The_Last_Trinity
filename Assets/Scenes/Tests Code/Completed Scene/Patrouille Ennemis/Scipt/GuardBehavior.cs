@@ -285,9 +285,14 @@ public class GuardBehavior : MonoBehaviour {
                     m_nma.SetDestination(m_staticPos);
                 }
             }
+            
                 
             //INTIMIDATION DU MONSTRE
-            if (Input.GetKeyDown(m_charactersInDangerScript[0].m_selector.inputMonster))
+            bool selectorValidation = false;
+            if(!m_charactersInDangerScript[0].m_cycle) selectorValidation = Input.GetKeyDown(m_charactersInDangerScript[0].m_selector.inputMonster);
+            else if(m_charactersInDangerScript[0].m_cycle) selectorValidation = Rumbler.Instance.m_gamepad.buttonSouth.isPressed;
+            
+            if (selectorValidation && m_charactersInDangerScript[0].m_chara == Charas.Monster)
             {
                 m_warningVibe = false;
                 m_intimidationVibe = true;

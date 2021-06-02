@@ -63,6 +63,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 	
 	[Header("SO Input")]
 	[SerializeField] [Tooltip("controller input")] public SOInputMultiChara m_inputs = null;
+	[HideInInspector] public bool m_cycle = false; //Will be assigned by interactDetection depending on the player script 
 	[Tooltip("position limite de joystick")] private float m_limitPosition = 0.5f;
 	[HideInInspector] [Tooltip("variable de déplacement en points par points du sélecteur")] private bool m_hasMoved = false;
 	
@@ -372,7 +373,9 @@ public class RobotPuzzleManager : MonoBehaviour {
 		//bool dPadX = Input.GetButtonDown("Dpad X");
 		float verticalAxis = Input.GetAxis("Vertical");
 		//bool dPadY = Input.GetButtonDown("Dpad Y");
-		bool selectorValidation = Input.GetKeyDown(m_inputs.inputRobot);
+		bool selectorValidation = false;
+		if(!m_cycle) selectorValidation = Input.GetKeyDown(m_inputs.inputRobot);
+		else if(m_cycle) selectorValidation = Rumbler.Instance.m_gamepad.buttonSouth.isPressed;
 		
 
 		if (!m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis >m_limitPosition || verticalAxis < -m_limitPosition)
@@ -430,7 +433,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 		}
 		
 		//Sortie du subPuzzle en cas de changement de personnage
-		if (m_interactDetection.m_isInSubPuzzle && (Input.GetKeyDown(m_inputs.inputMonster) || Input.GetKeyDown(m_inputs.inputHuman) || Rumbler.Instance.GetGamepad().buttonSouth.isPressed))
+		if ( (!m_cycle && (m_interactDetection.m_isInSubPuzzle && (Input.GetKeyDown(m_inputs.inputMonster) || Input.GetKeyDown(m_inputs.inputHuman)))) || (m_cycle && Rumbler.Instance.m_gamepad.buttonEast.isPressed))
 		{
 			if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
 		}
