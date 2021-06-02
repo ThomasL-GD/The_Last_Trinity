@@ -51,8 +51,8 @@ public class GuardBehavior : MonoBehaviour {
     private Vector3 m_spawnPoint = Vector3.zero;
     
     [Header("Monster Ability")]
-    [SerializeField] [Tooltip("temps de capacité de monstre")] [Range(0f,60f)] private float m_intimidationTime = 1.0f;
-    [SerializeField] [Tooltip("temps de stun qu'est l'ennemi")] [Range(0f,180f)] private float m_stunTime = 1.0f;
+    [SerializeField] [Tooltip("Temps de déploiement de l'intimidation du monstre allié\nUnit : seconds")] [Range(0f,60f)] private float m_intimidationTime = 1.0f;
+    [SerializeField] [Tooltip("Temps pendant lequel l'ennemi est stun\nMust be greater than intimidation Time\nUnit : seconds")] [Range(0f,180f)] private float m_stunTime = 1.0f;
     
     [Header("Rumble")]
     [SerializeField] [Tooltip("valeur de la vibration faible lorsque le character entre dans la zone de l'ennemi")] [Range(0f,1f)] private float m_lowWarningEnemy =0f;
@@ -170,7 +170,7 @@ public class GuardBehavior : MonoBehaviour {
 
                     if(m_animator != null)m_animator.SetBool(IsWalking, false);
                     
-                    //Debug.Log($"ennnemy rotation {Mathf.Abs(Mathf.Abs(m_staticRotation.eulerAngles.y) - Mathf.Abs(transform.rotation.eulerAngles.y))}   warning : {!m_warningVibe}   attack : {!m_attackVibe}", this);
+                    //Debug.Log($"enemy rotation {Mathf.Abs(Mathf.Abs(m_staticRotation.eulerAngles.y) - Mathf.Abs(transform.rotation.eulerAngles.y))}   warning : {!m_warningVibe}   attack : {!m_attackVibe}", this);
 
                     if (Mathf.Abs(Mathf.Abs(m_staticRotation.eulerAngles.y) - Mathf.Abs(transform.rotation.eulerAngles.y)) > 1f && (!m_warningVibe && !m_attackVibe)) {
                         float angle = Mathf.Abs(m_staticRotation.eulerAngles.y) - Mathf.Abs(transform.rotation.eulerAngles.y);
@@ -298,7 +298,7 @@ public class GuardBehavior : MonoBehaviour {
             if(!m_charactersInDangerScript[0].m_cycle) selectorValidation = Input.GetKeyDown(m_charactersInDangerScript[0].m_selector.inputMonster);
             else if(m_charactersInDangerScript[0].m_cycle) selectorValidation = Rumbler.Instance.m_gamepad.buttonSouth.wasPressedThisFrame;
             
-            if (selectorValidation && m_charactersInDangerScript[0].m_chara == Charas.Monster)
+            if (selectorValidation && m_charactersInDangerScript[0].m_chara == Charas.Monster) // TODO monster in any index
             {
                 m_warningVibe = false;
                 m_intimidationVibe = true;
