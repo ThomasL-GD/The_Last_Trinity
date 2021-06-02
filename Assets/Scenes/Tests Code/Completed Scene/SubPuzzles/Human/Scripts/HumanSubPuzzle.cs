@@ -230,14 +230,15 @@ public class HumanSubPuzzle : MonoBehaviour {
         
         for (int i = 0; i < 2; i++)
         {
-            GameObject timerObject = null;
-            if(i == 0) timerObject = Instantiate(m_prefabTimer, transform.position, transform.rotation, gameObject.transform);
-            else timerObject = Instantiate(m_prefabTimerRemplissage, transform.position, transform.rotation, gameObject.transform);
+            GameObject prefab = null;
+            if(i == 0) prefab = m_prefabTimer;
+            else prefab = m_prefabTimerRemplissage;
 
             for (int j = 0; j < 2; j++) {
+                    
+                GameObject timerObject = Instantiate(prefab, transform.position, transform.rotation, gameObject.transform);
 
-                if (timerObject.TryGetComponent<RectTransform>(out RectTransform rt))
-                {
+                if (timerObject.TryGetComponent<RectTransform>(out RectTransform rt)) {
 
                     float shiftMin = -0.2f;
                     float shiftMax = 0f;
