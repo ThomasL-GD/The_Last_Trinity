@@ -47,8 +47,10 @@ public class HumanSubPuzzle : MonoBehaviour {
     [SerializeField] [Tooltip("The time allowed to the player to complete this subPuzzle\n(unit : seconds)")] [Range(5f, 600f)] private float m_timeAllowed = 60f;
     [SerializeField] [Tooltip("The prefab for the appearance of the timer\nMust be a Rect transform element")] private GameObject m_prefabTimer = null;
     [SerializeField] [Tooltip("The prefab for the appearance of hat will fill the timer\n(will be massively distorted)\nMust be a Rect transform element")] private GameObject m_prefabTimerRemplissage = null;
+    [SerializeField] [Tooltip("The prefab for the appearance of hat will go around the timer\nMust be a Rect transform element")] private GameObject m_prefabTimerContour = null;
     private RectTransform[] m_rectTimers = null; //The rect transforms of the time bars
     private float m_elapsedTime = 0.0f; //The time passed since the subPuzzle Started
+    private float m_shiftY = 0.1f; //The shift of the fill timer
     
     [Header("Prefabs for visual representation")]
     [SerializeField] [Tooltip("The visual representation of the player\nMust be a Rect transform element\nMUST FACE TO THE RIGHT")] private GameObject m_prefabPlayer = null;
@@ -228,11 +230,22 @@ public class HumanSubPuzzle : MonoBehaviour {
         //Création du timer
         m_rectTimers = new RectTransform[2];
         
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < 3; i++)
         {
             GameObject prefab = null;
-            if(i == 0) prefab = m_prefabTimer;
-            else prefab = m_prefabTimerRemplissage;
+            float shiftY = 0f;
+            if (i == 0) {
+                prefab = m_prefabTimer;
+                shiftY = 0f;
+            }
+            else if (i == 1){
+                prefab = m_prefabTimerRemplissage;
+                shiftY = m_shiftY;
+            }
+            else {
+                prefab = m_prefabTimerContour;
+                shiftY = 0f;
+            }
 
             for (int j = 0; j < 2; j++) {
                     
@@ -255,15 +268,15 @@ public class HumanSubPuzzle : MonoBehaviour {
                     }
 
                     //Check the SetRectPosition() function if you don't understand those lines
-                    rt.anchorMin = new Vector2(shiftMin, 0);
-                    rt.anchorMax = new Vector2(shiftMax, 1);
+                    rt.anchorMin = new Vector2(shiftMin, 0 + shiftY);
+                    rt.anchorMax = new Vector2(shiftMax, 1 - shiftY);
 
                     rt.localPosition = Vector3.zero;
                     rt.anchoredPosition = Vector2.zero;
 
                     //We add the rect transform to an array to manipulate it later
                     if(i == 1) m_rectTimers[j] = rt;
-                    else timerObject.transform.SetSiblingIndex(0);
+                    //timerObject.transform.SetSiblingIndex(i);
 
                 }
             }
@@ -605,8 +618,8 @@ public class HumanSubPuzzle : MonoBehaviour {
             foreach (RectTransform rectTimer in m_rectTimers) {
             
                 //Check the SetRectPosition() function if you don't understand those lines
-                rectTimer.anchorMin = new Vector2(rectTimer.anchorMin.x, 0);
-                rectTimer.anchorMax = new Vector2(rectTimer.anchorMax.x, 1f - (1/(m_timeAllowed/m_elapsedTime)));
+                rectTimer.anchorMin = new Vector2(rectTimer.anchorMin.x, 0 + m_shiftY);
+                rectTimer.anchorMax = new Vector2(rectTimer.anchorMax.x, (1f) - ((1 - m_shiftY)/(m_timeAllowed/m_elapsedTime)));
 
                 rectTimer.localPosition = Vector3.zero;
                 rectTimer.anchoredPosition = Vector2.zero;
