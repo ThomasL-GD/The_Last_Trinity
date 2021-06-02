@@ -45,7 +45,8 @@ public class HumanSubPuzzle : MonoBehaviour {
 
     [Header("Timer")]
     [SerializeField] [Tooltip("The time allowed to the player to complete this subPuzzle\n(unit : seconds)")] [Range(5f, 600f)] private float m_timeAllowed = 60f;
-    [SerializeField] [Tooltip("The prefab for the appearance of the timer\n(will be massively distorted)\nMust be a Rect transform element")] private GameObject m_prefabTimer = null;
+    [SerializeField] [Tooltip("The prefab for the appearance of the timer\nMust be a Rect transform element")] private GameObject m_prefabTimer = null;
+    [SerializeField] [Tooltip("The prefab for the appearance of hat will fill the timer\n(will be massively distorted)\nMust be a Rect transform element")] private GameObject m_prefabTimerRemplissage = null;
     private RectTransform[] m_rectTimers = null; //The rect transforms of the time bars
     private float m_elapsedTime = 0.0f; //The time passed since the subPuzzle Started
     
@@ -227,32 +228,43 @@ public class HumanSubPuzzle : MonoBehaviour {
         //Création du timer
         m_rectTimers = new RectTransform[2];
         
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 2; i++)
+        {
+            GameObject timerObject = null;
+            if(i == 0) timerObject = Instantiate(m_prefabTimer, transform.position, transform.rotation, gameObject.transform);
+            else timerObject = Instantiate(m_prefabTimerRemplissage, transform.position, transform.rotation, gameObject.transform);
 
-            GameObject timerObject = Instantiate(m_prefabTimer, transform.position, transform.rotation, gameObject.transform);
-            
-            if (timerObject.TryGetComponent<RectTransform>(out RectTransform rt)) {
-                
-                float shiftMin = -0.2f;
-                float shiftMax = 0f;
-                //If we're placing the second one, we shift it to the right instead of the left
-                if (i == 0) {
-                    shiftMin = -0.2f;
-                    shiftMax = 0f;
-                }else {
-                    shiftMin = 1f;
-                    shiftMax = 1.2f;
+            for (int j = 0; j < 2; j++) {
+
+                if (timerObject.TryGetComponent<RectTransform>(out RectTransform rt))
+                {
+
+                    float shiftMin = -0.2f;
+                    float shiftMax = 0f;
+                    //If we're placing the second one, we shift it to the right instead of the left
+                    if (j == 0)
+                    {
+                        shiftMin = -0.2f;
+                        shiftMax = 0f;
+                    }
+                    else
+                    {
+                        shiftMin = 1f;
+                        shiftMax = 1.2f;
+                    }
+
+                    //Check the SetRectPosition() function if you don't understand those lines
+                    rt.anchorMin = new Vector2(shiftMin, 0);
+                    rt.anchorMax = new Vector2(shiftMax, 1);
+
+                    rt.localPosition = Vector3.zero;
+                    rt.anchoredPosition = Vector2.zero;
+
+                    //We add the rect transform to an array to manipulate it later
+                    if(i == 1) m_rectTimers[j] = rt;
+                    else timerObject.transform.SetSiblingIndex(0);
+
                 }
-            
-                //Check the SetRectPosition() function if you don't understand those lines
-                rt.anchorMin = new Vector2(shiftMin, 0);
-                rt.anchorMax = new Vector2(shiftMax, 1);
-
-                rt.localPosition = Vector3.zero;
-                rt.anchoredPosition = Vector2.zero;
-
-                //We add the rect transform to an array to manipulate it later
-                m_rectTimers[i] = rt;
             }
         }
         
