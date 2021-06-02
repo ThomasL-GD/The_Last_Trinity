@@ -255,7 +255,7 @@ public class PlayerController : MonoBehaviour
                     }
                 }
                 //If any other input corresponding to another character is pressed, we inactive this chara
-                else if (Input.GetKeyDown(m_keyCodes[0]) || Input.GetKeyDown(m_keyCodes[1]) || Input.GetKeyDown(m_keyCodes[2])){
+                else if ((Input.GetKeyDown(m_keyCodes[0]) || Input.GetKeyDown(m_keyCodes[1]) || Input.GetKeyDown(m_keyCodes[2]))){
                     //If this character was active, we create a soul and send it to the next selected character
                     if (m_isActive) {
                         m_soulScript.gameObject.transform.position = transform.position + m_soulOffset;
@@ -277,7 +277,7 @@ public class PlayerController : MonoBehaviour
             }
             else if (m_cycle) { // If we are on the new input system
                 //If an input of character change is pressed we switch charas
-                if (m_isActive && (Input.GetKeyDown(m_leftInput) || Input.GetKeyDown(m_rightInput))) {
+                if (m_isActive && (Input.GetKeyDown(m_leftInput) || Input.GetKeyDown(m_rightInput)) && !s_inBetweenSwitching) {
 
                     m_isActive = false; // this chara is no longer the active one
                     m_soulScript.gameObject.transform.position = transform.position + m_soulOffset; //We place the soul on us
