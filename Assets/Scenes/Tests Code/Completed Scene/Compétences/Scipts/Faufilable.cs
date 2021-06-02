@@ -7,7 +7,7 @@ public class Faufilable : MonoBehaviour
 {
     [SerializeField] [Tooltip("The input used to select this character")] private SOInputMultiChara m_selector = null;
     //private bool m_isSneaky = false; //Possibilité d'activer le Faufilage avec la touche de compétence du Humain
-    public bool m_isIntoWall= false; //Possibilité d'activer le Faufilage avec la touche de compétence du Humain
+    [HideInInspector] public bool m_isIntoWall= false; //Possibilité d'activer le Faufilage avec la touche de compétence du Humain
     private bool m_isTeleporting= false; //Bloquage du teleport si deja un en cours
 
 
@@ -16,7 +16,7 @@ public class Faufilable : MonoBehaviour
     [SerializeField] [Tooltip("The game object where the human will be sent at\n must be inside the collide boxes of another faufilable")] private GameObject m_exit = null;
 
     [Header("Human Properties")]
-    public Transform m_human = null;
+    [HideInInspector] public Transform m_human = null;
     private PlayerController m_humanScript = null;//Script de l'humain, obtenir la touche d'activation de la compétence
     private Vector3 m_travel = Vector3.zero;
     [SerializeField] [Tooltip("The speed multiplier that will be applied to the human once she's on hands and knees")] [Range(0.1f, 1f)] private float m_speedMultiplier = 0.5f;
@@ -49,9 +49,17 @@ public class Faufilable : MonoBehaviour
     }
 
     private void Update() {
+        
 
-        if (!m_isTeleporting && m_isIntoWall && Input.GetKeyDown(m_selector.inputHuman)) {
-            StartCoroutine(Teleport());
+        if (!m_isTeleporting && m_isIntoWall) {
+        
+            bool selectorValidation = false;
+            if(!m_humanScript.m_cycle) selectorValidation = Input.GetKeyDown(m_selector.inputRobot);
+            else if(m_humanScript.m_cycle) selectorValidation = Rumbler.Instance.m_gamepad.buttonSouth.isPressed;
+            
+            if(selectorValidation) {
+                StartCoroutine(Teleport());
+            }
         }
 
         //During teleportation, we move the player to let the camera follow their way

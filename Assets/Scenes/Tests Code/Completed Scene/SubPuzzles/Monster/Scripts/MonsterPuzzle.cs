@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.Design.Serialization;
 using System.Net.NetworkInformation;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -51,6 +52,7 @@ public class MonsterPuzzle : MonoBehaviour
     private int m_errorDone = 0; //reset du nombre d'erreurs possibles
 
     [Header("Joystick Manager")]
+    [HideInInspector] public bool m_cycle = false; //Will be assigned by interactDetection depending on the player script 
     [SerializeField] public SOInputMultiChara m_inputs = null;
     [SerializeField] [Tooltip("position limite de joystick")] [Range(0.1f, 1f)] private float m_limitPosition = 0.5f;
     [HideInInspector] [Tooltip("variable de déplacement en points par points du sélecteur")] private bool m_hasMoved = false;
@@ -189,7 +191,9 @@ public class MonsterPuzzle : MonoBehaviour
     {
         float horizontalAxis = Input.GetAxis("Horizontal");
         float verticalAxis = Input.GetAxis("Vertical");
-        bool selectorValidation = Input.GetKeyDown(m_inputs.inputMonster);
+        bool selectorValidation = false;
+        if(!m_cycle) selectorValidation = Input.GetKeyDown(m_inputs.inputMonster);
+        else if(m_cycle) selectorValidation = Rumbler.Instance.m_gamepad.buttonSouth.isPressed;
 
         if (!m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis >m_limitPosition || verticalAxis < -m_limitPosition) {
             
@@ -323,7 +327,7 @@ public class MonsterPuzzle : MonoBehaviour
         
 
         //Sortie du subPuzzle en cas de changement de personnage
-        if (m_interactDetection.m_isInSubPuzzle && Input.GetKeyDown(m_inputs.inputHuman) || Input.GetKeyDown(m_inputs.inputRobot))
+        if ((!m_cycle && (m_interactDetection.m_isInSubPuzzle && Input.GetKeyDown(m_inputs.inputHuman) || Input.GetKeyDown(m_inputs.inputRobot))) || (m_cycle && Rumbler.Instance.m_gamepad.buttonEast.isPressed))
         {
             if (m_interactDetection.enabled) m_interactDetection.PuzzleDeactivation();
         }

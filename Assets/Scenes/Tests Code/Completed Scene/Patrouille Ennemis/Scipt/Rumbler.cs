@@ -9,8 +9,8 @@ using UnityEngine.InputSystem.Controls;
 public class Rumbler : MonoBehaviour
 {
     [HideInInspector] public PlayerInput m_playerInput;
-    Gamepad m_gamepad = Gamepad.current;
-    private DpadControl m_dpad = Gamepad.current.dpad;
+    public Gamepad m_gamepad = Gamepad.current;
+    public DpadControl m_dpad = Gamepad.current.dpad;
 
     //All of the tabulated code under is what it takes to make a singleton
     [HideInInspector] [SerializeField] private string m_objectName = "";
