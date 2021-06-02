@@ -524,8 +524,10 @@ public class PlayerController : MonoBehaviour
         transform.SetPositionAndRotation(m_spawnPoint, transform.rotation);
         
         //We remove it to let others use it without killing the chara
-        DeathManager.Instance.DeathFade(true, m_deathFadeTime);
-        DeathManager.OnBlackScreen -= DeathDelegatorCall;
+        if (m_isPlayingDead) {
+            DeathManager.Instance.DeathFade(true, m_deathFadeTime);
+            DeathManager.OnBlackScreen -= DeathDelegatorCall;
+        }
         
         GuardBehavior.m_isKillingSomeone = false;
         DeathAnim(false);
