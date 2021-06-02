@@ -184,7 +184,7 @@ public class GuardBehavior : MonoBehaviour {
         }
         
 
-        if (m_enterZone && !m_isKillingSomeone && !m_intimidationVibe) {
+        if (m_enterZone && !m_isKillingSomeone && !m_intimidationVibe && !(m_charactersInDangerScript[0].m_chara == Charas.Human && m_charactersInDangerScript[0].m_isForbiddenToMove)) {
             m_warningVibe = true;
             m_intimidationVibe = false;
             m_attackVibe = false;
@@ -290,7 +290,7 @@ public class GuardBehavior : MonoBehaviour {
             //INTIMIDATION DU MONSTRE
             bool selectorValidation = false;
             if(!m_charactersInDangerScript[0].m_cycle) selectorValidation = Input.GetKeyDown(m_charactersInDangerScript[0].m_selector.inputMonster);
-            else if(m_charactersInDangerScript[0].m_cycle) selectorValidation = Rumbler.Instance.m_gamepad.buttonSouth.isPressed;
+            else if(m_charactersInDangerScript[0].m_cycle) selectorValidation = Rumbler.Instance.m_gamepad.buttonSouth.wasPressedThisFrame;
             
             if (selectorValidation && m_charactersInDangerScript[0].m_chara == Charas.Monster)
             {

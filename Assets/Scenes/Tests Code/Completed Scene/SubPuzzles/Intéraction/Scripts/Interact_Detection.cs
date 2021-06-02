@@ -82,7 +82,7 @@ public class Interact_Detection : MonoBehaviour
             bool input = false;
 
             if (m_playerController.m_cycle) {
-                input = Rumbler.Instance.m_gamepad.buttonSouth.isPressed;
+                input = Rumbler.Instance.m_gamepad.buttonSouth.wasPressedThisFrame;
             }
             else if (!m_playerController.m_cycle){
                 //input des différents character
@@ -165,7 +165,7 @@ public class Interact_Detection : MonoBehaviour
 
         if (p_mustKillTheChara) {
             Debug.Log("The subPuzzle killed a chara");
-            DeathManager.DeathDelegator?.Invoke();
+            m_playerController.Death();
         }
     }
 

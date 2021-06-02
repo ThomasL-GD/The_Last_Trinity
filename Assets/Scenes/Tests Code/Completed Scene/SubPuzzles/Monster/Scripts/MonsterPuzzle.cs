@@ -195,7 +195,7 @@ public class MonsterPuzzle : MonoBehaviour
         float verticalAxis = Input.GetAxis("Vertical");
         bool selectorValidation = false;
         if(!m_cycle) selectorValidation = Input.GetKeyDown(m_inputs.inputMonster);
-        else if(m_cycle) selectorValidation = Rumbler.Instance.m_gamepad.buttonSouth.isPressed;
+        else if(m_cycle) selectorValidation = Rumbler.Instance.m_gamepad.buttonSouth.wasPressedThisFrame;
 
         if (!m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis >m_limitPosition || verticalAxis < -m_limitPosition) {
             
@@ -333,7 +333,7 @@ public class MonsterPuzzle : MonoBehaviour
         
 
         //Sortie du subPuzzle en cas de changement de personnage
-        if ((!m_cycle && (m_interactDetection.m_isInSubPuzzle && Input.GetKeyDown(m_inputs.inputHuman) || Input.GetKeyDown(m_inputs.inputRobot))) || (m_cycle && Rumbler.Instance.m_gamepad.buttonEast.isPressed))
+        if ((!m_cycle && (m_interactDetection.m_isInSubPuzzle && Input.GetKeyDown(m_inputs.inputHuman) || Input.GetKeyDown(m_inputs.inputRobot))) || (m_cycle && Rumbler.Instance.m_gamepad.buttonEast.wasPressedThisFrame))
         {
             if (m_interactDetection.enabled) m_interactDetection.PuzzleDeactivation();
         }

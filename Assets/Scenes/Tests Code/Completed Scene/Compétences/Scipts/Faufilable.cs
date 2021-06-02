@@ -24,6 +24,7 @@ public class Faufilable : MonoBehaviour
 
     [Header("Effects")]
     [SerializeField] [Tooltip("Effect of the Duct when player is near")] private VisualEffect m_ductEffect = null;
+    [SerializeField] [Tooltip("The feedback for when the chara c&an teleport")] public GameObject m_teleportFeedback = null;
     [SerializeField] [Tooltip("The Smoke effect when the player leave the duct")] private GameObject m_smokeObject = null;
     private ParticleSystem m_smokeParticle; //Particle system of the smoke object
     void Start()
@@ -55,7 +56,7 @@ public class Faufilable : MonoBehaviour
         
             bool selectorValidation = false;
             if(!m_humanScript.m_cycle) selectorValidation = Input.GetKeyDown(m_selector.inputRobot);
-            else if(m_humanScript.m_cycle) selectorValidation = Rumbler.Instance.m_gamepad.buttonSouth.isPressed;
+            else if(m_humanScript.m_cycle) selectorValidation = Rumbler.Instance.m_gamepad.buttonSouth.wasPressedThisFrame;
             
             if(selectorValidation) {
                 StartCoroutine(Teleport());
