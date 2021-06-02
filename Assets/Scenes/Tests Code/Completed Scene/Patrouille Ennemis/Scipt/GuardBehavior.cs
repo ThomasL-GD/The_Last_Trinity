@@ -37,7 +37,8 @@ public class GuardBehavior : MonoBehaviour {
     [SerializeField] [Tooltip("The radius of the detection area")] [Range(0.01f,10f)] private float m_sphereRadius = 2.0f;
     [SerializeField] [Tooltip("The possible angle of detection")] [Range(0.1f,180f)] private float m_angleUncertainty = 9.0f;
     [SerializeField] [Tooltip("The maximum authorized difference between the position to reach and the current position (unit : Unity meters)")] [Range(0.0001f,1f)] private float m_uncertainty = 0.1f;
-
+    [SerializeField] [Tooltip("Changement position en hauteur de rayon pour raycast")] [Range(0.01f,50f)] private float m_offsetRay = 2.0f;
+    
     [Header("Waypoints Manager")]
     [SerializeField] [Tooltip("The list of points the guard will travel to, in order from up to down and cycling")] private List<Transform> m_destinationsTransforms = new List<Transform>();
     private List<Vector3> m_destinations = new List<Vector3>();
@@ -198,14 +199,19 @@ public class GuardBehavior : MonoBehaviour {
 
             //création de la variable du  raycast
             RaycastHit hit;
+            
+            //élévation de la position du raycast
+            Vector3 raycastPosition = new Vector3(transform.position.x, transform.position.y + m_offsetRay, transform.position.z);
+            
             //création physique du raycast
-            bool raycastHasHit = Physics.Raycast(transform.position, targetDir, out hit, m_sphereRadius * 5);
+            bool raycastHasHit = Physics.Raycast(raycastPosition, targetDir, out hit, m_sphereRadius * 5);
+            
             
             //Debug du raycast dans la scène
             if (raycastHasHit)
             {
-                Debug.DrawRay(transform.position, targetDir * hit.distance, Color.magenta, 10f);
-                
+                //Debug.DrawRay(raycastPosition, targetDir * hit.distance, Color.magenta, 10f);
+
                 if (m_charactersInDangerScript[0].gameObject.transform.position != hit.transform.position) //le chara se trouve derrière un obstacle et n'est pas visible par l'ennemi
                 {
                     Debug.Log("Oulala on ne voit pas le character derrière");
