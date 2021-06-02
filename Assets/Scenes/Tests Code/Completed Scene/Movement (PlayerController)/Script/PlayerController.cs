@@ -69,7 +69,7 @@ public class PlayerController : MonoBehaviour
     
     
     [Header("Death Manager")]
-    [SerializeField] [Range(0.2f, 5f)] [Tooltip("The time the player is allowed to stay in this death zone (unit : seconds)")] private float m_timeBeforeDying = 0.5f;
+    [SerializeField] [Range(0.2f, 20f)] [Tooltip("The time the player is allowed to stay in this death zone (unit : seconds)")] private float m_timeBeforeDying = 0.5f;
     [SerializeField] [Range(0.2f, 5f)] [Tooltip("The time of the death animation (must be longer than the death animation time) (unit : seconds)")] private float m_deathAnimTime = 1.5f;
     [SerializeField] [Range(0.2f, 5f)] [Tooltip("The time of the fade in black after death (unit : seconds)")] private float m_deathFadeTime = 1.5f;
     private float m_deathCounter = 0.0f;
@@ -78,7 +78,7 @@ public class PlayerController : MonoBehaviour
     [HideInInspector] public Vector3 m_spawnPoint = Vector3.zero;
 
     
-    //Cinemachine cameras des trois personnages  en 0 l'humaine, en 1 le monstre et en 2 le robot
+    //Cinemachine cameras des trois personnages en 0 l'humaine, en 1 le monstre et en 2 le robot
     private static CinemachineVirtualCamera[] m_allCameras = null;
     
     //String to hash conversion for the animator
