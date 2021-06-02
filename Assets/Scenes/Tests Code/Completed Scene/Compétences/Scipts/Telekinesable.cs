@@ -69,7 +69,11 @@ public class Telekinesable : MonoBehaviour
 
         if (m_telekinesieOpen)
         {
-            if (Input.GetKeyDown(m_selector.inputRobot) && !m_isInBetweenTravel && m_robotScript.m_isActive)
+            bool selectorValidation = false;
+            if(!m_robotScript.m_cycle) selectorValidation = Input.GetKeyDown(m_selector.inputRobot);
+            else if(m_robotScript.m_cycle) selectorValidation = Rumbler.Instance.m_gamepad.buttonSouth.wasPressedThisFrame;
+            
+            if (selectorValidation && !m_isInBetweenTravel && m_robotScript.m_isActive)
             {
                 m_isInBetweenTravel = true;
                 m_velocity = Vector3.zero;

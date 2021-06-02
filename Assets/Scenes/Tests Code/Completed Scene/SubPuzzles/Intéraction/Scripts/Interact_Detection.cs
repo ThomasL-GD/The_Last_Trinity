@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Cinemachine;
 using UnityEngine;
 
 public class Interact_Detection : MonoBehaviour
@@ -45,27 +46,27 @@ public class Interact_Detection : MonoBehaviour
     
     private void Start()
     {
-        if (m_puzzle == null) { Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO ADD A SUBPUZZLE IN INTERACT_DETECTION !");
+        if (m_puzzle == null) { Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO ADD A SUBPUZZLE IN INTERACT_DETECTION !", this);
         }
         else {
             switch (m_chara) {
                 case Charas.Human:
-                    if (!m_puzzle.TryGetComponent(out HumanSubPuzzle hsb)) Debug.LogError("JEEZ ! THE GAME DESIGNER PUT A SUBPUZZLE DIFFERENT FROM THE CHARA CHOOSED ABOVE IN INTERACT_DETECTION !");
+                    if (!m_puzzle.TryGetComponent(out HumanSubPuzzle hsb)) Debug.LogError("JEEZ ! THE GAME DESIGNER PUT A SUBPUZZLE DIFFERENT FROM THE CHARA CHOOSED ABOVE IN INTERACT_DETECTION !", this);
                     break;
                 case Charas.Monster:
-                    if (!m_puzzle.TryGetComponent(out MonsterPuzzle msb)) Debug.LogError("JEEZ ! THE GAME DESIGNER PUT A SUBPUZZLE DIFFERENT FROM THE CHARA CHOOSED ABOVE IN INTERACT_DETECTION !");
+                    if (!m_puzzle.TryGetComponent(out MonsterPuzzle msb)) Debug.LogError("JEEZ ! THE GAME DESIGNER PUT A SUBPUZZLE DIFFERENT FROM THE CHARA CHOOSED ABOVE IN INTERACT_DETECTION !", this);
                     break;
                 case Charas.Robot:
-                    if (!m_puzzle.TryGetComponent(out RobotPuzzleManager rsb)) Debug.LogError("JEEZ ! THE GAME DESIGNER PUT A SUBPUZZLE DIFFERENT FROM THE CHARA CHOOSED ABOVE IN INTERACT_DETECTION !");
+                    if (!m_puzzle.TryGetComponent(out RobotPuzzleManager rsb)) Debug.LogError("JEEZ ! THE GAME DESIGNER PUT A SUBPUZZLE DIFFERENT FROM THE CHARA CHOOSED ABOVE IN INTERACT_DETECTION !", this);
                     break;
             }
         }
         
-        if(m_timer > m_doorOpeningTime) Debug.LogError ($"JEEZ ! THE M_TIMER ({m_timer}) MUST BE SHORTER THAN THE M_DOOROPENINGTIME ({m_doorOpeningTime}) YOU FREAKING RETARDED !");
+        if(m_timer > m_doorOpeningTime) Debug.LogError ($"JEEZ ! THE M_TIMER ({m_timer}) MUST BE SHORTER THAN THE M_DOOROPENINGTIME ({m_doorOpeningTime}) YOU FREAKING RETARDED !", this);
 
-        if (m_camera == null) Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE CAMERA IN INTERACT_DETECTION !");
-        if (m_inputs == null) Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO ADD THE INPUTS IN INTERACT_DETECTION !");
-        if(m_doorSub.Length == 0) Debug.LogWarning("BE CAREFUL ! THERE IS NO DOOR FOR ANIMATION IN INTERACT_DETECTION !");
+        if (m_camera == null) Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE CAMERA IN INTERACT_DETECTION !", this);
+        if (m_inputs == null) Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO ADD THE INPUTS IN INTERACT_DETECTION !", this);
+        if(m_doorSub.Length == 0) Debug.LogWarning("BE CAREFUL ! THERE IS NO DOOR FOR ANIMATION IN INTERACT_DETECTION !", this);
         
     }
 
@@ -81,10 +82,16 @@ public class Interact_Detection : MonoBehaviour
 
             bool input = false;
 
-            //input des différents character
-            if (m_chara == Charas.Human) input = Input.GetKeyDown(m_inputs.inputHuman); //Gamepad.current.buttonWest.isPressed; 
-            else if (m_chara == Charas.Monster) input = Input.GetKeyDown(m_inputs.inputMonster); //Gamepad.current.buttonNorth.isPressed; 
-            else if (m_chara == Charas.Robot) input = Input.GetKeyDown(m_inputs.inputRobot); //Gamepad.current.buttonEast.isPressed; 
+            if (m_playerController.m_cycle) {
+                input = Rumbler.Instance.m_gamepad.buttonSouth.wasPressedThisFrame;
+            }
+            else if (!m_playerController.m_cycle){
+                //input des différents character
+                if (m_chara == Charas.Human) input = Input.GetKeyDown(m_inputs.inputHuman); //Gamepad.current.buttonWest.isPressed; 
+                else if (m_chara == Charas.Monster) input = Input.GetKeyDown(m_inputs.inputMonster); //Gamepad.current.buttonNorth.isPressed; 
+                else if (m_chara == Charas.Robot) input = Input.GetKeyDown(m_inputs.inputRobot); //Gamepad.current.buttonEast.isPressed;
+            }
+            
             
             if (m_playerController.m_isActive) {
                 
@@ -96,9 +103,21 @@ public class Interact_Detection : MonoBehaviour
                 //Input et bouton visible ==> entrée dans subpuzzle 
                 if (input && m_canMove) {
 
-                    if (m_chara == Charas.Human) { m_puzzle.GetComponent<HumanSubPuzzle>().m_interactDetection = this; }
-                    else if (m_chara == Charas.Monster) { m_puzzle.GetComponent<MonsterPuzzle>().m_interactDetection = this; }
-                    else if (m_chara == Charas.Robot) { m_puzzle.GetComponent<RobotPuzzleManager>().m_interactDetection = this; }
+                    if (m_chara == Charas.Human) {
+                        HumanSubPuzzle humanPuzzle = m_puzzle.GetComponent<HumanSubPuzzle>();
+                        humanPuzzle.m_interactDetection = this;
+                        humanPuzzle.m_cycle = m_playerController.m_cycle;
+                    }
+                    else if (m_chara == Charas.Monster) {
+                        MonsterPuzzle monsterPuzzle = m_puzzle.GetComponent<MonsterPuzzle>();
+                        monsterPuzzle.m_interactDetection = this;
+                        monsterPuzzle.m_cycle = m_playerController.m_cycle;
+                    }
+                    else if (m_chara == Charas.Robot) {
+                        RobotPuzzleManager robotPuzzle = m_puzzle.GetComponent<RobotPuzzleManager>();
+                        robotPuzzle.m_interactDetection = this;
+                        robotPuzzle.m_cycle = m_playerController.m_cycle;
+                    }
 
                     
                     m_puzzle.SetActive(true);
@@ -147,7 +166,7 @@ public class Interact_Detection : MonoBehaviour
 
         if (p_mustKillTheChara) {
             Debug.Log("The subPuzzle killed a chara");
-            DeathManager.DeathDelegator?.Invoke();
+            m_playerController.Death();
         }
     }
 
@@ -176,11 +195,11 @@ public class Interact_Detection : MonoBehaviour
     IEnumerator DoorTimer() {
         m_openDoor = true;
         PlayerController playerCon = m_playerController;
-        playerCon.LookSomewhere(m_doorSub[0].m_door.transform);
+        ICinemachineCamera camera = playerCon.LookSomewhere(m_doorSub[0].m_door.transform);
         
         yield return new WaitForSeconds(m_doorOpeningTime);
         
-        playerCon.Refocus();
+        playerCon.Refocus(camera);
         this.enabled = false;
     }
     

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0.99999946, b: 0.99999946, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -943,7 +943,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 780364263}
-  m_LocalRotation: {x: 0.48937008, y: -0.00213584, z: 0.0011985423, w: 0.8720728}
+  m_LocalRotation: {x: 0.48937002, y: -0.00213584, z: 0.0011985422, w: 0.8720728}
   m_LocalPosition: {x: 3.1433496, y: 15.41, z: -9.466768}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -1012,15 +1012,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6452857768148969855, guid: e86021a21d911b94ab8761b45653fa1f, type: 3}
       propertyPath: m_cycle
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6544665759506969077, guid: e86021a21d911b94ab8761b45653fa1f, type: 3}
       propertyPath: m_cycle
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7613189132782122368, guid: e86021a21d911b94ab8761b45653fa1f, type: 3}
       propertyPath: m_cycle
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e86021a21d911b94ab8761b45653fa1f, type: 3}
@@ -1683,10 +1683,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58c28f2d9385b0043906ab3666ed25a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_offsetValue: 0
   m_clamp: 2.5
   m_lookSpeed: 0
   m_returnSpeed: 0
+  m_offsetValue: 0
   m_incertitude: 0.1
 --- !u!1001 &1664310953
 PrefabInstance:
@@ -1699,6 +1699,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Robot SubPuzzle Setup
       objectReference: {fileID: 0}
+    - target: {fileID: 7524391391259663760, guid: 3750485d6d3d12748a2c723e8667e8d9, type: 3}
+      propertyPath: m_camera
+      value: 
+      objectReference: {fileID: 1031546554}
     - target: {fileID: 8793107278758582097, guid: 3750485d6d3d12748a2c723e8667e8d9, type: 3}
       propertyPath: m_RootOrder
       value: 1
@@ -1800,9 +1804,41 @@ PrefabInstance:
       propertyPath: m_debugMode
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7180087136600427617, guid: 6a47782a62854f94d8d04cafacbc56f1, type: 3}
+      propertyPath: m_prefabPlayer
+      value: 
+      objectReference: {fileID: 7763611416509085909, guid: a5a99614b26a1ab41a02d5f452e8136a, type: 3}
+    - target: {fileID: 7180087136600427617, guid: 6a47782a62854f94d8d04cafacbc56f1, type: 3}
+      propertyPath: m_prefabTimerRemplissage
+      value: 
+      objectReference: {fileID: 5405458696861513414, guid: 88fb0d9124e734a45b27ec467a9bdde8, type: 3}
+    - target: {fileID: 7180087136600427618, guid: 6a47782a62854f94d8d04cafacbc56f1, type: 3}
+      propertyPath: m_Type
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7180087136600427618, guid: 6a47782a62854f94d8d04cafacbc56f1, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: c318e07ee64b67e4c8f4365133182cdb, type: 3}
+    - target: {fileID: 7180087136600427618, guid: 6a47782a62854f94d8d04cafacbc56f1, type: 3}
+      propertyPath: m_Color.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7180087136600427623, guid: 6a47782a62854f94d8d04cafacbc56f1, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7665418445033554696, guid: 6a47782a62854f94d8d04cafacbc56f1, type: 3}
+      propertyPath: m_camera
+      value: 
+      objectReference: {fileID: 1031546554}
     - target: {fileID: 8028357306112050459, guid: 6a47782a62854f94d8d04cafacbc56f1, type: 3}
       propertyPath: m_Name
       value: Human SubPuzzle Setup
+      objectReference: {fileID: 0}
+    - target: {fileID: 8975861060210693474, guid: 6a47782a62854f94d8d04cafacbc56f1, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6a47782a62854f94d8d04cafacbc56f1, type: 3}
@@ -2269,20 +2305,28 @@ PrefabInstance:
       value: 0.736
       objectReference: {fileID: 0}
     - target: {fileID: 1047692316632580639, guid: 06ba45be42bc0e940949ed6b96d10ec6, type: 3}
+      propertyPath: m_empty
+      value: 
+      objectReference: {fileID: 3954188131145494931, guid: c91045deae910b84c9efdb8951bb1f59, type: 3}
+    - target: {fileID: 1047692316632580639, guid: 06ba45be42bc0e940949ed6b96d10ec6, type: 3}
       propertyPath: m_highA
       value: 0.262
       objectReference: {fileID: 0}
     - target: {fileID: 1047692316632580639, guid: 06ba45be42bc0e940949ed6b96d10ec6, type: 3}
       propertyPath: m_arrayWidth
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1047692316632580639, guid: 06ba45be42bc0e940949ed6b96d10ec6, type: 3}
       propertyPath: m_arrayHeight
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1047692316632580639, guid: 06ba45be42bc0e940949ed6b96d10ec6, type: 3}
       propertyPath: m_errorAllowed
-      value: 0
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1047692316632580639, guid: 06ba45be42bc0e940949ed6b96d10ec6, type: 3}
+      propertyPath: m_offsetBorders
+      value: 0.08
       objectReference: {fileID: 0}
     - target: {fileID: 1047692316632580639, guid: 06ba45be42bc0e940949ed6b96d10ec6, type: 3}
       propertyPath: m_rumbleDuration
@@ -2302,7 +2346,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1047692316632580639, guid: 06ba45be42bc0e940949ed6b96d10ec6, type: 3}
       propertyPath: m_nbAmalgamePieces
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1047692316632580639, guid: 06ba45be42bc0e940949ed6b96d10ec6, type: 3}
       propertyPath: m_colorValidation.b

@@ -32,6 +32,7 @@ public class HumanSubPuzzle : MonoBehaviour {
     
     [Header("Input Manager")]
     [SerializeField] public SOInputMultiChara m_inputs = null;
+    [HideInInspector] public bool m_cycle = false; //Will be assigned by interactDetection depending on the player script 
     [HideInInspector] [Tooltip("position limite de joystick")] private float m_limitPosition = 0.5f;
     [HideInInspector] [Tooltip("variable de déplacement en points par points du sélecteur")] private bool m_hasMoved = false;
     
@@ -44,9 +45,12 @@ public class HumanSubPuzzle : MonoBehaviour {
 
     [Header("Timer")]
     [SerializeField] [Tooltip("The time allowed to the player to complete this subPuzzle\n(unit : seconds)")] [Range(5f, 600f)] private float m_timeAllowed = 60f;
-    [SerializeField] [Tooltip("The prefab for the appearance of the timer\n(will be massively distorted)\nMust be a Rect transform element")] private GameObject m_prefabTimer = null;
+    [SerializeField] [Tooltip("The prefab for the appearance of the timer\nMust be a Rect transform element")] private GameObject m_prefabTimer = null;
+    [SerializeField] [Tooltip("The prefab for the appearance of hat will fill the timer\n(will be massively distorted)\nMust be a Rect transform element")] private GameObject m_prefabTimerRemplissage = null;
+    [SerializeField] [Tooltip("The prefab for the appearance of hat will go around the timer\nMust be a Rect transform element")] private GameObject m_prefabTimerContour = null;
     private RectTransform[] m_rectTimers = null; //The rect transforms of the time bars
     private float m_elapsedTime = 0.0f; //The time passed since the subPuzzle Started
+    private float m_shiftY = 0.1f; //The shift of the fill timer
     
     [Header("Prefabs for visual representation")]
     [SerializeField] [Tooltip("The visual representation of the player\nMust be a Rect transform element\nMUST FACE TO THE RIGHT")] private GameObject m_prefabPlayer = null;
@@ -82,21 +86,21 @@ public class HumanSubPuzzle : MonoBehaviour {
         m_interactDetection.SquarePanelToScreen();
 
         if (m_mazeHeight < 2 || m_mazeWidth < 2) {
-            Debug.LogError("Invalid size of the maze ! each dimension must be 2 or more cell long");
+            Debug.LogError("Invalid size of the maze ! each dimension must be 2 or more cell long", this);
         }
         if (m_wallsToRemove + m_wallsToRemoveAfterBreaking >= m_mazeHeight * m_mazeWidth * 4) {
-            Debug.LogWarning("Warning ! You want to remove to many random walls from the maze, it's gonna be either way too easy or completely fucked up");
+            Debug.LogWarning("Warning ! You want to remove to many random walls from the maze, it's gonna be either way too easy or completely fucked up", this);
         }
         
-        if(m_prefabDown == null) Debug.LogError("JEEZ ! THERE IS NO PREFAB FOR THE DOWN WALL !");
-        if(m_prefabLeft == null) Debug.LogError("JEEZ ! THERE IS NO PREFAB FOR THE LEFT WALL !");
-        if(m_prefabRight == null) Debug.LogError("JEEZ ! THERE IS NO PREFAB FOR THE RIGHT WALL !");
-        if(m_prefabUp == null) Debug.LogError("JEEZ ! THERE IS NO PREFAB FOR THE UP WALL !");
-        if(m_prefabPlayer == null) Debug.LogError("JEEZ ! THERE IS NO PREFAB FOR THE PLAYER !");
-        if(m_prefabBG == null) Debug.LogError("JEEZ ! THERE IS NO PREFAB FOR THE BACKGROUND !");
-        if(m_prefabTimer == null) Debug.LogError("JEEZ ! THERE IS NO OBJECT FOR THE TIMER !");
-        if(m_lightObject == null) Debug.LogError("JEEZ ! THERE IS NO OBJECT FOR THE Light !");
-        if(m_soLight == null) Debug.LogError("JEEZ ! THERE IS NO SOLIGHT IN THE HUMAN SUBPUZZLE !");
+        if(m_prefabDown == null) Debug.LogError("JEEZ ! THERE IS NO PREFAB FOR THE DOWN WALL !", this);
+        if(m_prefabLeft == null) Debug.LogError("JEEZ ! THERE IS NO PREFAB FOR THE LEFT WALL !", this);
+        if(m_prefabRight == null) Debug.LogError("JEEZ ! THERE IS NO PREFAB FOR THE RIGHT WALL !", this);
+        if(m_prefabUp == null) Debug.LogError("JEEZ ! THERE IS NO PREFAB FOR THE UP WALL !", this);
+        if(m_prefabPlayer == null) Debug.LogError("JEEZ ! THERE IS NO PREFAB FOR THE PLAYER !", this);
+        if(m_prefabBG == null) Debug.LogError("JEEZ ! THERE IS NO PREFAB FOR THE BACKGROUND !", this);
+        if(m_prefabTimer == null) Debug.LogError("JEEZ ! THERE IS NO OBJECT FOR THE TIMER !", this);
+        if(m_lightObject == null) Debug.LogError("JEEZ ! THERE IS NO OBJECT FOR THE Light !", this);
+        if(m_soLight == null) Debug.LogError("JEEZ ! THERE IS NO SOLIGHT IN THE HUMAN SUBPUZZLE !", this);
         
         //We calculate the size of each cell
         m_offset = 0f;
@@ -226,32 +230,55 @@ public class HumanSubPuzzle : MonoBehaviour {
         //Création du timer
         m_rectTimers = new RectTransform[2];
         
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 3; i++)
+        {
+            GameObject prefab = null;
+            float shiftY = 0f;
+            if (i == 0) {
+                prefab = m_prefabTimer;
+                shiftY = 0f;
+            }
+            else if (i == 1){
+                prefab = m_prefabTimerRemplissage;
+                shiftY = m_shiftY;
+            }
+            else {
+                prefab = m_prefabTimerContour;
+                shiftY = 0f;
+            }
 
-            GameObject timerObject = Instantiate(m_prefabTimer, transform.position, transform.rotation, gameObject.transform);
-            
-            if (timerObject.TryGetComponent<RectTransform>(out RectTransform rt)) {
-                
-                float shiftMin = -0.2f;
-                float shiftMax = 0f;
-                //If we're placing the second one, we shift it to the right instead of the left
-                if (i == 0) {
-                    shiftMin = -0.2f;
-                    shiftMax = 0f;
-                }else {
-                    shiftMin = 1f;
-                    shiftMax = 1.2f;
+            for (int j = 0; j < 2; j++) {
+                    
+                GameObject timerObject = Instantiate(prefab, transform.position, transform.rotation, gameObject.transform);
+
+                if (timerObject.TryGetComponent<RectTransform>(out RectTransform rt)) {
+
+                    float shiftMin = -0.2f;
+                    float shiftMax = 0f;
+                    //If we're placing the second one, we shift it to the right instead of the left
+                    if (j == 0)
+                    {
+                        shiftMin = -0.2f;
+                        shiftMax = 0f;
+                    }
+                    else
+                    {
+                        shiftMin = 1f;
+                        shiftMax = 1.2f;
+                    }
+
+                    //Check the SetRectPosition() function if you don't understand those lines
+                    rt.anchorMin = new Vector2(shiftMin, 0 + shiftY);
+                    rt.anchorMax = new Vector2(shiftMax, 1 - shiftY);
+
+                    rt.localPosition = Vector3.zero;
+                    rt.anchoredPosition = Vector2.zero;
+
+                    //We add the rect transform to an array to manipulate it later
+                    if(i == 1) m_rectTimers[j] = rt;
+                    //timerObject.transform.SetSiblingIndex(i);
+
                 }
-            
-                //Check the SetRectPosition() function if you don't understand those lines
-                rt.anchorMin = new Vector2(shiftMin, 0);
-                rt.anchorMax = new Vector2(shiftMax, 1);
-
-                rt.localPosition = Vector3.zero;
-                rt.anchoredPosition = Vector2.zero;
-
-                //We add the rect transform to an array to manipulate it later
-                m_rectTimers[i] = rt;
             }
         }
         
@@ -513,22 +540,27 @@ public class HumanSubPuzzle : MonoBehaviour {
             m_hasMoved = false;
         }
 
-        if (!m_hasMoved && (horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis > m_limitPosition || verticalAxis < -m_limitPosition)) {
+        bool left = ((!m_hasMoved && horizontalAxis < -m_limitPosition) || Rumbler.Instance.GetDpad().left.wasPressedThisFrame);
+        bool right = ((!m_hasMoved && horizontalAxis > m_limitPosition) || Rumbler.Instance.GetDpad().right.wasPressedThisFrame);
+        bool up = ((!m_hasMoved && verticalAxis > m_limitPosition) || Rumbler.Instance.GetDpad().up.wasPressedThisFrame);
+        bool down = ((!m_hasMoved && verticalAxis < -m_limitPosition) || Rumbler.Instance.GetDpad().down.wasPressedThisFrame);
+
+        if (m_interactDetection.m_canMove && (down || right || up || left)) {
             
             Directions attemptedMovement = Directions.None;
             m_hasMoved = true;
             
             //We first stocks the way the player wants to go if he's not blocked by the limits of the maze
-            if (m_interactDetection.m_canMove && horizontalAxis < -m_limitPosition && m_selector.x > 0) {
+            if (left && m_selector.x > 0) {
                 attemptedMovement = Directions.Left;
             }
-            else if (m_interactDetection.m_canMove && horizontalAxis > m_limitPosition && m_selector.x < m_maze.GetLength(1) - 1) {
+            else if (right && m_selector.x < m_maze.GetLength(1) - 1) {
                 attemptedMovement = Directions.Right;
             }
-            else if (m_interactDetection.m_canMove && verticalAxis > m_limitPosition && m_selector.y < m_maze.GetLength(0) - 1) {
+            else if (up && m_selector.y < m_maze.GetLength(0) - 1) {
                 attemptedMovement = Directions.Up;
             }
-            else if (m_interactDetection.m_canMove && verticalAxis < -m_limitPosition && m_selector.y > 0) {
+            else if (down && m_selector.y > 0) {
                 attemptedMovement = Directions.Down;
             }
 
@@ -577,7 +609,7 @@ public class HumanSubPuzzle : MonoBehaviour {
         }
         
         //Sortie du subPuzzle en cas de changement de personnage
-        if (m_interactDetection.m_isInSubPuzzle && (Input.GetKeyDown(m_inputs.inputMonster) || Input.GetKeyDown(m_inputs.inputRobot))) {
+        if ((!m_cycle && (m_interactDetection.m_isInSubPuzzle && (Input.GetKeyDown(m_inputs.inputMonster) || Input.GetKeyDown(m_inputs.inputRobot)))) || (m_cycle && Rumbler.Instance.m_gamepad.buttonEast.wasPressedThisFrame)) {
             if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
         }
 
@@ -586,8 +618,8 @@ public class HumanSubPuzzle : MonoBehaviour {
             foreach (RectTransform rectTimer in m_rectTimers) {
             
                 //Check the SetRectPosition() function if you don't understand those lines
-                rectTimer.anchorMin = new Vector2(rectTimer.anchorMin.x, 0);
-                rectTimer.anchorMax = new Vector2(rectTimer.anchorMax.x, 1f - (1/(m_timeAllowed/m_elapsedTime)));
+                rectTimer.anchorMin = new Vector2(rectTimer.anchorMin.x, 0f - ((1f - m_shiftY)/(m_timeAllowed/m_elapsedTime)));
+                rectTimer.anchorMax = new Vector2(rectTimer.anchorMax.x, 1f - ((1f - m_shiftY)/(m_timeAllowed/m_elapsedTime)));
 
                 rectTimer.localPosition = Vector3.zero;
                 rectTimer.anchoredPosition = Vector2.zero;

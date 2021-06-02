@@ -7,16 +7,15 @@ public class Faufilable : MonoBehaviour
 {
     [SerializeField] [Tooltip("The input used to select this character")] private SOInputMultiChara m_selector = null;
     //private bool m_isSneaky = false; //Possibilité d'activer le Faufilage avec la touche de compétence du Humain
-    public bool m_isIntoWall= false; //Possibilité d'activer le Faufilage avec la touche de compétence du Humain
+    [HideInInspector] public bool m_isIntoWall= false; //Possibilité d'activer le Faufilage avec la touche de compétence du Humain
     private bool m_isTeleporting= false; //Bloquage du teleport si deja un en cours
-
-
+    
     [Header("Travel")]
     [SerializeField] [Tooltip("Time of travel between the two exits")] [Range(0.1f, 3f)] private float m_travelTime = 1f; //Temps avant que le joueur se téléporte vers la sortie
     [SerializeField] [Tooltip("The game object where the human will be sent at\n must be inside the collide boxes of another faufilable")] private GameObject m_exit = null;
 
     [Header("Human Properties")]
-    public Transform m_human = null;
+    [HideInInspector] public Transform m_human = null;
     private PlayerController m_humanScript = null;//Script de l'humain, obtenir la touche d'activation de la compétence
     private Vector3 m_travel = Vector3.zero;
     [SerializeField] [Tooltip("The speed multiplier that will be applied to the human once she's on hands and knees")] [Range(0.1f, 1f)] private float m_speedMultiplier = 0.5f;
@@ -24,6 +23,7 @@ public class Faufilable : MonoBehaviour
 
     [Header("Effects")]
     [SerializeField] [Tooltip("Effect of the Duct when player is near")] private VisualEffect m_ductEffect = null;
+    [SerializeField] [Tooltip("The feedback for when the chara c&an teleport")] public GameObject m_teleportFeedback = null;
     [SerializeField] [Tooltip("The Smoke effect when the player leave the duct")] private GameObject m_smokeObject = null;
     private ParticleSystem m_smokeParticle; //Particle system of the smoke object
     void Start()
@@ -49,9 +49,17 @@ public class Faufilable : MonoBehaviour
     }
 
     private void Update() {
+        
 
-        if (!m_isTeleporting && m_isIntoWall && Input.GetKeyDown(m_selector.inputHuman)) {
-            StartCoroutine(Teleport());
+        if (!m_isTeleporting && m_isIntoWall) {
+        
+            bool selectorValidation = false;
+            if(!m_humanScript.m_cycle) selectorValidation = Input.GetKeyDown(m_selector.inputHuman);
+            else if(m_humanScript.m_cycle) selectorValidation = Rumbler.Instance.m_gamepad.buttonSouth.wasPressedThisFrame;
+            
+            if(selectorValidation) {
+                StartCoroutine(Teleport());
+            }
         }
 
         //During teleportation, we move the player to let the camera follow their way
@@ -61,7 +69,13 @@ public class Faufilable : MonoBehaviour
     }
 
     /// <summary>
-    /// Teleporte le joueur sur la sortie sérialisé
+    /// 1. Desactive le mesh renderer du chara human
+    /// 2. Desactive la gravite
+    /// 3. Empeche le joueur de se déplacer
+    /// 4. Transporte le joueur jusqu'au point d'arrêt
+    /// 5. Reactive la gravité
+    /// 6. Reactive le mesh renderer du chara human
+    /// 7. Lance les effets
     /// </summary>
     /// <returns></returns>
     IEnumerator Teleport()
@@ -143,7 +157,6 @@ public class Faufilable : MonoBehaviour
         CharacterController charaController = p_player.GetComponent<CharacterController>();
         charaController.height *= sizeMultiplier;
         charaController.center *= sizeMultiplier;
-
     }
 
     /// <summary>
