@@ -618,8 +618,8 @@ public class HumanSubPuzzle : MonoBehaviour {
             foreach (RectTransform rectTimer in m_rectTimers) {
             
                 //Check the SetRectPosition() function if you don't understand those lines
-                rectTimer.anchorMin = new Vector2(rectTimer.anchorMin.x, 0 + m_shiftY);
-                rectTimer.anchorMax = new Vector2(rectTimer.anchorMax.x, (1f) - ((1 - m_shiftY)/(m_timeAllowed/m_elapsedTime)));
+                rectTimer.anchorMin = new Vector2(rectTimer.anchorMin.x, 0f - ((1f - m_shiftY)/(m_timeAllowed/m_elapsedTime)));
+                rectTimer.anchorMax = new Vector2(rectTimer.anchorMax.x, 1f - ((1f - m_shiftY)/(m_timeAllowed/m_elapsedTime)));
 
                 rectTimer.localPosition = Vector3.zero;
                 rectTimer.anchoredPosition = Vector2.zero;
