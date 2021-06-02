@@ -355,6 +355,22 @@ PrefabInstance:
       propertyPath: m_puzzle
       value: 
       objectReference: {fileID: 6852013594792502749}
+    - target: {fileID: 2284151202770795660, guid: 9362e6136bd641344b425a192b223d05, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 5b2918f710e8c6b4ab2d9d31be61fb7a, type: 2}
+    - target: {fileID: 4903001141808850497, guid: 9362e6136bd641344b425a192b223d05, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.708
+      objectReference: {fileID: 0}
+    - target: {fileID: 4903001141808850497, guid: 9362e6136bd641344b425a192b223d05, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -0.081
+      objectReference: {fileID: 0}
+    - target: {fileID: 4903001141808850497, guid: 9362e6136bd641344b425a192b223d05, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 1.049
+      objectReference: {fileID: 0}
     - target: {fileID: 4973650483923431518, guid: 9362e6136bd641344b425a192b223d05, type: 3}
       propertyPath: m_Name
       value: ROBOT OBJECT
@@ -427,6 +443,10 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 5495019683951513450, guid: 9362e6136bd641344b425a192b223d05, type: 3}
+      propertyPath: prewarm
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7599895704918401034, guid: 9362e6136bd641344b425a192b223d05, type: 3}
       propertyPath: m_Layer
       value: 2
@@ -434,6 +454,10 @@ PrefabInstance:
     - target: {fileID: 7599895706107214960, guid: 9362e6136bd641344b425a192b223d05, type: 3}
       propertyPath: m_Layer
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7599895706107214960, guid: 9362e6136bd641344b425a192b223d05, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9362e6136bd641344b425a192b223d05, type: 3}
