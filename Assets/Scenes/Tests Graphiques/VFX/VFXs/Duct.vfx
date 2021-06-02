@@ -583,7 +583,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: UnityEditor.VFX.Vector, Unity.VisualEffectGraph.Editor,
           Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      m_SerializableObject: '{"vector":{"x":-0.8994632959365845,"y":29.996685028076173,"z":0.7999078035354614}}'
+      m_SerializableObject: '{"vector":{"x":-0.8994632959365845,"y":10.0,"z":0.7999078035354614}}'
     m_Space: 0
   m_Property:
     name: A
@@ -753,7 +753,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: UnityEditor.VFX.Vector, Unity.VisualEffectGraph.Editor,
           Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      m_SerializableObject: '{"vector":{"x":0.33000001311302187,"y":1.0,"z":1.0}}'
+      m_SerializableObject: '{"vector":{"x":0.33000001311302187,"y":1.0,"z":0.33000001311302187}}'
     m_Space: 0
   m_Property:
     name: B
@@ -1050,7 +1050,7 @@ MonoBehaviour:
   m_UICollapsed: 0
   m_UISuperCollapsed: 0
   m_InputSlots:
-  - {fileID: 8926484042661614746}
+  - {fileID: 8926484042661614747}
   - {fileID: 8926484042661614693}
   - {fileID: 8926484042661614586}
   m_OutputSlots: []
@@ -1207,7 +1207,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: UnityEngine.AnimationCurve, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
-      m_SerializableObject: '{"frames":[{"time":8.344650268554688e-7,"value":0.3630467653274536,"inTangent":-0.9878872632980347,"outTangent":-1.0100820064544678,"tangentMode":0,"leftTangentMode":0,"rightTangentMode":0,"broken":true},{"time":0.5085816383361816,"value":0.16214700043201447,"inTangent":-0.04482223838567734,"outTangent":-0.014887572266161442,"tangentMode":0,"leftTangentMode":0,"rightTangentMode":0,"broken":true},{"time":0.9864908456802368,"value":-0.004555240273475647,"inTangent":-0.6459013819694519,"outTangent":-0.6459013819694519,"tangentMode":0,"leftTangentMode":0,"rightTangentMode":0,"broken":false}],"preWrapMode":8,"postWrapMode":8,"version":1}'
+      m_SerializableObject: '{"frames":[{"time":0.0068176984786987309,"value":0.1885167360305786,"inTangent":-0.9878872632980347,"outTangent":-1.0100820064544678,"tangentMode":0,"leftTangentMode":0,"rightTangentMode":0,"broken":true},{"time":0.5085816383361816,"value":0.08903378993272782,"inTangent":-0.04482223838567734,"outTangent":-0.014887572266161442,"tangentMode":0,"leftTangentMode":0,"rightTangentMode":0,"broken":true},{"time":0.9864908456802368,"value":-0.004555240273475647,"inTangent":-0.6459013819694519,"outTangent":-0.6459013819694519,"tangentMode":0,"leftTangentMode":0,"rightTangentMode":0,"broken":false}],"preWrapMode":8,"postWrapMode":8,"version":1}'
     m_Space: 2147483647
   m_Property:
     name: Size
@@ -1685,6 +1685,40 @@ MonoBehaviour:
   m_UICollapsed: 1
   m_UISuperCollapsed: 0
   m_MasterSlot: {fileID: 8926484042661614746}
+  m_MasterData:
+    m_Owner: {fileID: 8926484042661614585}
+    m_Value:
+      m_Type:
+        m_SerializableType: UnityEngine.Gradient, UnityEngine.CoreModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+      m_SerializableObject: '{"colorKeys":[{"color":{"r":0.0,"g":0.0,"b":0.0,"a":1.0},"time":0.0},{"color":{"r":0.75,"g":0.15000000596046449,"b":0.0,"a":1.0},"time":0.3000076413154602},{"color":{"r":1.25,"g":0.5600000023841858,"b":0.11999999731779099,"a":1.0},"time":0.5000076293945313},{"color":{"r":3.5,"g":2.0,"b":0.5,"a":1.0},"time":0.7000076174736023},{"color":{"r":4.0,"g":3.5,"b":1.2000000476837159,"a":1.0},"time":0.9000076055526733},{"color":{"r":12.0,"g":10.0,"b":2.5,"a":1.0},"time":1.0}],"alphaKeys":[{"alpha":0.0,"time":0.0},{"alpha":1.0,"time":1.0}],"gradientMode":0}'
+    m_Space: 2147483647
+  m_Property:
+    name: gradient
+    m_serializedType:
+      m_SerializableType: UnityEngine.Gradient, UnityEngine.CoreModule, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+  m_Direction: 0
+  m_LinkedSlots: []
+--- !u!114 &8926484042661614747
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76f778ff57c4e8145b9681fe3268d8e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_UIIgnoredErrors: []
+  m_Parent: {fileID: 0}
+  m_Children: []
+  m_UIPosition: {x: 0, y: 0}
+  m_UICollapsed: 1
+  m_UISuperCollapsed: 0
+  m_MasterSlot: {fileID: 8926484042661614747}
   m_MasterData:
     m_Owner: {fileID: 8926484042661614585}
     m_Value:
