@@ -86,7 +86,7 @@ public class MonsterPuzzle : MonoBehaviour
         //Si nombre de pièces demandées à être affichées est inférieur au nombre de pièces possibles à afficher
         if (m_arrayHeight*m_arrayWidth > m_piecePrefab.Length)
         {
-            Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO MODIFY THE HEIGHT AND THE WIDTH OF THE ARRAY ACCORDING TO THE NUMBER OF DIFFERENT SYMBOLS !");
+            Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO MODIFY THE HEIGHT AND THE WIDTH OF THE ARRAY ACCORDING TO THE NUMBER OF DIFFERENT SYMBOLS !", this);
         }
         else PuzzleGenerate();
 
@@ -146,9 +146,6 @@ public class MonsterPuzzle : MonoBehaviour
             }
             
         }
-        
-        
-        /////////////////////////////////////////////////////////////////////////////   SELECTEUR   /////////////////////////////////////////////////////////////////////////////
 
 
         /////////////////////////////////////////////////////////////////////////////   CORRECT PIECES   /////////////////////////////////////////////////////////////////////////////
@@ -197,7 +194,12 @@ public class MonsterPuzzle : MonoBehaviour
         if(!m_cycle) selectorValidation = Input.GetKeyDown(m_inputs.inputMonster);
         else if(m_cycle) selectorValidation = Rumbler.Instance.m_gamepad.buttonSouth.wasPressedThisFrame;
 
-        if (!m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis >m_limitPosition || verticalAxis < -m_limitPosition) {
+        bool left = ((!m_hasMoved && horizontalAxis < -m_limitPosition) || Rumbler.Instance.GetDpad().left.wasPressedThisFrame);
+        bool right = ((!m_hasMoved && horizontalAxis > m_limitPosition) || Rumbler.Instance.GetDpad().right.wasPressedThisFrame);
+        bool up = ((!m_hasMoved && verticalAxis > m_limitPosition) || Rumbler.Instance.GetDpad().up.wasPressedThisFrame);
+        bool down = ((!m_hasMoved && verticalAxis < -m_limitPosition) || Rumbler.Instance.GetDpad().down.wasPressedThisFrame);
+
+        if (m_interactDetection.m_canMove && (down || right || up || left)) {
             
             //We unselect the last piece we were selecting
             Color colorPiece = m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color;
@@ -206,22 +208,22 @@ public class MonsterPuzzle : MonoBehaviour
             else if (colorPiece == m_colorErrorSelec) m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color = m_colorError;
             
             //déplacement du sélecteur avec le joystick gauche
-            if (m_interactDetection.m_canMove && !m_hasMoved && horizontalAxis < -m_limitPosition && m_selectorX > 0)   //Déplacement a gauche si position X sélecteur > position  X  première prefab instanciée
+            if (m_interactDetection.m_canMove && left && m_selectorX > 0)   //Déplacement a gauche si position X sélecteur > position  X  première prefab instanciée
             {
                 m_selectorX--;
                 m_hasMoved = true;
             }
-            else if (m_interactDetection.m_canMove && !m_hasMoved && horizontalAxis > m_limitPosition && m_selectorX < m_arrayWidth-1)  //Déplacement à droite si position  X sélecteur  < valeur largeur tableau prefab
+            else if (m_interactDetection.m_canMove && right && m_selectorX < m_arrayWidth-1)  //Déplacement à droite si position  X sélecteur  < valeur largeur tableau prefab
             {
                 m_selectorX++;
                 m_hasMoved = true;
             }
-            else if (m_interactDetection.m_canMove && !m_hasMoved && verticalAxis > m_limitPosition && m_selectorY < m_arrayHeight-1)  //Déplacement en haut si position Y sélecteur < position Y première prefab
+            else if (m_interactDetection.m_canMove && up && m_selectorY < m_arrayHeight-1)  //Déplacement en haut si position Y sélecteur < position Y première prefab
             {
                 m_selectorY++;
                 m_hasMoved = true;
             }
-            else if (m_interactDetection.m_canMove && !m_hasMoved && verticalAxis < -m_limitPosition && m_selectorY > 0) //Déplacement en bas si position Y sélecteur > valeur dernière prefab du tableau prefab
+            else if (m_interactDetection.m_canMove && down && m_selectorY > 0) //Déplacement en bas si position Y sélecteur > valeur dernière prefab du tableau prefab
             {
                 m_selectorY--;
                 m_hasMoved = true;
