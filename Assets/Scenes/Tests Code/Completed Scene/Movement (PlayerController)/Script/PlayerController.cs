@@ -424,38 +424,59 @@ public class PlayerController : MonoBehaviour
     /// Make the current camera look to another object
     /// </summary>
     /// <param name="p_newCamera">The new camera you want to have focus from</param>
-    public void LookSomewhere(Transform p_lookAt)
+    public ICinemachineCamera LookSomewhere(Transform p_lookAt)
     {
         switch (m_chara)
         {
             case Charas.Human:
                 m_allCameras[0].LookAt = p_lookAt;
+                return m_allCameras[0];
                 break;
             case Charas.Monster:
                 m_allCameras[1].LookAt = p_lookAt;
+                return m_allCameras[1];
                 break;
             case Charas.Robot:
                 m_allCameras[2].LookAt = p_lookAt;
+                return m_allCameras[2];
                 break;
+            default:
+                return null;
         }
     }
     
     /// <summary>
     /// Make the current camera look back to the current character
     /// </summary>
-    public void Refocus()
+    public void Refocus(ICinemachineCamera p_cameraToRefocus = null)
     {
-        switch (m_chara)
-        {
-            case Charas.Human:
-                m_allCameras[0].LookAt = gameObject.transform;
-                break;
-            case Charas.Monster:
-                m_allCameras[1].LookAt = gameObject.transform;
-                break;
-            case Charas.Robot:
-                m_allCameras[2].LookAt = gameObject.transform;
-                break;
+        if (p_cameraToRefocus == null) {
+            switch (m_chara)
+            {
+                case Charas.Human:
+                    m_allCameras[0].LookAt = gameObject.transform;
+                    break;
+                case Charas.Monster:
+                    m_allCameras[1].LookAt = gameObject.transform;
+                    break;
+                case Charas.Robot:
+                    m_allCameras[2].LookAt = gameObject.transform;
+                    break;
+            }
+        }
+        else {
+            switch (m_chara)
+            {
+                case Charas.Human:
+                    p_cameraToRefocus.LookAt = gameObject.transform;
+                    break;
+                case Charas.Monster:
+                    p_cameraToRefocus.LookAt = gameObject.transform;
+                    break;
+                case Charas.Robot:
+                    p_cameraToRefocus.LookAt = gameObject.transform;
+                    break;
+            }
         }
     }
 

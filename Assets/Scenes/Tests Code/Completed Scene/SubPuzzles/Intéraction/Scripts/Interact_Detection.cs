@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Cinemachine;
 using UnityEngine;
 
 public class Interact_Detection : MonoBehaviour
@@ -194,11 +195,11 @@ public class Interact_Detection : MonoBehaviour
     IEnumerator DoorTimer() {
         m_openDoor = true;
         PlayerController playerCon = m_playerController;
-        playerCon.LookSomewhere(m_doorSub[0].m_door.transform);
+        ICinemachineCamera camera = playerCon.LookSomewhere(m_doorSub[0].m_door.transform);
         
         yield return new WaitForSeconds(m_doorOpeningTime);
         
-        playerCon.Refocus();
+        playerCon.Refocus(camera);
         this.enabled = false;
     }
     
