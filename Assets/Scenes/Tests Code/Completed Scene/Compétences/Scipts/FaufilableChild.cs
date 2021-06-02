@@ -26,6 +26,7 @@ public class FaufilableChild : MonoBehaviour {
     private void OnTriggerEnter(Collider p_other) {
         if (p_other.gameObject.transform == m_parentScript.m_human) {
             m_parentScript.m_isIntoWall = true;
+            if(m_parentScript.m_teleportFeedback != null) m_parentScript.m_teleportFeedback.SetActive(true);
         }
     }
     
@@ -37,6 +38,7 @@ public class FaufilableChild : MonoBehaviour {
     private void OnTriggerExit(Collider p_other) {
         if (p_other.gameObject.transform == m_parentScript.m_human) {
             m_parentScript.m_isIntoWall = false;
+            if(m_parentScript.m_teleportFeedback != null) m_parentScript.m_teleportFeedback.SetActive(false);
         }
     }
 }

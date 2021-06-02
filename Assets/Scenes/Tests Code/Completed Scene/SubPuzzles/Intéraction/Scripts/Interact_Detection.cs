@@ -81,10 +81,16 @@ public class Interact_Detection : MonoBehaviour
 
             bool input = false;
 
-            //input des différents character
-            if (m_chara == Charas.Human) input = Input.GetKeyDown(m_inputs.inputHuman); //Gamepad.current.buttonWest.isPressed; 
-            else if (m_chara == Charas.Monster) input = Input.GetKeyDown(m_inputs.inputMonster); //Gamepad.current.buttonNorth.isPressed; 
-            else if (m_chara == Charas.Robot) input = Input.GetKeyDown(m_inputs.inputRobot); //Gamepad.current.buttonEast.isPressed; 
+            if (m_playerController.m_cycle) {
+                input = Rumbler.Instance.m_gamepad.buttonSouth.wasPressedThisFrame;
+            }
+            else if (!m_playerController.m_cycle){
+                //input des différents character
+                if (m_chara == Charas.Human) input = Input.GetKeyDown(m_inputs.inputHuman); //Gamepad.current.buttonWest.isPressed; 
+                else if (m_chara == Charas.Monster) input = Input.GetKeyDown(m_inputs.inputMonster); //Gamepad.current.buttonNorth.isPressed; 
+                else if (m_chara == Charas.Robot) input = Input.GetKeyDown(m_inputs.inputRobot); //Gamepad.current.buttonEast.isPressed;
+            }
+            
             
             if (m_playerController.m_isActive) {
                 
@@ -96,9 +102,21 @@ public class Interact_Detection : MonoBehaviour
                 //Input et bouton visible ==> entrée dans subpuzzle 
                 if (input && m_canMove) {
 
-                    if (m_chara == Charas.Human) { m_puzzle.GetComponent<HumanSubPuzzle>().m_interactDetection = this; }
-                    else if (m_chara == Charas.Monster) { m_puzzle.GetComponent<MonsterPuzzle>().m_interactDetection = this; }
-                    else if (m_chara == Charas.Robot) { m_puzzle.GetComponent<RobotPuzzleManager>().m_interactDetection = this; }
+                    if (m_chara == Charas.Human) {
+                        HumanSubPuzzle humanPuzzle = m_puzzle.GetComponent<HumanSubPuzzle>();
+                        humanPuzzle.m_interactDetection = this;
+                        humanPuzzle.m_cycle = m_playerController.m_cycle;
+                    }
+                    else if (m_chara == Charas.Monster) {
+                        MonsterPuzzle monsterPuzzle = m_puzzle.GetComponent<MonsterPuzzle>();
+                        monsterPuzzle.m_interactDetection = this;
+                        monsterPuzzle.m_cycle = m_playerController.m_cycle;
+                    }
+                    else if (m_chara == Charas.Robot) {
+                        RobotPuzzleManager robotPuzzle = m_puzzle.GetComponent<RobotPuzzleManager>();
+                        robotPuzzle.m_interactDetection = this;
+                        robotPuzzle.m_cycle = m_playerController.m_cycle;
+                    }
 
                     
                     m_puzzle.SetActive(true);
@@ -147,7 +165,7 @@ public class Interact_Detection : MonoBehaviour
 
         if (p_mustKillTheChara) {
             Debug.Log("The subPuzzle killed a chara");
-            DeathManager.DeathDelegator?.Invoke();
+            m_playerController.Death();
         }
     }
 

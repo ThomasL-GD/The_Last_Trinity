@@ -63,6 +63,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 	
 	[Header("SO Input")]
 	[SerializeField] [Tooltip("controller input")] public SOInputMultiChara m_inputs = null;
+	[HideInInspector] public bool m_cycle = false; //Will be assigned by interactDetection depending on the player script 
 	[Tooltip("position limite de joystick")] private float m_limitPosition = 0.5f;
 	[HideInInspector] [Tooltip("variable de déplacement en points par points du sélecteur")] private bool m_hasMoved = false;
 	
@@ -372,14 +373,16 @@ public class RobotPuzzleManager : MonoBehaviour {
 		//bool dPadX = Input.GetButtonDown("Dpad X");
 		float verticalAxis = Input.GetAxis("Vertical");
 		//bool dPadY = Input.GetButtonDown("Dpad Y");
-		bool selectorValidation = Input.GetKeyDown(m_inputs.inputRobot);
+		bool selectorValidation = false;
+		if(!m_cycle) selectorValidation = Input.GetKeyDown(m_inputs.inputRobot);
+		else if(m_cycle) selectorValidation = Rumbler.Instance.m_gamepad.buttonSouth.wasPressedThisFrame;
 		
 
 		if (!m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis >m_limitPosition || verticalAxis < -m_limitPosition)
 		{
 			
 			//déplacement du sélecteur
-			if (m_interactDetection.m_canMove && !m_hasMoved && (horizontalAxis < -m_limitPosition || Rumbler.Instance.GetDpad().left.isPressed) && m_selector.x > 0) //Déplacement a gauche si position X sélecteur > position  X  première prefab instanciée
+			if (m_interactDetection.m_canMove && !m_hasMoved && (horizontalAxis < -m_limitPosition || Rumbler.Instance.GetDpad().left.wasPressedThisFrame) && m_selector.x > 0) //Déplacement a gauche si position X sélecteur > position  X  première prefab instanciée
 			{
 				//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
 				if(m_puzzle.m_pieces[m_selector.x, m_selector.y].m_isEmptyPiece == false || m_canMoveOnEmpty) m_selector.x--;
@@ -390,7 +393,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 				if(m_puzzle.m_pieces[m_selector.x, m_selector.y].m_isEmptyPiece == false || m_canMoveOnEmpty) m_selector.x++;		//vérifie que la pièce à gauche de là où se situe le sélecteur possède au moins une connexion
 				m_hasMoved = true;
 			}
-			else if (m_interactDetection.m_canMove && !m_hasMoved && (verticalAxis > m_limitPosition || Rumbler.Instance.GetDpad().up.isPressed) && m_selector.y < m_puzzle.m_height - 1) //Déplacement en haut si position Y sélecteur > position Y dernière prefab
+			else if (m_interactDetection.m_canMove && !m_hasMoved && (verticalAxis > m_limitPosition || Rumbler.Instance.GetDpad().up.wasPressedThisFrame) && m_selector.y < m_puzzle.m_height - 1) //Déplacement en haut si position Y sélecteur > position Y dernière prefab
 			{
 				if (m_puzzle.m_pieces[m_selector.x, m_selector.y].m_isEmptyPiece == false || m_canMoveOnEmpty)
 				{
@@ -398,7 +401,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 					m_hasMoved = true;
 				}
 			}
-			else if (m_interactDetection.m_canMove && !m_hasMoved && (verticalAxis < -m_limitPosition || Rumbler.Instance.GetDpad().left.isPressed) && m_selector.y > 0) //Déplacement en bas si position Y sélecteur < 0
+			else if (m_interactDetection.m_canMove && !m_hasMoved && (verticalAxis < -m_limitPosition || Rumbler.Instance.GetDpad().left.wasPressedThisFrame) && m_selector.y > 0) //Déplacement en bas si position Y sélecteur < 0
 			{
 				if (m_puzzle.m_pieces[m_selector.x, m_selector.y].m_isEmptyPiece == false || m_canMoveOnEmpty)
 				{
@@ -430,15 +433,15 @@ public class RobotPuzzleManager : MonoBehaviour {
 		}
 		
 		//Sortie du subPuzzle en cas de changement de personnage
-		if (m_interactDetection.m_isInSubPuzzle && (Input.GetKeyDown(m_inputs.inputMonster) || Input.GetKeyDown(m_inputs.inputHuman) || Rumbler.Instance.GetGamepad().buttonSouth.isPressed))
+		if ( (!m_cycle && (m_interactDetection.m_isInSubPuzzle && (Input.GetKeyDown(m_inputs.inputMonster) || Input.GetKeyDown(m_inputs.inputHuman)))) || (m_cycle && Rumbler.Instance.m_gamepad.buttonEast.wasPressedThisFrame))
 		{
 			if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
 		}
 
-		Debug.Log(Rumbler.Instance.GetDpad().down.isPressed);
-		Debug.Log(Rumbler.Instance.GetDpad().up.isPressed);
-		Debug.Log(Rumbler.Instance.GetDpad().left.isPressed);
-		Debug.Log(Rumbler.Instance.GetDpad().right.isPressed);
+		Debug.Log(Rumbler.Instance.GetDpad().down.wasPressedThisFrame);
+		Debug.Log(Rumbler.Instance.GetDpad().up.wasPressedThisFrame);
+		Debug.Log(Rumbler.Instance.GetDpad().left.wasPressedThisFrame);
+		Debug.Log(Rumbler.Instance.GetDpad().right.wasPressedThisFrame);
 	}
 	
 
