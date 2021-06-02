@@ -48,7 +48,7 @@ public class PlayerController : MonoBehaviour
     
 
     [Header("Switch Chara Input Mode")]
-    [SerializeField] [Tooltip("If on, two inputs are used to cycle between the charas, if Off, each chra has their own input")] private bool m_cycle = true;
+    [SerializeField] [Tooltip("If on, two inputs are used to cycle between the charas, if Off, each chra has their own input")] public bool m_cycle = true;
     
     
     [Header("If Cycle is ON")]

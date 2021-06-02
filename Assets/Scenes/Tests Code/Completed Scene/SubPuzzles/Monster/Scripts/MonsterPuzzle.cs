@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.Design.Serialization;
 using System.Net.NetworkInformation;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -17,6 +18,8 @@ public class MonsterPuzzle : MonoBehaviour
     [SerializeField] [Tooltip("Couleur pour une pièce qui est sélectionnée")] private Color m_colorSelector = new Color(0f, 0.2f, 0.8f, 1f);
     [SerializeField] [Tooltip("Couleur pour une pièce qui est validée")] private Color m_colorValidation = new Color(0.6f, 0.8f, 1f, 1f);
     [SerializeField] [Tooltip("Couleur pour une pièce qui est fausse")] private Color m_colorError = new Color(1f, 0.1f, 0.1f, 1f);
+    [SerializeField] [Tooltip("Couleur pour une pièce qui est validée avec le selecteur dessus")] private Color m_colorValidationSelec = new Color(0.2f, 0.6f, 1f, 1f);
+    [SerializeField] [Tooltip("Couleur pour une pièce qui est fausse avec le selecteur dessus")] private Color m_colorErrorSelec = new Color(0.7f, 0.1f, 0.7f, 1f);
     
     [Header("Listes")]
     [Tooltip("liste des pièces qui peuvent apparaitre")]private List<GameObject> m_stockPieces = new List<GameObject>();
@@ -51,6 +54,7 @@ public class MonsterPuzzle : MonoBehaviour
     private int m_errorDone = 0; //reset du nombre d'erreurs possibles
 
     [Header("Joystick Manager")]
+    [HideInInspector] public bool m_cycle = false; //Will be assigned by interactDetection depending on the player script 
     [SerializeField] public SOInputMultiChara m_inputs = null;
     [SerializeField] [Tooltip("position limite de joystick")] [Range(0.1f, 1f)] private float m_limitPosition = 0.5f;
     [HideInInspector] [Tooltip("variable de déplacement en points par points du sélecteur")] private bool m_hasMoved = false;
@@ -189,13 +193,17 @@ public class MonsterPuzzle : MonoBehaviour
     {
         float horizontalAxis = Input.GetAxis("Horizontal");
         float verticalAxis = Input.GetAxis("Vertical");
-        bool selectorValidation = Input.GetKeyDown(m_inputs.inputMonster);
+        bool selectorValidation = false;
+        if(!m_cycle) selectorValidation = Input.GetKeyDown(m_inputs.inputMonster);
+        else if(m_cycle) selectorValidation = Rumbler.Instance.m_gamepad.buttonSouth.isPressed;
 
         if (!m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis >m_limitPosition || verticalAxis < -m_limitPosition) {
             
             //We unselect the last piece we were selecting
             Color colorPiece = m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color;
-            if(colorPiece != m_colorValidation && colorPiece != m_colorError) m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color = Color.black;
+            if(colorPiece == Color.black || colorPiece == m_colorSelector) m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color = Color.black;
+            else if (colorPiece == m_colorValidationSelec) m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color = m_colorValidation;
+            else if (colorPiece == m_colorErrorSelec) m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color = m_colorError;
             
             //déplacement du sélecteur avec le joystick gauche
             if (m_interactDetection.m_canMove && !m_hasMoved && horizontalAxis < -m_limitPosition && m_selectorX > 0)   //Déplacement a gauche si position X sélecteur > position  X  première prefab instanciée
@@ -222,7 +230,9 @@ public class MonsterPuzzle : MonoBehaviour
             //nouvelle position du sélecteur
             //SetRectPosition(m_selectorTransform.gameObject, m_selectorX, m_selectorY);
             colorPiece = m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color;
-            if(colorPiece != m_colorValidation && colorPiece != m_colorError)m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color = m_colorSelector;
+            if (colorPiece == m_colorValidation)m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color = m_colorValidationSelec;
+            else if (colorPiece == m_colorError)m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color = m_colorErrorSelec;
+            else if(colorPiece != m_colorValidation && colorPiece != m_colorError)m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color = m_colorSelector;
         }
 
         //Joystick se recentre sur la manette
@@ -323,7 +333,7 @@ public class MonsterPuzzle : MonoBehaviour
         
 
         //Sortie du subPuzzle en cas de changement de personnage
-        if (m_interactDetection.m_isInSubPuzzle && Input.GetKeyDown(m_inputs.inputHuman) || Input.GetKeyDown(m_inputs.inputRobot))
+        if ((!m_cycle && (m_interactDetection.m_isInSubPuzzle && Input.GetKeyDown(m_inputs.inputHuman) || Input.GetKeyDown(m_inputs.inputRobot))) || (m_cycle && Rumbler.Instance.m_gamepad.buttonEast.isPressed))
         {
             if (m_interactDetection.enabled) m_interactDetection.PuzzleDeactivation();
         }

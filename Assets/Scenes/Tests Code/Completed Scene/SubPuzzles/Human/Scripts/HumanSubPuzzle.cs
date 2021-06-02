@@ -32,6 +32,7 @@ public class HumanSubPuzzle : MonoBehaviour {
     
     [Header("Input Manager")]
     [SerializeField] public SOInputMultiChara m_inputs = null;
+    [HideInInspector] public bool m_cycle = false; //Will be assigned by interactDetection depending on the player script 
     [HideInInspector] [Tooltip("position limite de joystick")] private float m_limitPosition = 0.5f;
     [HideInInspector] [Tooltip("variable de déplacement en points par points du sélecteur")] private bool m_hasMoved = false;
     
@@ -577,7 +578,7 @@ public class HumanSubPuzzle : MonoBehaviour {
         }
         
         //Sortie du subPuzzle en cas de changement de personnage
-        if (m_interactDetection.m_isInSubPuzzle && (Input.GetKeyDown(m_inputs.inputMonster) || Input.GetKeyDown(m_inputs.inputRobot))) {
+        if ((!m_cycle && (m_interactDetection.m_isInSubPuzzle && (Input.GetKeyDown(m_inputs.inputMonster) || Input.GetKeyDown(m_inputs.inputRobot)))) || (m_cycle && Rumbler.Instance.m_gamepad.buttonEast.isPressed)) {
             if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
         }
 
