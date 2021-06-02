@@ -54,7 +54,7 @@ public class Faufilable : MonoBehaviour
         if (!m_isTeleporting && m_isIntoWall) {
         
             bool selectorValidation = false;
-            if(!m_humanScript.m_cycle) selectorValidation = Input.GetKeyDown(m_selector.inputRobot);
+            if(!m_humanScript.m_cycle) selectorValidation = Input.GetKeyDown(m_selector.inputHuman);
             else if(m_humanScript.m_cycle) selectorValidation = Rumbler.Instance.m_gamepad.buttonSouth.wasPressedThisFrame;
             
             if(selectorValidation) {
