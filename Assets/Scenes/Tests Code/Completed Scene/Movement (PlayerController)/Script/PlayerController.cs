@@ -98,6 +98,10 @@ public class PlayerController : MonoBehaviour
     //     Physics.IgnoreLayerCollision(6,6); //Is supposed to forbid the collision between two players
     // }
 
+    [Header("Audio")] 
+    [SerializeField] [Tooltip("Déplacement du character")] private AudioSource m_moveSound;
+    [SerializeField] [Tooltip("mort du character")] private AudioSource m_deathSound;
+    
     private void Start()
     {
         DeathManager.DeathDelegator += EndDeath;
@@ -215,7 +219,9 @@ public class PlayerController : MonoBehaviour
                 //The line below doesn't work with the charController component
                 //if(m_isActive) transform.Translate(movementDirection * (m_speed * Time.deltaTime), Space.World);
 
-                if (m_isActive) m_charaController.Move(movementDirection * (m_speed * Time.deltaTime));
+                if (m_isActive) {
+                    m_charaController.Move(movementDirection * (m_speed * Time.deltaTime));
+                }
             
                 //Utilisation du Quaternion pour permettre au player de toujours se déplacer dans l'angle où il regarde
                 if (movementDirection != Vector3.zero)
@@ -223,10 +229,15 @@ public class PlayerController : MonoBehaviour
                     Quaternion toRotation = Quaternion.LookRotation(movementDirection, Vector3.up);
                     
                     transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, m_rotationSpeed * Time.deltaTime);
-                    
-                    if(m_animator != null) m_animator.SetBool(IsRunning, true);
+
+                    if (m_animator != null) {
+                        m_animator.SetBool(IsRunning, true);
+                    }
                 }
-                else if(m_animator != null) m_animator.SetBool(IsRunning, false);
+                else if (m_animator != null) {
+                    m_animator.SetBool(IsRunning, false);
+                    //m_moveSound.Play(); //Son de déplacement du personnage
+                }
 
             }
 
@@ -369,6 +380,7 @@ public class PlayerController : MonoBehaviour
         //We can detect if it is a player or not by checking if it has a PlayerController script
         if (!p_other.gameObject.TryGetComponent(out DeathZone pScript)) return;
         m_isDying = true;
+        
     }
 
     /// <summary>
@@ -492,6 +504,8 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     public void Death() {
         if (!m_isPlayingDead) {
+            //son de mort du personnage
+            m_deathSound.Play();
             DeathAnim(true);
             m_isForbiddenToMove = true;
             StartCoroutine(DeathTimer());
