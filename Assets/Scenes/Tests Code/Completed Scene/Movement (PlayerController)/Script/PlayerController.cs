@@ -39,6 +39,7 @@ public class PlayerController : MonoBehaviour
     private static bool s_inBetweenSwitching = false; //is Active when someone is switching character
     [Tooltip("For Debug Only")] public bool m_isForbiddenToMove = false; 
     [HideInInspector] public bool m_isSwitchingChara = false;
+    [HideInInspector] public bool m_isInSubPuzzle = false;
 
     private CharacterController m_charaController = null;
     [SerializeField] [Tooltip("Gravity strength on this character")] private float m_gravity = -9.81f;
@@ -69,7 +70,7 @@ public class PlayerController : MonoBehaviour
     
     
     [Header("Death Manager")]
-    [SerializeField] [Range(0.2f, 5f)] [Tooltip("The time the player is allowed to stay in this death zone (unit : seconds)")] private float m_timeBeforeDying = 0.5f;
+    [SerializeField] [Range(0.2f, 20f)] [Tooltip("The time the player is allowed to stay in this death zone (unit : seconds)")] private float m_timeBeforeDying = 0.5f;
     [SerializeField] [Range(0.2f, 5f)] [Tooltip("The time of the death animation (must be longer than the death animation time) (unit : seconds)")] private float m_deathAnimTime = 1.5f;
     [SerializeField] [Range(0.2f, 5f)] [Tooltip("The time of the fade in black after death (unit : seconds)")] private float m_deathFadeTime = 1.5f;
     private float m_deathCounter = 0.0f;
@@ -80,7 +81,7 @@ public class PlayerController : MonoBehaviour
     private static CinemachineVirtualCamera s_deathCamera = null; 
 
     
-    //Cinemachine cameras des trois personnages  en 0 l'humaine, en 1 le monstre et en 2 le robot
+    //Cinemachine cameras des trois personnages en 0 l'humaine, en 1 le monstre et en 2 le robot
     private static CinemachineVirtualCamera[] m_allCameras = null;
     
     //String to hash conversion for the animator
@@ -260,7 +261,7 @@ public class PlayerController : MonoBehaviour
                     }
                 }
                 //If any other input corresponding to another character is pressed, we inactive this chara
-                else if (Input.GetKeyDown(m_keyCodes[0]) || Input.GetKeyDown(m_keyCodes[1]) || Input.GetKeyDown(m_keyCodes[2])){
+                else if ((Input.GetKeyDown(m_keyCodes[0]) || Input.GetKeyDown(m_keyCodes[1]) || Input.GetKeyDown(m_keyCodes[2]))){
                     //If this character was active, we create a soul and send it to the next selected character
                     if (m_isActive) {
                         m_soulScript.gameObject.transform.position = transform.position + m_soulOffset;
@@ -282,7 +283,7 @@ public class PlayerController : MonoBehaviour
             }
             else if (m_cycle) { // If we are on the new input system
                 //If an input of character change is pressed we switch charas
-                if (m_isActive && (Input.GetKeyDown(m_leftInput) || Input.GetKeyDown(m_rightInput))) {
+                if (m_isActive && (Input.GetKeyDown(m_leftInput) || Input.GetKeyDown(m_rightInput)) && !s_inBetweenSwitching && !m_isInSubPuzzle) {
 
                     m_isActive = false; // this chara is no longer the active one
                     m_soulScript.gameObject.transform.position = transform.position + m_soulOffset; //We place the soul on us
@@ -338,21 +339,23 @@ public class PlayerController : MonoBehaviour
     IEnumerator SwitchTimer() {
         bool cycle = m_cycle; // Just to make sure everything's gonna work if someone switch the boolean in play mode
         
-        yield return new WaitForSeconds(m_soulScript.m_duration / 1.2f);
+        yield return new WaitForSeconds(m_soulScript.m_duration * 0.8f);
         
         //We reset correct values according to the input system wanted
         if (!cycle) {
             m_isActive = true;
-            m_isSwitchingChara = false;
-            s_inBetweenSwitching = false;
         }
         else if (cycle) {
             m_s_charasScripts.array[m_s_charasScripts.currentIndex].m_isActive = true;
             m_s_charasScripts.array[m_s_charasScripts.currentIndex].m_isSwitchingChara = false;
-            m_isSwitchingChara = false;
-            s_inBetweenSwitching = false;
         }
         
+        
+        yield return new WaitForSeconds(m_soulScript.m_duration * 0.2f);
+
+        m_isSwitchingChara = false;
+        s_inBetweenSwitching = false;
+
     }
     
 
@@ -428,38 +431,59 @@ public class PlayerController : MonoBehaviour
     /// Make the current camera look to another object
     /// </summary>
     /// <param name="p_newCamera">The new camera you want to have focus from</param>
-    public void LookSomewhere(Transform p_lookAt)
+    public ICinemachineCamera LookSomewhere(Transform p_lookAt)
     {
         switch (m_chara)
         {
             case Charas.Human:
                 m_allCameras[0].LookAt = p_lookAt;
+                return m_allCameras[0];
                 break;
             case Charas.Monster:
                 m_allCameras[1].LookAt = p_lookAt;
+                return m_allCameras[1];
                 break;
             case Charas.Robot:
                 m_allCameras[2].LookAt = p_lookAt;
+                return m_allCameras[2];
                 break;
+            default:
+                return null;
         }
     }
     
     /// <summary>
     /// Make the current camera look back to the current character
     /// </summary>
-    public void Refocus()
+    public void Refocus(ICinemachineCamera p_cameraToRefocus = null)
     {
-        switch (m_chara)
-        {
-            case Charas.Human:
-                m_allCameras[0].LookAt = gameObject.transform;
-                break;
-            case Charas.Monster:
-                m_allCameras[1].LookAt = gameObject.transform;
-                break;
-            case Charas.Robot:
-                m_allCameras[2].LookAt = gameObject.transform;
-                break;
+        if (p_cameraToRefocus == null) {
+            switch (m_chara)
+            {
+                case Charas.Human:
+                    m_allCameras[0].LookAt = gameObject.transform;
+                    break;
+                case Charas.Monster:
+                    m_allCameras[1].LookAt = gameObject.transform;
+                    break;
+                case Charas.Robot:
+                    m_allCameras[2].LookAt = gameObject.transform;
+                    break;
+            }
+        }
+        else {
+            switch (m_chara)
+            {
+                case Charas.Human:
+                    p_cameraToRefocus.LookAt = gameObject.transform;
+                    break;
+                case Charas.Monster:
+                    p_cameraToRefocus.LookAt = gameObject.transform;
+                    break;
+                case Charas.Robot:
+                    p_cameraToRefocus.LookAt = gameObject.transform;
+                    break;
+            }
         }
     }
 
@@ -535,8 +559,10 @@ public class PlayerController : MonoBehaviour
         }
         
         //We remove it to let others use it without killing the chara
-        DeathManager.Instance.DeathFade(true, m_deathFadeTime);
-        DeathManager.OnBlackScreen -= DeathDelegatorCall;
+        if (m_isPlayingDead) {
+            DeathManager.Instance.DeathFade(true, m_deathFadeTime);
+            DeathManager.OnBlackScreen -= DeathDelegatorCall;
+        }
         
         GuardBehavior.m_isKillingSomeone = false;
         DeathAnim(false);

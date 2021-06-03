@@ -113,6 +113,11 @@ public class Start_Manager : MonoBehaviour {
         float horizontalAxis = Input.GetAxis("Horizontal");
         float verticalAxis = Input.GetAxis("Vertical");
         bool selectorValidation = Input.GetKeyDown(KeyCode.JoystickButton1);   //Joystick1Button1 est le bouton croix manette PS4
+        
+        bool left = ((!m_hasMoved && horizontalAxis < -m_limitPosition) || Rumbler.Instance.GetDpad().left.wasPressedThisFrame);
+        bool right = ((!m_hasMoved && horizontalAxis > m_limitPosition) || Rumbler.Instance.GetDpad().right.wasPressedThisFrame);
+        bool up = ((!m_hasMoved && verticalAxis > m_limitPosition) || Rumbler.Instance.GetDpad().up.wasPressedThisFrame);
+        bool down = ((!m_hasMoved && verticalAxis < -m_limitPosition) || Rumbler.Instance.GetDpad().down.wasPressedThisFrame);
 
         
         /////////////////////////////       MENU MOVEMENTS        /////////////////////////////
@@ -120,16 +125,16 @@ public class Start_Manager : MonoBehaviour {
         
         //DEPLACEMENT DU CURSEUR si le menu adequat est actif
         if (m_englishMenuIsActive || m_frenchMenuIsActive) {
-            if (!m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis > m_limitPosition || verticalAxis < -m_limitPosition)
+            if (left || right || up || down)
             {
                 //déplacement du sélecteur avec le joystick gauche
-                if (!m_hasMoved && verticalAxis > m_limitPosition && m_selectorIndex > 0) //Déplacement sur le bouton au-dessus de celui actuellement
+                if (up && m_selectorIndex > 0) //Déplacement sur le bouton au-dessus de celui actuellement
                 {
                     m_selectorIndex--;
                     m_menuSelector.transform.position = m_test[m_selectorIndex].transform.position;
                     m_hasMoved = true;
                 }
-                else if (!m_hasMoved && verticalAxis < -m_limitPosition && m_selectorIndex < 3) //Déplacement sur le bouton en-dessous de celui actuellement
+                else if (down && m_selectorIndex < 3) //Déplacement sur le bouton en-dessous de celui actuellement
                 {
                     m_selectorIndex++;
                     m_menuSelector.transform.position = m_test[m_selectorIndex].transform.position;

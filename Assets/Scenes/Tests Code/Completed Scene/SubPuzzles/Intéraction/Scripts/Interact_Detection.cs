@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Cinemachine;
 using UnityEngine;
 
 public class Interact_Detection : MonoBehaviour
@@ -45,27 +46,27 @@ public class Interact_Detection : MonoBehaviour
     
     private void Start()
     {
-        if (m_puzzle == null) { Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO ADD A SUBPUZZLE IN INTERACT_DETECTION !");
+        if (m_puzzle == null) { Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO ADD A SUBPUZZLE IN INTERACT_DETECTION !", this);
         }
         else {
             switch (m_chara) {
                 case Charas.Human:
-                    if (!m_puzzle.TryGetComponent(out HumanSubPuzzle hsb)) Debug.LogError("JEEZ ! THE GAME DESIGNER PUT A SUBPUZZLE DIFFERENT FROM THE CHARA CHOOSED ABOVE IN INTERACT_DETECTION !");
+                    if (!m_puzzle.TryGetComponent(out HumanSubPuzzle hsb)) Debug.LogError("JEEZ ! THE GAME DESIGNER PUT A SUBPUZZLE DIFFERENT FROM THE CHARA CHOOSED ABOVE IN INTERACT_DETECTION !", this);
                     break;
                 case Charas.Monster:
-                    if (!m_puzzle.TryGetComponent(out MonsterPuzzle msb)) Debug.LogError("JEEZ ! THE GAME DESIGNER PUT A SUBPUZZLE DIFFERENT FROM THE CHARA CHOOSED ABOVE IN INTERACT_DETECTION !");
+                    if (!m_puzzle.TryGetComponent(out MonsterPuzzle msb)) Debug.LogError("JEEZ ! THE GAME DESIGNER PUT A SUBPUZZLE DIFFERENT FROM THE CHARA CHOOSED ABOVE IN INTERACT_DETECTION !", this);
                     break;
                 case Charas.Robot:
-                    if (!m_puzzle.TryGetComponent(out RobotPuzzleManager rsb)) Debug.LogError("JEEZ ! THE GAME DESIGNER PUT A SUBPUZZLE DIFFERENT FROM THE CHARA CHOOSED ABOVE IN INTERACT_DETECTION !");
+                    if (!m_puzzle.TryGetComponent(out RobotPuzzleManager rsb)) Debug.LogError("JEEZ ! THE GAME DESIGNER PUT A SUBPUZZLE DIFFERENT FROM THE CHARA CHOOSED ABOVE IN INTERACT_DETECTION !", this);
                     break;
             }
         }
         
-        if(m_timer > m_doorOpeningTime) Debug.LogError ($"JEEZ ! THE M_TIMER ({m_timer}) MUST BE SHORTER THAN THE M_DOOROPENINGTIME ({m_doorOpeningTime}) YOU FREAKING RETARDED !");
+        if(m_timer > m_doorOpeningTime) Debug.LogError ($"JEEZ ! THE M_TIMER ({m_timer}) MUST BE SHORTER THAN THE M_DOOROPENINGTIME ({m_doorOpeningTime}) YOU FREAKING RETARDED !", this);
 
-        if (m_camera == null) Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE CAMERA IN INTERACT_DETECTION !");
-        if (m_inputs == null) Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO ADD THE INPUTS IN INTERACT_DETECTION !");
-        if(m_doorSub.Length == 0) Debug.LogWarning("BE CAREFUL ! THERE IS NO DOOR FOR ANIMATION IN INTERACT_DETECTION !");
+        if (m_camera == null) Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE CAMERA IN INTERACT_DETECTION !", this);
+        if (m_inputs == null) Debug.LogError ("JEEZ ! THE GAME DESIGNER FORGOT TO ADD THE INPUTS IN INTERACT_DETECTION !", this);
+        if(m_doorSub.Length == 0) Debug.LogWarning("BE CAREFUL ! THERE IS NO DOOR FOR ANIMATION IN INTERACT_DETECTION !", this);
         
     }
 
@@ -122,6 +123,7 @@ public class Interact_Detection : MonoBehaviour
                     m_puzzle.SetActive(true);
                     m_isInSubPuzzle = true;
                     m_playerController.m_isForbiddenToMove = true; //We forbid the movements for the player
+                    m_playerController.m_isInSubPuzzle = true; //We forbid the movements for the player
                     m_buttonActivate = false;
                 }
             }
@@ -152,6 +154,7 @@ public class Interact_Detection : MonoBehaviour
             m_activationButton.SetActive(false);
             m_buttonActivate = false;
             m_isInSubPuzzle = false;
+            m_playerController.m_isInSubPuzzle = false;
             m_puzzle.SetActive(false);
         }
         else {
@@ -159,6 +162,7 @@ public class Interact_Detection : MonoBehaviour
             m_activationButton.SetActive(true);
             m_buttonActivate = true;
             m_isInSubPuzzle = false;
+            m_playerController.m_isInSubPuzzle = false;
             m_puzzle.SetActive(false);
             Debug.Log("Le puzzle doit se fermer");
         }
@@ -181,6 +185,7 @@ public class Interact_Detection : MonoBehaviour
         m_canMove = false;
         m_puzzle.SetActive(false);
         m_isInSubPuzzle = false;
+        m_playerController.m_isInSubPuzzle = false;
         m_activationButton.SetActive(false);
         m_buttonActivate = false;
         
@@ -194,11 +199,11 @@ public class Interact_Detection : MonoBehaviour
     IEnumerator DoorTimer() {
         m_openDoor = true;
         PlayerController playerCon = m_playerController;
-        playerCon.LookSomewhere(m_doorSub[0].m_door.transform);
+        ICinemachineCamera camera = playerCon.LookSomewhere(m_doorSub[0].m_door.transform);
         
         yield return new WaitForSeconds(m_doorOpeningTime);
         
-        playerCon.Refocus();
+        playerCon.Refocus(camera);
         this.enabled = false;
     }
     

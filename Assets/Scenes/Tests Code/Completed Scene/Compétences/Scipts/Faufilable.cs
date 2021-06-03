@@ -9,8 +9,7 @@ public class Faufilable : MonoBehaviour
     //private bool m_isSneaky = false; //Possibilité d'activer le Faufilage avec la touche de compétence du Humain
     [HideInInspector] public bool m_isIntoWall= false; //Possibilité d'activer le Faufilage avec la touche de compétence du Humain
     private bool m_isTeleporting= false; //Bloquage du teleport si deja un en cours
-
-
+    
     [Header("Travel")]
     [SerializeField] [Tooltip("Time of travel between the two exits")] [Range(0.1f, 3f)] private float m_travelTime = 1f; //Temps avant que le joueur se téléporte vers la sortie
     [SerializeField] [Tooltip("The game object where the human will be sent at\n must be inside the collide boxes of another faufilable")] private GameObject m_exit = null;
@@ -55,7 +54,7 @@ public class Faufilable : MonoBehaviour
         if (!m_isTeleporting && m_isIntoWall) {
         
             bool selectorValidation = false;
-            if(!m_humanScript.m_cycle) selectorValidation = Input.GetKeyDown(m_selector.inputRobot);
+            if(!m_humanScript.m_cycle) selectorValidation = Input.GetKeyDown(m_selector.inputHuman);
             else if(m_humanScript.m_cycle) selectorValidation = Rumbler.Instance.m_gamepad.buttonSouth.wasPressedThisFrame;
             
             if(selectorValidation) {
@@ -70,7 +69,13 @@ public class Faufilable : MonoBehaviour
     }
 
     /// <summary>
-    /// Teleporte le joueur sur la sortie sérialisé
+    /// 1. Desactive le mesh renderer du chara human
+    /// 2. Desactive la gravite
+    /// 3. Empeche le joueur de se déplacer
+    /// 4. Transporte le joueur jusqu'au point d'arrêt
+    /// 5. Reactive la gravité
+    /// 6. Reactive le mesh renderer du chara human
+    /// 7. Lance les effets
     /// </summary>
     /// <returns></returns>
     IEnumerator Teleport()
@@ -152,7 +157,6 @@ public class Faufilable : MonoBehaviour
         CharacterController charaController = p_player.GetComponent<CharacterController>();
         charaController.height *= sizeMultiplier;
         charaController.center *= sizeMultiplier;
-
     }
 
     /// <summary>

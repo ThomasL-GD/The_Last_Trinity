@@ -38,6 +38,8 @@ public class MonsterPuzzle : MonoBehaviour
     [Header("Dimensions")]
     [SerializeField] [Tooltip("hauteur du tableau de prefab")] [Range(0,20)] public int m_arrayHeight = 10;
     [SerializeField] [Tooltip("largeur du tableau de prefab")] [Range(0,20)] public int m_arrayWidth = 10;
+    [SerializeField] [Tooltip("Offset des bords de la pierre\nUnit : percentage (between 0 and 1)")] [Range(0f, 0.5f)] private float m_offsetBorders = 0.1f;
+    [SerializeField] [Tooltip("The gameObject in which things will be created\nMost likely a empty child")] private GameObject m_parent = null;
 
     //La position de la première case
     private Vector3 m_initialPos = Vector3.zero;
@@ -86,7 +88,7 @@ public class MonsterPuzzle : MonoBehaviour
         //Si nombre de pièces demandées à être affichées est inférieur au nombre de pièces possibles à afficher
         if (m_arrayHeight*m_arrayWidth > m_piecePrefab.Length)
         {
-            Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO MODIFY THE HEIGHT AND THE WIDTH OF THE ARRAY ACCORDING TO THE NUMBER OF DIFFERENT SYMBOLS !");
+            Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO MODIFY THE HEIGHT AND THE WIDTH OF THE ARRAY ACCORDING TO THE NUMBER OF DIFFERENT SYMBOLS !", this);
         }
         else PuzzleGenerate();
 
@@ -95,6 +97,14 @@ public class MonsterPuzzle : MonoBehaviour
         RectTransform rect = gameObject.GetComponent<RectTransform>();
         rect.localPosition = Vector3.zero;
         rect.anchoredPosition = Vector2.zero;
+        
+        //Child container
+        RectTransform goRect = m_parent.GetComponent<RectTransform>();
+        
+        goRect.anchorMin = new Vector2(0 + m_offsetBorders, 0 + m_offsetBorders);
+        goRect.anchorMax = new Vector2(1 - m_offsetBorders, 1 - m_offsetBorders);
+        goRect.localPosition = Vector3.zero;
+        goRect.anchoredPosition = Vector2.zero;
     }
     
 
@@ -133,7 +143,7 @@ public class MonsterPuzzle : MonoBehaviour
                 int random = Random.Range(0, m_stockPieces.Count);
                 
                 //instantiation dans la scène d'une pièce tirée dans le stock de prefab 
-                m_prefabStock[x,y] = Instantiate(m_stockPieces[random], transform.position, transform.rotation, gameObject.transform);
+                m_prefabStock[x,y] = Instantiate(m_stockPieces[random], transform.position, transform.rotation, m_parent.transform);
                 SetRectPosition(m_prefabStock[x,y], y, x);
                 
                 //ajout du prefab instancié dans une nouvelle liste regroupant les pièces actives
@@ -146,9 +156,6 @@ public class MonsterPuzzle : MonoBehaviour
             }
             
         }
-        
-        
-        /////////////////////////////////////////////////////////////////////////////   SELECTEUR   /////////////////////////////////////////////////////////////////////////////
 
 
         /////////////////////////////////////////////////////////////////////////////   CORRECT PIECES   /////////////////////////////////////////////////////////////////////////////
@@ -166,7 +173,7 @@ public class MonsterPuzzle : MonoBehaviour
                 int random = Random.Range(0, m_potentialPieces.Count);
 
                 //ajout du prefab à l'emplacement des prefab à trouver
-                GameObject gameO = Instantiate(m_potentialPieces[random], transform.position, transform.rotation, gameObject.transform);
+                GameObject gameO = Instantiate(m_potentialPieces[random], transform.position, transform.rotation, m_parent.transform);
                 SetRectPosition(gameO, (((float)m_arrayWidth)/2f) - 0.5f, m_arrayHeight + 1);
 
                 //ajout du préfab présent dans la scène à la liste de prefab à trouver (correctPieces)
@@ -197,7 +204,12 @@ public class MonsterPuzzle : MonoBehaviour
         if(!m_cycle) selectorValidation = Input.GetKeyDown(m_inputs.inputMonster);
         else if(m_cycle) selectorValidation = Rumbler.Instance.m_gamepad.buttonSouth.wasPressedThisFrame;
 
-        if (!m_hasMoved && horizontalAxis < -m_limitPosition || horizontalAxis > m_limitPosition || verticalAxis >m_limitPosition || verticalAxis < -m_limitPosition) {
+        bool left = ((!m_hasMoved && horizontalAxis < -m_limitPosition) || Rumbler.Instance.GetDpad().left.wasPressedThisFrame);
+        bool right = ((!m_hasMoved && horizontalAxis > m_limitPosition) || Rumbler.Instance.GetDpad().right.wasPressedThisFrame);
+        bool up = ((!m_hasMoved && verticalAxis > m_limitPosition) || Rumbler.Instance.GetDpad().up.wasPressedThisFrame);
+        bool down = ((!m_hasMoved && verticalAxis < -m_limitPosition) || Rumbler.Instance.GetDpad().down.wasPressedThisFrame);
+
+        if (m_interactDetection.m_canMove && (down || right || up || left)) {
             
             //We unselect the last piece we were selecting
             Color colorPiece = m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color;
@@ -206,22 +218,22 @@ public class MonsterPuzzle : MonoBehaviour
             else if (colorPiece == m_colorErrorSelec) m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color = m_colorError;
             
             //déplacement du sélecteur avec le joystick gauche
-            if (m_interactDetection.m_canMove && !m_hasMoved && horizontalAxis < -m_limitPosition && m_selectorX > 0)   //Déplacement a gauche si position X sélecteur > position  X  première prefab instanciée
+            if (m_interactDetection.m_canMove && left && m_selectorX > 0)   //Déplacement a gauche si position X sélecteur > position  X  première prefab instanciée
             {
                 m_selectorX--;
                 m_hasMoved = true;
             }
-            else if (m_interactDetection.m_canMove && !m_hasMoved && horizontalAxis > m_limitPosition && m_selectorX < m_arrayWidth-1)  //Déplacement à droite si position  X sélecteur  < valeur largeur tableau prefab
+            else if (m_interactDetection.m_canMove && right && m_selectorX < m_arrayWidth-1)  //Déplacement à droite si position  X sélecteur  < valeur largeur tableau prefab
             {
                 m_selectorX++;
                 m_hasMoved = true;
             }
-            else if (m_interactDetection.m_canMove && !m_hasMoved && verticalAxis > m_limitPosition && m_selectorY < m_arrayHeight-1)  //Déplacement en haut si position Y sélecteur < position Y première prefab
+            else if (m_interactDetection.m_canMove && up && m_selectorY < m_arrayHeight-1)  //Déplacement en haut si position Y sélecteur < position Y première prefab
             {
                 m_selectorY++;
                 m_hasMoved = true;
             }
-            else if (m_interactDetection.m_canMove && !m_hasMoved && verticalAxis < -m_limitPosition && m_selectorY > 0) //Déplacement en bas si position Y sélecteur > valeur dernière prefab du tableau prefab
+            else if (m_interactDetection.m_canMove && down && m_selectorY > 0) //Déplacement en bas si position Y sélecteur > valeur dernière prefab du tableau prefab
             {
                 m_selectorY--;
                 m_hasMoved = true;
@@ -379,7 +391,7 @@ public class MonsterPuzzle : MonoBehaviour
         
         // https://memegenerator.net/instance/44816816/plotracoon-we-shall-destroy-them-all
         //As all the gameobjects we instantiated are child of this gameobject, we just have to erase all the children of this
-        foreach(Transform child in gameObject.transform) {
+        foreach(Transform child in m_parent.transform) {
             Destroy(child.gameObject);
         }
 
