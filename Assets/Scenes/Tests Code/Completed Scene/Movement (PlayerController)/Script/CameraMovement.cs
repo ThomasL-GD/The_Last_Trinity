@@ -16,8 +16,8 @@ public class CameraMovement : MonoBehaviour
     [SerializeField] [Range(-5, 5)] [Tooltip("The max offset this camera can have on both directions")] private float m_clamp = 2.5f; //Clamp de la caméra sur le rail de dolly
     [SerializeField] [Range(0, 3)] [Tooltip("The speed at which the camera moves when the player use the appropriate input")] private float m_lookSpeed = 0f; //Vitesse de déplacement du look sur le côté
     [SerializeField] [Range(0, 6)] [Tooltip("The speed at which the camera moves when the player let go the appropriate input")] private float m_returnSpeed = 0f; //Vitesse de déplacement du retour de la caméra
-    [SerializeField] [Range(-5, 5)] [Tooltip("The offset of the camera on the rail")] private float m_offsetValue = -0.25f; //Value de l'offset de la caméra sur le rail de la dolly
-    private float m_globalOffset = -0.25f; //Vitesse de déplacement du retour de la caméra
+    private float m_offsetValue = 0f; //Value de l'offset de la caméra sur le rail de la dolly
+    [SerializeField] [Range(-5, 5)] [Tooltip("The offset of the camera on the rail")] private float m_globalOffset = 0;
     [SerializeField] [Range(0f, 1f)] private float m_incertitude = 0.1f; //Valeur d'incertitude de la distance de l'offset
 
     void Start()
