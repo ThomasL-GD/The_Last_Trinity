@@ -63,7 +63,7 @@ public class ZoneChangementDolly : MonoBehaviour {
                         break;
                 }   
             }
-            else if(m_isCancelingOnExit){
+            else {
                 m_previousVCamR = charaScript.GetCurrentCamera();
                 charaScript.SetNewCamera(m_vCamRZ);
             }
