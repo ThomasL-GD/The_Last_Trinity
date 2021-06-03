@@ -39,6 +39,7 @@ public class PlayerController : MonoBehaviour
     private static bool s_inBetweenSwitching = false; //is Active when someone is switching character
     [Tooltip("For Debug Only")] public bool m_isForbiddenToMove = false; 
     [HideInInspector] public bool m_isSwitchingChara = false;
+    [HideInInspector] public bool m_isInSubPuzzle = false;
 
     private CharacterController m_charaController = null;
     [SerializeField] [Tooltip("Gravity strength on this character")] private float m_gravity = -9.81f;
@@ -277,7 +278,7 @@ public class PlayerController : MonoBehaviour
             }
             else if (m_cycle) { // If we are on the new input system
                 //If an input of character change is pressed we switch charas
-                if (m_isActive && (Input.GetKeyDown(m_leftInput) || Input.GetKeyDown(m_rightInput)) && !s_inBetweenSwitching) {
+                if (m_isActive && (Input.GetKeyDown(m_leftInput) || Input.GetKeyDown(m_rightInput)) && !s_inBetweenSwitching && !m_isInSubPuzzle) {
 
                     m_isActive = false; // this chara is no longer the active one
                     m_soulScript.gameObject.transform.position = transform.position + m_soulOffset; //We place the soul on us
@@ -333,21 +334,23 @@ public class PlayerController : MonoBehaviour
     IEnumerator SwitchTimer() {
         bool cycle = m_cycle; // Just to make sure everything's gonna work if someone switch the boolean in play mode
         
-        yield return new WaitForSeconds(m_soulScript.m_duration / 1.2f);
+        yield return new WaitForSeconds(m_soulScript.m_duration * 0.8f);
         
         //We reset correct values according to the input system wanted
         if (!cycle) {
             m_isActive = true;
-            m_isSwitchingChara = false;
-            s_inBetweenSwitching = false;
         }
         else if (cycle) {
             m_s_charasScripts.array[m_s_charasScripts.currentIndex].m_isActive = true;
             m_s_charasScripts.array[m_s_charasScripts.currentIndex].m_isSwitchingChara = false;
-            m_isSwitchingChara = false;
-            s_inBetweenSwitching = false;
         }
         
+        
+        yield return new WaitForSeconds(m_soulScript.m_duration * 0.2f);
+
+        m_isSwitchingChara = false;
+        s_inBetweenSwitching = false;
+
     }
     
 
