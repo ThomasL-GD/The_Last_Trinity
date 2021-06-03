@@ -210,7 +210,7 @@ public class GuardBehavior : MonoBehaviour {
             //Debug du raycast dans la scène
             if (raycastHasHit)
             {
-                //Debug.DrawRay(raycastPosition, targetDir * hit.distance, Color.magenta, 10f);
+                Debug.DrawRay(raycastPosition, targetDir * hit.distance, Color.magenta, 10f);
 
                 if (m_charactersInDangerScript[0].gameObject.transform.position != hit.transform.position) //le chara se trouve derrière un obstacle et n'est pas visible par l'ennemi
                 {
