@@ -77,6 +77,8 @@ public class PlayerController : MonoBehaviour
     private bool m_isDying = false; //If the chara is in a death zone
     private bool m_isPlayingDead = false; //If the chara is currently playing their death animation
     [HideInInspector] public Vector3 m_spawnPoint = Vector3.zero;
+    [HideInInspector] public CinemachineVirtualCamera m_spawnCamera = null;
+    private static CinemachineVirtualCamera s_deathCamera = null; 
 
     
     //Cinemachine cameras des trois personnages en 0 l'humaine, en 1 le monstre et en 2 le robot
@@ -115,16 +117,19 @@ public class PlayerController : MonoBehaviour
                 m_s_charasScripts.human = this;
                 m_s_charasScripts.ResetArray();
                 IsSneaky = Animator.StringToHash("IsSneaky");
+                m_spawnCamera = vCamH;
                 break;
             case Charas.Monster:
                 m_s_charasScripts.monster = this;
                 m_s_charasScripts.ResetArray();
                 IsIntimidating = Animator.StringToHash("IsIntimidating");
+                m_spawnCamera = vCamM;
                 break;
             case Charas.Robot:
                 m_s_charasScripts.robot = this;
                 m_s_charasScripts.ResetArray();
                 IsTelekinesing = Animator.StringToHash("IsTelekinesing");
+                m_spawnCamera = vCamR;
                 break;
         }
 
@@ -145,9 +150,9 @@ public class PlayerController : MonoBehaviour
             Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE SCRIPTABLE OBJECT FOR THE INPUTS !");
         }
     #endif
-        
+
         if (vCamH != null && vCamM != null && vCamR != null) m_allCameras = new CinemachineVirtualCamera[3] {vCamH, vCamM, vCamR};
-        
+
 
         if (TryGetComponent(out Animator animator)) m_animator = animator;
         else Debug.LogWarning("JEEZ ! THE GAME DESIGNER FORGOT TO PUT AN ANIMATOR ON THIS CHARA ! (it's still gonna work tought)");
@@ -410,8 +415,7 @@ public class PlayerController : MonoBehaviour
     /// <returns>Returns the camera focusing this character</returns>
     public CinemachineVirtualCamera GetCurrentCamera()
     {
-        switch (m_chara)
-        {
+        switch (m_chara) {
             case Charas.Human:
                 return m_allCameras[0];
             case Charas.Monster:
@@ -491,6 +495,20 @@ public class PlayerController : MonoBehaviour
             DeathAnim(true);
             m_isForbiddenToMove = true;
             StartCoroutine(DeathTimer());
+            //We set a new camera to look throught to be sure the players sees the character who is dying
+            switch (m_chara) {
+                case Charas.Human:
+                    s_deathCamera = m_allCameras[0];
+                    break;
+                case Charas.Monster:
+                    s_deathCamera = m_allCameras[1];
+                    break;
+                case Charas.Robot:
+                    s_deathCamera = m_allCameras[2];
+                    break;
+            }
+
+            s_deathCamera.Priority = 8;
         }
         else Debug.LogWarning("Multiple Deaths at the same time ? this is hella shady");
     }
@@ -522,9 +540,23 @@ public class PlayerController : MonoBehaviour
         m_isDying = false;
         m_deathCounter = 0.0f;
         m_isForbiddenToMove = false;
+        s_deathCamera.Priority = 0;
 
         //We teleport the player to their spawnpoint
         transform.SetPositionAndRotation(m_spawnPoint, transform.rotation);
+        
+        //We reset the appropriate camera according to the spawnpoint
+        switch (m_chara) {
+            case Charas.Human:
+                m_allCameras[0] = m_spawnCamera;
+                break;
+            case Charas.Monster:
+                m_allCameras[1] = m_spawnCamera;
+                break;
+            case Charas.Robot:
+                m_allCameras[2] = m_spawnCamera;
+                break;
+        }
         
         //We remove it to let others use it without killing the chara
         if (m_isPlayingDead) {
