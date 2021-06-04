@@ -290,7 +290,7 @@ public class MonsterPuzzle : MonoBehaviour
                         {
                             Debug.Log("Vous avez trouvé toutes les pièces !");
                             
-                            m_winSound.Play();  //son de réussite de subPuzzle
+                            //m_winSound.Play();  //son de réussite de subPuzzle
                             
                             m_interactDetection.m_achieved = true;  //le joueur a trouvé toutes les pièces
                             m_interactDetection.m_canMove = false;  //le joueur ne peut plus bouger le selecteur
@@ -332,7 +332,7 @@ public class MonsterPuzzle : MonoBehaviour
                             
                             if (m_errorDone < m_errorAllowed)
                             {
-                                m_badSound.Play(); //Son de pièce mauvaise
+                                //m_badSound.Play(); //Son de pièce mauvaise
                                 Rumbler.Instance.Rumble(m_lowA, m_highA, m_rumbleDuration);
                             }
                             else if (m_errorDone >= m_errorAllowed)

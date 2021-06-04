@@ -350,7 +350,7 @@ public class PlayerController : MonoBehaviour
         }
 
         if (!m_isActive && Input.GetKeyDown(m_callKey)) {
-            
+            m_nma.SetDestination(m_s_charasScripts.array[m_s_charasScripts.currentIndex].gameObject.transform.position);
         }
         
         //if(m_chara == Charas.Robot)Debug.Log($"{transform.position}");
