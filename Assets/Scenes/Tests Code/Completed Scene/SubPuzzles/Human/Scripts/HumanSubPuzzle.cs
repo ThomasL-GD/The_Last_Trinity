@@ -609,7 +609,7 @@ public class HumanSubPuzzle : MonoBehaviour {
         //Win verification
         if (m_selector.x == m_mazeWidth - 1 && m_selector.y == 0) {
             
-            m_winSound.Play();  //son de réussite de subPuzzle
+            //m_winSound.Play();  //son de réussite de subPuzzle
             Win();
         }
         

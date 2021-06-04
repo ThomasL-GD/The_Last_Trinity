@@ -273,7 +273,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 	/// </summary>
 	public void Win()
 	{
-		m_winSound.Play();	//Son de réussite de subPuzzle
+		//m_winSound.Play();	//Son de réussite de subPuzzle
 		
 		m_interactDetection.m_achieved = true;
 		m_interactDetection.m_canMove = false;
@@ -437,7 +437,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 		if (selectorValidation && m_interactDetection.m_canMove) {
 			
 			//son de rotation de pièce
-			m_rotatePieceSound.Play();
+			//m_rotatePieceSound.Play();
 			
 			//rotation de la pièce
 			SweepPiece(m_selector.x, m_selector.y);
