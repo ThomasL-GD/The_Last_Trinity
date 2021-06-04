@@ -225,7 +225,7 @@ public class GuardBehavior : MonoBehaviour {
             if (raycastHasHit)
             {
                 Debug.DrawRay(raycastPosition, targetDir * hit.distance, Color.magenta, 10f);
-                m_detectionSound.Play(); //Son de repérage d'un character
+                //m_detectionSound.Play(); //Son de repérage d'un character
                 
                 if (m_charactersInDangerScript[0].gameObject.transform.position != hit.transform.position) //le chara se trouve derrière un obstacle et n'est pas visible par l'ennemi
                 {
