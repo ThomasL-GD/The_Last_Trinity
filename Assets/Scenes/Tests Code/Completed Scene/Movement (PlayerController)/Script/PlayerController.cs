@@ -55,8 +55,8 @@ public class PlayerController : MonoBehaviour
     
     
     [Header("If Cycle is ON")]
-    [SerializeField] [Tooltip("The input used to rotate chara selection clockwise")] private KeyCode m_rightInput = KeyCode.JoystickButton0;
-    [SerializeField] [Tooltip("The input used to rotate chara selection counter-clockwise")] private KeyCode m_leftInput = KeyCode.JoystickButton1;
+    [SerializeField] [Tooltip("The input used to rotate chara selection clockwise")] public KeyCode m_rightInput = KeyCode.JoystickButton4;
+    [SerializeField] [Tooltip("The input used to rotate chara selection counter-clockwise")] public KeyCode m_leftInput = KeyCode.JoystickButton5;
     private static PlayerCharactersArray m_s_charasScripts = new PlayerCharactersArray();
     [SerializeField] [Tooltip("The input used to make other characters come to you")] private KeyCode m_callKey = KeyCode.None;
     private bool m_isNmaActive = false;
