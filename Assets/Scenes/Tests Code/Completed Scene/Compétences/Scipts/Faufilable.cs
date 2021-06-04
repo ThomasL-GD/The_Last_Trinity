@@ -23,7 +23,7 @@ public class Faufilable : MonoBehaviour
 
     [Header("Effects")]
     [SerializeField] [Tooltip("Effect of the Duct when player is near")] private VisualEffect m_ductEffect = null;
-    [SerializeField] [Tooltip("The feedback for when the chara c&an teleport")] public GameObject m_teleportFeedback = null;
+    [SerializeField] [Tooltip("The feedback for when the chara can teleport")] public GameObject m_teleportFeedback = null;
     [SerializeField] [Tooltip("The Smoke effect when the player leave the duct")] private GameObject m_smokeObject = null;
     private ParticleSystem m_smokeParticle; //Particle system of the smoke object
     void Start()

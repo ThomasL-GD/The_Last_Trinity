@@ -15,6 +15,7 @@ public class EndLevelZone : MonoBehaviour {
     [SerializeField] [Tooltip("The time taken by the fade in black to occur\nUnit : seconds")] [Range(0.5f, 10f)] private float m_fadeTime = 4f;
     private float m_counterNextLevel = 0f;
     private bool m_levelIsCompleted = false;
+    private static bool s_isEndingLevel = false;
     
     // Start is called before the first frame update
     void Awake() {
@@ -28,8 +29,10 @@ public class EndLevelZone : MonoBehaviour {
     }
 
     private void Update() {
-        if (m_levelIsCompleted) {
+        if (!s_isEndingLevel && m_levelIsCompleted) {
             m_levelIsCompleted = false;
+            s_isEndingLevel = true;
+            Debug.Log("DELEGATOR NEXT LEVEL ADDED !");
             //We add the function that will laucnh next level to the OnBlackScreen delegator so the next level will be launched once the screen is fully black
             DeathManager.OnBlackScreen += NextLevel;
             DeathManager.Instance.DeathFade(false, m_fadeTime);
@@ -38,6 +41,7 @@ public class EndLevelZone : MonoBehaviour {
 
     private void NextLevel() {
         Debug.Log("Less goooooooooo DaBaby");
+        DeathManager.OnBlackScreen -= NextLevel;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 

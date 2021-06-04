@@ -23,12 +23,18 @@ public class Telekinesable : MonoBehaviour
     
     [Header("Clamping")]
     [SerializeField] [Tooltip("Un slider d'int")] [Range(0, 4)] private int m_unSliderDint = 2;
+    [SerializeField] [Tooltip("The gameobject that will be active when the robot is close enough")] private GameObject m_teleportFeedback = null;
     //[SerializeField] [Tooltip("The maximum authorized difference between the position to reach and the current position (unit : Unity meters)")] [Range(0f, 1f)] private float m_uncertainty = 0.1f;
    
     private Vector3 m_velocity = Vector3.zero; //Vélocité 0 pour le smoothDamp
     private PlayerController m_robotScript = null; //Récupération du script du plauerController pour obtenir le Robot
 
     private VisualEffect m_cube; //Visual effect en enfant de l'objet Telekinesable
+    
+    // [Header("Audio")]
+    // [SerializeField] [Tooltip("Son de montée")] private AudioSource m_upSound;
+    // [SerializeField] [Tooltip("Son de stabilisation")] private AudioSource m_telekinesieSound;
+    // [SerializeField] [Tooltip("Son de descente")] private AudioSource m_downSound;
     
     void Start() {
         DeathManager.DeathDelegator += Reset;
@@ -62,6 +68,9 @@ public class Telekinesable : MonoBehaviour
         }
         else if (posClamp == ClampEnjoyer(m_targetPos) && m_activeTelekinesie)
         {
+            //son de télékinésie stable
+            //m_telekinesieSound.PlayOneShot(m_telekinesieSound.clip);
+            
             //Debug.Log("Quelconque");
             m_isInBetweenTravel = false;
             m_activeTelekinesie = false;
@@ -75,13 +84,19 @@ public class Telekinesable : MonoBehaviour
             
             if (selectorValidation && !m_isInBetweenTravel && m_robotScript.m_isActive)
             {
+
                 m_isInBetweenTravel = true;
                 m_velocity = Vector3.zero;
-                if (m_activeTelekinesie) {
+                if (m_activeTelekinesie)
+                {
                     m_robotScript.m_isForbiddenToMove = true;
+                    //m_upSound.PlayOneShot(m_upSound.clip); //son de montée
                     m_robotScript.AbilityAnim(true); //Animation up play
                 }
-                else m_robotScript.AbilityAnim(false); //Animation down play
+                else{
+                    m_robotScript.AbilityAnim(false); //Animation down play
+                    //m_downSound.PlayOneShot(m_downSound.clip);  //son de descente
+                }
             }
         }
         
@@ -105,6 +120,7 @@ public class Telekinesable : MonoBehaviour
             if (player.m_chara == Charas.Robot)
             {
                 m_cube.Play();
+                if(m_teleportFeedback != null) m_teleportFeedback.SetActive(true);
                 m_telekinesieOpen = true;
                 m_robotScript = player;
             }
@@ -122,6 +138,7 @@ public class Telekinesable : MonoBehaviour
             if (player.m_chara == Charas.Robot)
             {
                 m_cube.Stop();
+                if(m_teleportFeedback != null) m_teleportFeedback.SetActive(false);
                 m_telekinesieOpen = false;
                 m_activeTelekinesie = false;
                 m_robotScript = null;

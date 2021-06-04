@@ -9,6 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
+using UnityEngine.AI;
 using UnityEngine.EventSystems;
 
 /// <summary>
@@ -46,6 +47,7 @@ public class PlayerController : MonoBehaviour
     private float m_effectiveGravity = 0f;
     private Vector3 m_charaVelocity = Vector3.zero;
     private Animator m_animator = null;
+    private NavMeshAgent m_nma = null;
     
 
     [Header("Switch Chara Input Mode")]
@@ -56,6 +58,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] [Tooltip("The input used to rotate chara selection clockwise")] private KeyCode m_rightInput = KeyCode.JoystickButton0;
     [SerializeField] [Tooltip("The input used to rotate chara selection counter-clockwise")] private KeyCode m_leftInput = KeyCode.JoystickButton1;
     private static PlayerCharactersArray m_s_charasScripts = new PlayerCharactersArray();
+    [SerializeField] [Tooltip("The input used to make other characters come to you")] private KeyCode m_callKey = KeyCode.None;
+    private bool m_isNmaActive = false;
     
     
     [Header("If Cycle is OFF")]
@@ -98,6 +102,10 @@ public class PlayerController : MonoBehaviour
     //     Physics.IgnoreLayerCollision(6,6); //Is supposed to forbid the collision between two players
     // }
 
+    // [Header("Audio")] 
+    // [SerializeField] [Tooltip("Déplacement du character")] private AudioSource m_moveSound;
+    // [SerializeField] [Tooltip("mort du character")] private AudioSource m_deathSound;
+    
     private void Start()
     {
         DeathManager.DeathDelegator += EndDeath;
@@ -156,6 +164,11 @@ public class PlayerController : MonoBehaviour
 
         if (TryGetComponent(out Animator animator)) m_animator = animator;
         else Debug.LogWarning("JEEZ ! THE GAME DESIGNER FORGOT TO PUT AN ANIMATOR ON THIS CHARA ! (it's still gonna work tought)");
+
+        if (m_callKey != null) {
+            if (TryGetComponent(out NavMeshAgent nma)) m_nma = nma;
+            else Debug.LogWarning("JEEZ ! THE GAME DESIGNER FORGOT TO PUT A NAVMESH AGENT ! (it's still gonna work tought)");
+        }
         
         if (TryGetComponent(out CharacterController charaController)) m_charaController = charaController;
         else Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT A CHARA CONTROLLER ON THIS CHARA !");
@@ -215,7 +228,9 @@ public class PlayerController : MonoBehaviour
                 //The line below doesn't work with the charController component
                 //if(m_isActive) transform.Translate(movementDirection * (m_speed * Time.deltaTime), Space.World);
 
-                if (m_isActive) m_charaController.Move(movementDirection * (m_speed * Time.deltaTime));
+                if (m_isActive) {
+                    m_charaController.Move(movementDirection * (m_speed * Time.deltaTime));
+                }
             
                 //Utilisation du Quaternion pour permettre au player de toujours se déplacer dans l'angle où il regarde
                 if (movementDirection != Vector3.zero)
@@ -223,10 +238,15 @@ public class PlayerController : MonoBehaviour
                     Quaternion toRotation = Quaternion.LookRotation(movementDirection, Vector3.up);
                     
                     transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, m_rotationSpeed * Time.deltaTime);
-                    
-                    if(m_animator != null) m_animator.SetBool(IsRunning, true);
+
+                    if (m_animator != null) {
+                        m_animator.SetBool(IsRunning, true);
+                        //if(!m_moveSound.isPlaying) m_moveSound.PlayOneShot(m_moveSound.clip); //Son de déplacement du personnage
+                    }
                 }
-                else if(m_animator != null) m_animator.SetBool(IsRunning, false);
+                else if (m_animator != null) {
+                    m_animator.SetBool(IsRunning, false);
+                }
 
             }
 
@@ -329,6 +349,16 @@ public class PlayerController : MonoBehaviour
                 if (!m_isPlayingDead)Death();
             }
         }
+
+        if (!m_isActive && m_cycle && Input.GetKeyDown(m_callKey)) {
+            m_nma.SetDestination(m_s_charasScripts.array[m_s_charasScripts.currentIndex].gameObject.transform.position);
+            m_isNmaActive = true;
+        }
+
+        if (m_cycle && m_isNmaActive && m_isActive) {
+            m_nma.isStopped = true;
+            m_isNmaActive = false;
+        }
         
         //if(m_chara == Charas.Robot)Debug.Log($"{transform.position}");
     }
@@ -369,6 +399,7 @@ public class PlayerController : MonoBehaviour
         //We can detect if it is a player or not by checking if it has a PlayerController script
         if (!p_other.gameObject.TryGetComponent(out DeathZone pScript)) return;
         m_isDying = true;
+        
     }
 
     /// <summary>
@@ -492,6 +523,8 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     public void Death() {
         if (!m_isPlayingDead) {
+            //son de mort du personnage
+            //m_deathSound.Play();
             DeathAnim(true);
             m_isForbiddenToMove = true;
             StartCoroutine(DeathTimer());
@@ -544,6 +577,7 @@ public class PlayerController : MonoBehaviour
 
         //We teleport the player to their spawnpoint
         transform.SetPositionAndRotation(m_spawnPoint, transform.rotation);
+        AbilityAnim(false);
         
         //We reset the appropriate camera according to the spawnpoint
         switch (m_chara) {

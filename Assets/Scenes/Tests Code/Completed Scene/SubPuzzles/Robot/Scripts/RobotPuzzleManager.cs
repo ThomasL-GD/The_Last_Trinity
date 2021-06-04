@@ -66,9 +66,13 @@ public class RobotPuzzleManager : MonoBehaviour {
 	[HideInInspector] public bool m_cycle = false; //Will be assigned by interactDetection depending on the player script 
 	[Tooltip("position limite de joystick")] private float m_limitPosition = 0.5f;
 	[HideInInspector] [Tooltip("variable de déplacement en points par points du sélecteur")] private bool m_hasMoved = false;
-	
 	[HideInInspector] [Tooltip("Script d'intéraction entre le personnage et l'objet comprenant le subpuzzle")] public Interact_Detection m_interactDetection = null;
 
+	// [Header("Audio")] 
+	// [SerializeField] [Tooltip("Son de rotation de pièce de subPuzzle")] private AudioSource m_rotatePieceSound;
+	// [SerializeField] [Tooltip("Son de réussite de subPuzzle")] private AudioSource m_winSound;
+	// [SerializeField] [Tooltip("Son d'ouverture de SubPuzzle")] private AudioSource m_openSound;
+	
 	private void Awake()
 	{
 		m_piecePrefabs = new GameObject[6];	//tableau. Le 6 est arbitraire et représente le nombre de pièces différentes
@@ -143,6 +147,9 @@ public class RobotPuzzleManager : MonoBehaviour {
 		else {
 			Debug.LogError ("JEEZ ! THE GAME DESIGNER PUT A WRONG PREFAB FOR THE SELECTOR, IT MUST BE A UI ELEMENT WITH A RECT TRANSFORM !", this);
 		}
+		
+		//son d'ouverture de subPuzzle
+		//m_openSound.Play();
 	}
 
 
@@ -237,7 +244,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 	/// Cette fonction se fait une fois que chaque pièce a été instancié
 	/// </summary>
 	/// <returns></returns>
-	public int Sweep()
+	private int Sweep()
 	{
 		int value = 0;
 
@@ -264,8 +271,10 @@ public class RobotPuzzleManager : MonoBehaviour {
 	/// <summary>
 	/// activation du canvas de victoire après réussite de puzzle
 	/// </summary>
-	public void Win()
+	private void Win()
 	{
+		//m_winSound.Play();	//Son de réussite de subPuzzle
+		
 		m_interactDetection.m_achieved = true;
 		m_interactDetection.m_canMove = false;
 		if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
@@ -276,7 +285,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 	/// <summary>
 	/// Fonction qui implique la rotation de pièce et indique le changement de valeurs de la pièce sur chaque face
 	/// </summary>
-	public void SweepPiece(int p_x, int p_y)
+	private void SweepPiece(int p_x, int p_y)
 	{
 		//Debug.Log("test 2");
 		int difference = -QuickSweep(p_x,p_y);   //valeur de position au départ
@@ -298,7 +307,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 	/// <param name="p_width"></param>
 	/// <param name="p_height"></param>
 	/// <returns></returns>
-	public int QuickSweep(int p_width,int p_height)
+	private int QuickSweep(int p_width,int p_height)
 	{
 		int value = 0;
 
@@ -426,6 +435,10 @@ public class RobotPuzzleManager : MonoBehaviour {
 		
 
 		if (selectorValidation && m_interactDetection.m_canMove) {
+			
+			//son de rotation de pièce
+			//m_rotatePieceSound.PlayOneShot(m_rotatePieceSound.clip);
+			
 			//rotation de la pièce
 			SweepPiece(m_selector.x, m_selector.y);
 		}
