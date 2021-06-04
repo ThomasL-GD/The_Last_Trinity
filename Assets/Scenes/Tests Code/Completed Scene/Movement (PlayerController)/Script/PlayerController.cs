@@ -9,6 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
+using UnityEngine.AI;
 using UnityEngine.EventSystems;
 
 /// <summary>
@@ -46,6 +47,7 @@ public class PlayerController : MonoBehaviour
     private float m_effectiveGravity = 0f;
     private Vector3 m_charaVelocity = Vector3.zero;
     private Animator m_animator = null;
+    private NavMeshAgent m_nma = null;
     
 
     [Header("Switch Chara Input Mode")]
@@ -66,6 +68,7 @@ public class PlayerController : MonoBehaviour
     [Header("Soul")]
     [SerializeField] [Tooltip("The game object of what represents the soul, it will be driven from a character to another when a switch occurs")] public GameObject m_soul = null;
     [Tooltip("Offset for the instantiate of the Soul")][SerializeField] public Vector3 m_soulOffset = Vector3.zero;
+    [SerializeField] [Tooltip("The input used to make other characters come to you")] private KeyCode m_callKey = KeyCode.None;
     private AutoRotation m_soulScript = null;
     
     
@@ -160,6 +163,11 @@ public class PlayerController : MonoBehaviour
 
         if (TryGetComponent(out Animator animator)) m_animator = animator;
         else Debug.LogWarning("JEEZ ! THE GAME DESIGNER FORGOT TO PUT AN ANIMATOR ON THIS CHARA ! (it's still gonna work tought)");
+
+        if (m_callKey != null) {
+            if (TryGetComponent(out NavMeshAgent nma)) m_nma = nma;
+            else Debug.LogWarning("JEEZ ! THE GAME DESIGNER FORGOT TO PUT A NAVMESH AGENT ! (it's still gonna work tought)");
+        }
         
         if (TryGetComponent(out CharacterController charaController)) m_charaController = charaController;
         else Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT A CHARA CONTROLLER ON THIS CHARA !");
@@ -339,6 +347,10 @@ public class PlayerController : MonoBehaviour
             if (m_deathCounter > m_timeBeforeDying) {
                 if (!m_isPlayingDead)Death();
             }
+        }
+
+        if (!m_isActive && Input.GetKeyDown(m_callKey)) {
+            
         }
         
         //if(m_chara == Charas.Robot)Debug.Log($"{transform.position}");
