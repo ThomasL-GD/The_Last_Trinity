@@ -241,7 +241,7 @@ public class PlayerController : MonoBehaviour
 
                     if (m_animator != null) {
                         m_animator.SetBool(IsRunning, true);
-                        if(!m_moveSound.isPlaying) m_moveSound.PlayOneShot(m_moveSound.clip); //Son de déplacement du personnage
+                        //if(!m_moveSound.isPlaying) m_moveSound.PlayOneShot(m_moveSound.clip); //Son de déplacement du personnage
                     }
                 }
                 else if (m_animator != null) {
@@ -524,7 +524,7 @@ public class PlayerController : MonoBehaviour
     public void Death() {
         if (!m_isPlayingDead) {
             //son de mort du personnage
-            m_deathSound.Play();
+            //m_deathSound.Play();
             DeathAnim(true);
             m_isForbiddenToMove = true;
             StartCoroutine(DeathTimer());

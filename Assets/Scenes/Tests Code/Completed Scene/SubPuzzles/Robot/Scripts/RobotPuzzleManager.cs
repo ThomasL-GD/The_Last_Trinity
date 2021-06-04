@@ -68,10 +68,10 @@ public class RobotPuzzleManager : MonoBehaviour {
 	[HideInInspector] [Tooltip("variable de déplacement en points par points du sélecteur")] private bool m_hasMoved = false;
 	[HideInInspector] [Tooltip("Script d'intéraction entre le personnage et l'objet comprenant le subpuzzle")] public Interact_Detection m_interactDetection = null;
 
-	[Header("Audio")] 
-	[SerializeField] [Tooltip("Son de rotation de pièce de subPuzzle")] private AudioSource m_rotatePieceSound;
-	[SerializeField] [Tooltip("Son de réussite de subPuzzle")] private AudioSource m_winSound;
-	[SerializeField] [Tooltip("Son d'ouverture de SubPuzzle")] private AudioSource m_openSound;
+	// [Header("Audio")] 
+	// [SerializeField] [Tooltip("Son de rotation de pièce de subPuzzle")] private AudioSource m_rotatePieceSound;
+	// [SerializeField] [Tooltip("Son de réussite de subPuzzle")] private AudioSource m_winSound;
+	// [SerializeField] [Tooltip("Son d'ouverture de SubPuzzle")] private AudioSource m_openSound;
 	
 	private void Awake()
 	{
@@ -149,7 +149,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 		}
 		
 		//son d'ouverture de subPuzzle
-		m_openSound.Play();
+		//m_openSound.Play();
 	}
 
 
@@ -273,7 +273,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 	/// </summary>
 	private void Win()
 	{
-		m_winSound.Play();	//Son de réussite de subPuzzle
+		//m_winSound.Play();	//Son de réussite de subPuzzle
 		
 		m_interactDetection.m_achieved = true;
 		m_interactDetection.m_canMove = false;
@@ -437,7 +437,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 		if (selectorValidation && m_interactDetection.m_canMove) {
 			
 			//son de rotation de pièce
-			m_rotatePieceSound.PlayOneShot(m_rotatePieceSound.clip);
+			//m_rotatePieceSound.PlayOneShot(m_rotatePieceSound.clip);
 			
 			//rotation de la pièce
 			SweepPiece(m_selector.x, m_selector.y);

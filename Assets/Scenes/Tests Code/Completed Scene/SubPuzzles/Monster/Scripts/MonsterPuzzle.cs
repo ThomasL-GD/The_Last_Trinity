@@ -68,9 +68,9 @@ public class MonsterPuzzle : MonoBehaviour
     
     [HideInInspector] [Tooltip("Script d'intéraction entre le personnage et l'objet comprenant le subpuzzle")] public Interact_Detection m_interactDetection = null;
     
-    [Header("Audio")] 
-    [SerializeField] [Tooltip("Son de sélection de pièce bonne")] private AudioSource m_goodSound;
-    [SerializeField] [Tooltip("Son de réussite de SubPuzzle")] private AudioSource m_winSound;
+    // [Header("Audio")] 
+    // [SerializeField] [Tooltip("Son de sélection de pièce bonne")] private AudioSource m_goodSound;
+    // [SerializeField] [Tooltip("Son de réussite de SubPuzzle")] private AudioSource m_winSound;
     
     // OnEnable is called before the first frame update
     void OnEnable() {
@@ -281,7 +281,7 @@ public class MonsterPuzzle : MonoBehaviour
                     //PIECE PAS ENCORE TROUVEE ET CORRECTE
                     if (!isAlreadyFound)    
                     {
-                        m_goodSound.PlayOneShot(m_goodSound.clip);
+                        //m_goodSound.PlayOneShot(m_goodSound.clip);
                         
                         m_foundPieces.Add(m_correctPieces[i]); //ajout d'une pièce correcte à pièce trouvé
                         m_findPiece++; //incrémentation des bonnes pièces trouvées
@@ -290,7 +290,7 @@ public class MonsterPuzzle : MonoBehaviour
                         {
                             Debug.Log("Vous avez trouvé toutes les pièces !");
 
-                            m_winSound.PlayOneShot(m_winSound.clip); //son de réussite de subPuzzle
+                            //m_winSound.PlayOneShot(m_winSound.clip); //son de réussite de subPuzzle
                             
                             m_interactDetection.m_achieved = true;  //le joueur a trouvé toutes les pièces
                             m_interactDetection.m_canMove = false;  //le joueur ne peut plus bouger le selecteur
