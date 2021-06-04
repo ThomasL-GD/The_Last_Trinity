@@ -42,8 +42,7 @@ public class Interact_Detection : MonoBehaviour
     [SerializeField] [Tooltip("List of Door to open, if empty, won't open any door")] private MovableDoor[] m_doorSub = new MovableDoor[]{}; //Liste de portes à ouvrir lorsque le puzzle est réussi
     [SerializeField] [Tooltip("The time taken by each door to open (unit : seconds)")] [Range(0f,5f)] private float m_doorOpeningTime = 2f; //Vitesse d'ouverture des portes
     [SerializeField] [Tooltip("Temps que l'écran de fin reste activé quand le subpuzzle est réussit (unit : seconds)")] [Range(0f,5f)] private float m_timer = 1f;
-    
-    
+
     private void Start()
     {
         if (m_puzzle == null) { Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO ADD A SUBPUZZLE IN INTERACT_DETECTION !", this);
@@ -119,10 +118,10 @@ public class Interact_Detection : MonoBehaviour
                         robotPuzzle.m_cycle = m_playerController.m_cycle;
                     }
 
-                    
                     m_puzzle.SetActive(true);
                     m_isInSubPuzzle = true;
                     m_playerController.m_isForbiddenToMove = true; //We forbid the movements for the player
+                    m_playerController.m_isInSubPuzzle = true; //We forbid the movements for the player
                     m_buttonActivate = false;
                 }
             }
@@ -153,6 +152,7 @@ public class Interact_Detection : MonoBehaviour
             m_activationButton.SetActive(false);
             m_buttonActivate = false;
             m_isInSubPuzzle = false;
+            m_playerController.m_isInSubPuzzle = false;
             m_puzzle.SetActive(false);
         }
         else {
@@ -160,6 +160,7 @@ public class Interact_Detection : MonoBehaviour
             m_activationButton.SetActive(true);
             m_buttonActivate = true;
             m_isInSubPuzzle = false;
+            m_playerController.m_isInSubPuzzle = false;
             m_puzzle.SetActive(false);
             Debug.Log("Le puzzle doit se fermer");
         }
@@ -182,6 +183,7 @@ public class Interact_Detection : MonoBehaviour
         m_canMove = false;
         m_puzzle.SetActive(false);
         m_isInSubPuzzle = false;
+        m_playerController.m_isInSubPuzzle = false;
         m_activationButton.SetActive(false);
         m_buttonActivate = false;
         

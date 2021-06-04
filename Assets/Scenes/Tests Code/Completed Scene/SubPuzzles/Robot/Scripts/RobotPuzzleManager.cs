@@ -66,9 +66,13 @@ public class RobotPuzzleManager : MonoBehaviour {
 	[HideInInspector] public bool m_cycle = false; //Will be assigned by interactDetection depending on the player script 
 	[Tooltip("position limite de joystick")] private float m_limitPosition = 0.5f;
 	[HideInInspector] [Tooltip("variable de déplacement en points par points du sélecteur")] private bool m_hasMoved = false;
-	
 	[HideInInspector] [Tooltip("Script d'intéraction entre le personnage et l'objet comprenant le subpuzzle")] public Interact_Detection m_interactDetection = null;
 
+	[Header("Audio")] 
+	[SerializeField] [Tooltip("Son de rotation de pièce de subPuzzle")] private AudioSource m_rotatePieceSound;
+	[SerializeField] [Tooltip("Son de réussite de subPuzzle")] private AudioSource m_winSound;
+	[SerializeField] [Tooltip("Son d'ouverture de SubPuzzle")] private AudioSource m_openSound;
+	
 	private void Awake()
 	{
 		m_piecePrefabs = new GameObject[6];	//tableau. Le 6 est arbitraire et représente le nombre de pièces différentes
@@ -143,6 +147,9 @@ public class RobotPuzzleManager : MonoBehaviour {
 		else {
 			Debug.LogError ("JEEZ ! THE GAME DESIGNER PUT A WRONG PREFAB FOR THE SELECTOR, IT MUST BE A UI ELEMENT WITH A RECT TRANSFORM !", this);
 		}
+		
+		//son d'ouverture de subPuzzle
+		m_openSound.Play();
 	}
 
 
@@ -266,6 +273,8 @@ public class RobotPuzzleManager : MonoBehaviour {
 	/// </summary>
 	public void Win()
 	{
+		m_winSound.Play();	//Son de réussite de subPuzzle
+		
 		m_interactDetection.m_achieved = true;
 		m_interactDetection.m_canMove = false;
 		if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
@@ -426,6 +435,10 @@ public class RobotPuzzleManager : MonoBehaviour {
 		
 
 		if (selectorValidation && m_interactDetection.m_canMove) {
+			
+			//son de rotation de pièce
+			m_rotatePieceSound.Play();
+			
 			//rotation de la pièce
 			SweepPiece(m_selector.x, m_selector.y);
 		}

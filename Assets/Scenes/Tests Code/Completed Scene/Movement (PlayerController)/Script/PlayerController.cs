@@ -39,6 +39,7 @@ public class PlayerController : MonoBehaviour
     private static bool s_inBetweenSwitching = false; //is Active when someone is switching character
     [Tooltip("For Debug Only")] public bool m_isForbiddenToMove = false; 
     [HideInInspector] public bool m_isSwitchingChara = false;
+    [HideInInspector] public bool m_isInSubPuzzle = false;
 
     private CharacterController m_charaController = null;
     [SerializeField] [Tooltip("Gravity strength on this character")] private float m_gravity = -9.81f;
@@ -76,6 +77,8 @@ public class PlayerController : MonoBehaviour
     private bool m_isDying = false; //If the chara is in a death zone
     private bool m_isPlayingDead = false; //If the chara is currently playing their death animation
     [HideInInspector] public Vector3 m_spawnPoint = Vector3.zero;
+    [HideInInspector] public CinemachineVirtualCamera m_spawnCamera = null;
+    private static CinemachineVirtualCamera s_deathCamera = null; 
 
     
     //Cinemachine cameras des trois personnages en 0 l'humaine, en 1 le monstre et en 2 le robot
@@ -95,6 +98,10 @@ public class PlayerController : MonoBehaviour
     //     Physics.IgnoreLayerCollision(6,6); //Is supposed to forbid the collision between two players
     // }
 
+    [Header("Audio")] 
+    [SerializeField] [Tooltip("Déplacement du character")] private AudioSource m_moveSound;
+    [SerializeField] [Tooltip("mort du character")] private AudioSource m_deathSound;
+    
     private void Start()
     {
         DeathManager.DeathDelegator += EndDeath;
@@ -114,16 +121,19 @@ public class PlayerController : MonoBehaviour
                 m_s_charasScripts.human = this;
                 m_s_charasScripts.ResetArray();
                 IsSneaky = Animator.StringToHash("IsSneaky");
+                m_spawnCamera = vCamH;
                 break;
             case Charas.Monster:
                 m_s_charasScripts.monster = this;
                 m_s_charasScripts.ResetArray();
                 IsIntimidating = Animator.StringToHash("IsIntimidating");
+                m_spawnCamera = vCamM;
                 break;
             case Charas.Robot:
                 m_s_charasScripts.robot = this;
                 m_s_charasScripts.ResetArray();
                 IsTelekinesing = Animator.StringToHash("IsTelekinesing");
+                m_spawnCamera = vCamR;
                 break;
         }
 
@@ -144,9 +154,9 @@ public class PlayerController : MonoBehaviour
             Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THE SCRIPTABLE OBJECT FOR THE INPUTS !");
         }
     #endif
-        
+
         if (vCamH != null && vCamM != null && vCamR != null) m_allCameras = new CinemachineVirtualCamera[3] {vCamH, vCamM, vCamR};
-        
+
 
         if (TryGetComponent(out Animator animator)) m_animator = animator;
         else Debug.LogWarning("JEEZ ! THE GAME DESIGNER FORGOT TO PUT AN ANIMATOR ON THIS CHARA ! (it's still gonna work tought)");
@@ -209,7 +219,9 @@ public class PlayerController : MonoBehaviour
                 //The line below doesn't work with the charController component
                 //if(m_isActive) transform.Translate(movementDirection * (m_speed * Time.deltaTime), Space.World);
 
-                if (m_isActive) m_charaController.Move(movementDirection * (m_speed * Time.deltaTime));
+                if (m_isActive) {
+                    m_charaController.Move(movementDirection * (m_speed * Time.deltaTime));
+                }
             
                 //Utilisation du Quaternion pour permettre au player de toujours se déplacer dans l'angle où il regarde
                 if (movementDirection != Vector3.zero)
@@ -217,10 +229,15 @@ public class PlayerController : MonoBehaviour
                     Quaternion toRotation = Quaternion.LookRotation(movementDirection, Vector3.up);
                     
                     transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, m_rotationSpeed * Time.deltaTime);
-                    
-                    if(m_animator != null) m_animator.SetBool(IsRunning, true);
+
+                    if (m_animator != null) {
+                        m_animator.SetBool(IsRunning, true);
+                    }
                 }
-                else if(m_animator != null) m_animator.SetBool(IsRunning, false);
+                else if (m_animator != null) {
+                    m_animator.SetBool(IsRunning, false);
+                    //m_moveSound.Play(); //Son de déplacement du personnage
+                }
 
             }
 
@@ -277,7 +294,7 @@ public class PlayerController : MonoBehaviour
             }
             else if (m_cycle) { // If we are on the new input system
                 //If an input of character change is pressed we switch charas
-                if (m_isActive && (Input.GetKeyDown(m_leftInput) || Input.GetKeyDown(m_rightInput)) && !s_inBetweenSwitching) {
+                if (m_isActive && (Input.GetKeyDown(m_leftInput) || Input.GetKeyDown(m_rightInput)) && !s_inBetweenSwitching && !m_isInSubPuzzle) {
 
                     m_isActive = false; // this chara is no longer the active one
                     m_soulScript.gameObject.transform.position = transform.position + m_soulOffset; //We place the soul on us
@@ -333,21 +350,23 @@ public class PlayerController : MonoBehaviour
     IEnumerator SwitchTimer() {
         bool cycle = m_cycle; // Just to make sure everything's gonna work if someone switch the boolean in play mode
         
-        yield return new WaitForSeconds(m_soulScript.m_duration / 1.2f);
+        yield return new WaitForSeconds(m_soulScript.m_duration * 0.8f);
         
         //We reset correct values according to the input system wanted
         if (!cycle) {
             m_isActive = true;
-            m_isSwitchingChara = false;
-            s_inBetweenSwitching = false;
         }
         else if (cycle) {
             m_s_charasScripts.array[m_s_charasScripts.currentIndex].m_isActive = true;
             m_s_charasScripts.array[m_s_charasScripts.currentIndex].m_isSwitchingChara = false;
-            m_isSwitchingChara = false;
-            s_inBetweenSwitching = false;
         }
         
+        
+        yield return new WaitForSeconds(m_soulScript.m_duration * 0.2f);
+
+        m_isSwitchingChara = false;
+        s_inBetweenSwitching = false;
+
     }
     
 
@@ -361,6 +380,7 @@ public class PlayerController : MonoBehaviour
         //We can detect if it is a player or not by checking if it has a PlayerController script
         if (!p_other.gameObject.TryGetComponent(out DeathZone pScript)) return;
         m_isDying = true;
+        
     }
 
     /// <summary>
@@ -407,8 +427,7 @@ public class PlayerController : MonoBehaviour
     /// <returns>Returns the camera focusing this character</returns>
     public CinemachineVirtualCamera GetCurrentCamera()
     {
-        switch (m_chara)
-        {
+        switch (m_chara) {
             case Charas.Human:
                 return m_allCameras[0];
             case Charas.Monster:
@@ -485,9 +504,25 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     public void Death() {
         if (!m_isPlayingDead) {
+            //son de mort du personnage
+            m_deathSound.Play();
             DeathAnim(true);
             m_isForbiddenToMove = true;
             StartCoroutine(DeathTimer());
+            //We set a new camera to look throught to be sure the players sees the character who is dying
+            switch (m_chara) {
+                case Charas.Human:
+                    s_deathCamera = m_allCameras[0];
+                    break;
+                case Charas.Monster:
+                    s_deathCamera = m_allCameras[1];
+                    break;
+                case Charas.Robot:
+                    s_deathCamera = m_allCameras[2];
+                    break;
+            }
+
+            s_deathCamera.Priority = 8;
         }
         else Debug.LogWarning("Multiple Deaths at the same time ? this is hella shady");
     }
@@ -519,9 +554,23 @@ public class PlayerController : MonoBehaviour
         m_isDying = false;
         m_deathCounter = 0.0f;
         m_isForbiddenToMove = false;
+        s_deathCamera.Priority = 0;
 
         //We teleport the player to their spawnpoint
         transform.SetPositionAndRotation(m_spawnPoint, transform.rotation);
+        
+        //We reset the appropriate camera according to the spawnpoint
+        switch (m_chara) {
+            case Charas.Human:
+                m_allCameras[0] = m_spawnCamera;
+                break;
+            case Charas.Monster:
+                m_allCameras[1] = m_spawnCamera;
+                break;
+            case Charas.Robot:
+                m_allCameras[2] = m_spawnCamera;
+                break;
+        }
         
         //We remove it to let others use it without killing the chara
         if (m_isPlayingDead) {

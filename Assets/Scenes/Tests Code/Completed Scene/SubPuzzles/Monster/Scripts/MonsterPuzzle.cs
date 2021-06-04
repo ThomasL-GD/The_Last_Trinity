@@ -68,7 +68,10 @@ public class MonsterPuzzle : MonoBehaviour
     
     [HideInInspector] [Tooltip("Script d'intéraction entre le personnage et l'objet comprenant le subpuzzle")] public Interact_Detection m_interactDetection = null;
     
-
+    [Header("Audio")] 
+    [SerializeField] [Tooltip("Son de sélection de pièce bonne")] private AudioSource m_goodSound;
+    [SerializeField] [Tooltip("Son de sélection de pièce mauvaise")] private AudioSource m_badSound;
+    [SerializeField] [Tooltip("Son de réussite de SubPuzzle")] private AudioSource m_winSound;
     
     // OnEnable is called before the first frame update
     void OnEnable() {
@@ -279,14 +282,17 @@ public class MonsterPuzzle : MonoBehaviour
                     //PIECE PAS ENCORE TROUVEE ET CORRECTE
                     if (!isAlreadyFound)    
                     {
-                        m_foundPieces.Add(m_correctPieces[i]); //ajout d'une pièce correcte à pièce trouvé
+                        m_goodSound.Play(); //Son de pièce bonne trouvée
                         
+                        m_foundPieces.Add(m_correctPieces[i]); //ajout d'une pièce correcte à pièce trouvé
                         m_findPiece++; //incrémentation des bonnes pièces trouvées
 
                         if (m_findPiece == m_nbAmalgamePieces) //Si le nombre de pièces trouvées = nombre de pièces à trouver
                         {
                             Debug.Log("Vous avez trouvé toutes les pièces !");
-
+                            
+                            m_winSound.Play();  //son de réussite de subPuzzle
+                            
                             m_interactDetection.m_achieved = true;  //le joueur a trouvé toutes les pièces
                             m_interactDetection.m_canMove = false;  //le joueur ne peut plus bouger le selecteur
                             if(m_interactDetection.enabled)m_interactDetection.PuzzleDeactivation();
@@ -324,9 +330,10 @@ public class MonsterPuzzle : MonoBehaviour
                             m_prefabStock[m_selectorY, m_selectorX].GetComponent<Image>().color = m_colorError;   //désactive la pièce
                             
                             m_errorDone++;   //nombre d'erreurs possibles avant défaite diminue
-
+                            
                             if (m_errorDone < m_errorAllowed)
                             {
+                                m_badSound.Play(); //Son de pièce mauvaise
                                 Rumbler.Instance.Rumble(m_lowA, m_highA, m_rumbleDuration);
                             }
                             else if (m_errorDone >= m_errorAllowed)

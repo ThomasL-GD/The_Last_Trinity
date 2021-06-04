@@ -23,6 +23,7 @@ public class Checkpoint : MonoBehaviour
         if (p_other.gameObject.TryGetComponent(out PlayerController charaScript)) {
             
             if (charaScript.m_chara == m_chara) charaScript.m_spawnPoint = transform.position;
+            if (charaScript.m_chara == m_chara) charaScript.m_spawnCamera = charaScript.GetCurrentCamera();
         }
     }
 }
