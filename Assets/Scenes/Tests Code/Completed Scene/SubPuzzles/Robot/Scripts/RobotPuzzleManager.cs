@@ -273,7 +273,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 	/// </summary>
 	public void Win()
 	{
-		m_winSound.Play();	//Son de réussite de subPuzzle
+		//m_winSound.Play();	//Son de réussite de subPuzzle
 		
 		m_interactDetection.m_achieved = true;
 		m_interactDetection.m_canMove = false;
