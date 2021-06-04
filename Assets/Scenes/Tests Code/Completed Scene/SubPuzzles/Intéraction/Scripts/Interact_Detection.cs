@@ -43,6 +43,9 @@ public class Interact_Detection : MonoBehaviour
     [SerializeField] [Tooltip("The time taken by each door to open (unit : seconds)")] [Range(0f,5f)] private float m_doorOpeningTime = 2f; //Vitesse d'ouverture des portes
     [SerializeField] [Tooltip("Temps que l'écran de fin reste activé quand le subpuzzle est réussit (unit : seconds)")] [Range(0f,5f)] private float m_timer = 1f;
 
+    [Header("Audio")] 
+    [SerializeField] [Tooltip("Son de réussite de subPuzzle")] private AudioSource m_puzzleWinSound;
+    
     private void Start()
     {
         if (m_puzzle == null) { Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO ADD A SUBPUZZLE IN INTERACT_DETECTION !", this);
@@ -144,6 +147,7 @@ public class Interact_Detection : MonoBehaviour
     {
         if (m_achieved)
         {
+            m_puzzleWinSound.Play();    //son de réussite de subPuzzle
             StartCoroutine(EndLook());
         }
         else if (GuardBehavior.m_isKillingSomeone)

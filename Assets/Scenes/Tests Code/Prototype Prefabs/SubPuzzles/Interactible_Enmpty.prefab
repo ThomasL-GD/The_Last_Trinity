@@ -31,7 +31,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 7599895706107214975}
+  - {fileID: 4903001141808850497}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -118,9 +118,14 @@ MonoBehaviour:
   m_isInSubPuzzle: 0
   m_activationButton: {fileID: 7599895706107214960}
   m_openDoor: 0
-  m_doorSub: []
+  m_doorSub:
+  - m_name: Porte 1 humaine
+    m_door: {fileID: 0}
+    m_positionToGo: {x: 14.768, y: 20.656708, z: 17.818968}
+    m_velocity: {x: 0, y: 0, z: 0}
   m_doorOpeningTime: 2
   m_timer: 1
+  m_puzzleWinSound: {fileID: 0}
 --- !u!1001 &433321613861133601
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -195,8 +200,8 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 8033075205926052177, guid: c0caf7af98f32ea4583dec78b085e2f5, type: 3}
   m_PrefabInstance: {fileID: 433321613861133601}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &7599895706107214975 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8033075205926052190, guid: c0caf7af98f32ea4583dec78b085e2f5, type: 3}
+--- !u!224 &4903001141808850497 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 4758477666601466720, guid: c0caf7af98f32ea4583dec78b085e2f5, type: 3}
   m_PrefabInstance: {fileID: 433321613861133601}
   m_PrefabAsset: {fileID: 0}
