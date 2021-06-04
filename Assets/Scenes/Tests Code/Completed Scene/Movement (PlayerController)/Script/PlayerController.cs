@@ -241,11 +241,11 @@ public class PlayerController : MonoBehaviour
 
                     if (m_animator != null) {
                         m_animator.SetBool(IsRunning, true);
+                        //if(!m_moveSound.isPlaying) m_moveSound.PlayOneShot(m_moveSound.clip); //Son de déplacement du personnage
                     }
                 }
                 else if (m_animator != null) {
                     m_animator.SetBool(IsRunning, false);
-                    //m_moveSound.Play(); //Son de déplacement du personnage
                 }
 
             }

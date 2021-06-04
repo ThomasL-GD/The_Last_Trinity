@@ -31,6 +31,11 @@ public class Telekinesable : MonoBehaviour
 
     private VisualEffect m_cube; //Visual effect en enfant de l'objet Telekinesable
     
+    // [Header("Audio")]
+    // [SerializeField] [Tooltip("Son de montée")] private AudioSource m_upSound;
+    // [SerializeField] [Tooltip("Son de stabilisation")] private AudioSource m_telekinesieSound;
+    // [SerializeField] [Tooltip("Son de descente")] private AudioSource m_downSound;
+    
     void Start() {
         DeathManager.DeathDelegator += Reset;
         m_originalPos = transform.position;
@@ -63,6 +68,9 @@ public class Telekinesable : MonoBehaviour
         }
         else if (posClamp == ClampEnjoyer(m_targetPos) && m_activeTelekinesie)
         {
+            //son de télékinésie stable
+            //m_telekinesieSound.PlayOneShot(m_telekinesieSound.clip);
+            
             //Debug.Log("Quelconque");
             m_isInBetweenTravel = false;
             m_activeTelekinesie = false;
@@ -76,13 +84,19 @@ public class Telekinesable : MonoBehaviour
             
             if (selectorValidation && !m_isInBetweenTravel && m_robotScript.m_isActive)
             {
+
                 m_isInBetweenTravel = true;
                 m_velocity = Vector3.zero;
-                if (m_activeTelekinesie) {
+                if (m_activeTelekinesie)
+                {
                     m_robotScript.m_isForbiddenToMove = true;
+                    //m_upSound.PlayOneShot(m_upSound.clip); //son de montée
                     m_robotScript.AbilityAnim(true); //Animation up play
                 }
-                else m_robotScript.AbilityAnim(false); //Animation down play
+                else{
+                    m_robotScript.AbilityAnim(false); //Animation down play
+                    //m_downSound.PlayOneShot(m_downSound.clip);  //son de descente
+                }
             }
         }
         

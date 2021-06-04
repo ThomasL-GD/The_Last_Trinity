@@ -437,7 +437,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 		if (selectorValidation && m_interactDetection.m_canMove) {
 			
 			//son de rotation de pièce
-			//m_rotatePieceSound.Play();
+			//m_rotatePieceSound.PlayOneShot(m_rotatePieceSound.clip);
 			
 			//rotation de la pièce
 			SweepPiece(m_selector.x, m_selector.y);
