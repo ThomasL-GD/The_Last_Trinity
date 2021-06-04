@@ -80,15 +80,19 @@ public class GuardBehavior : MonoBehaviour {
     private static readonly int IsWalking = Animator.StringToHash("IsWalking");
 
     // [Header("Audio")] 
-    // [SerializeField] [Tooltip("déplacement Monstre")] private AudioSource m_moveSound;
+    //[SerializeField] [Tooltip("déplacement Monstre")] private AudioSource m_moveSound;
     // [SerializeField] [Tooltip("attaque Monstre")] private AudioSource m_attackSound;
     // [SerializeField] [Tooltip("detection Monstre")] private AudioSource m_detectionSound;
     // [SerializeField] [Tooltip("poursuite Monstre")] private AudioSource m_pursuitSound;
     // [SerializeField] [Tooltip("respiration Monstre")] private AudioSource m_breathSound;
     // [SerializeField] [Tooltip("Intimidation")] private AudioSource m_intimidationSound;
+
+    public AudioSource[] m_audioSource;
     
     // Start is called before the first frame update
     void Start() {
+        
+        m_audioSource = GetComponents<AudioSource>();
         
         if(m_destinationsTransforms.Count < 1) Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT DESTINATIONS IN THE ENNEMY !", this);
         
@@ -123,6 +127,8 @@ public class GuardBehavior : MonoBehaviour {
             m_nma.SetDestination(m_destinations[m_currentDestination]);
         }
         
+        Debug.Log(m_audioSource[0].name);
+        Debug.Log(m_audioSource[1].name);
     }
 
     private void OnEnable() {

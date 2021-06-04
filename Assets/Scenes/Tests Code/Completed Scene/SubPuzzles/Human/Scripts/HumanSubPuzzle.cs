@@ -632,7 +632,7 @@ public class HumanSubPuzzle : MonoBehaviour {
             m_elapsedTime += Time.deltaTime;
 
             if (m_elapsedTime > m_timeAllowed) {
-                m_interactDetection.PuzzleDeactivation(true);
+                m_interactDetection.PuzzleDeactivation(false);
                 //This line might destroy everything somehow :
                 //DeathManager.DeathDelegator?.Invoke();
             }
