@@ -102,9 +102,9 @@ public class PlayerController : MonoBehaviour
     //     Physics.IgnoreLayerCollision(6,6); //Is supposed to forbid the collision between two players
     // }
 
-    [Header("Audio")] 
-    [SerializeField] [Tooltip("Déplacement du character")] private AudioSource m_moveSound;
-    [SerializeField] [Tooltip("mort du character")] private AudioSource m_deathSound;
+    // [Header("Audio")] 
+    // [SerializeField] [Tooltip("Déplacement du character")] private AudioSource m_moveSound;
+    // [SerializeField] [Tooltip("mort du character")] private AudioSource m_deathSound;
     
     private void Start()
     {

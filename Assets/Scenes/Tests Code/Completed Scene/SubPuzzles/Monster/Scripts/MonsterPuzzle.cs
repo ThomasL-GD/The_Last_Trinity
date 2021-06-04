@@ -68,10 +68,10 @@ public class MonsterPuzzle : MonoBehaviour
     
     [HideInInspector] [Tooltip("Script d'intéraction entre le personnage et l'objet comprenant le subpuzzle")] public Interact_Detection m_interactDetection = null;
     
-    [Header("Audio")] 
-    [SerializeField] [Tooltip("Son de sélection de pièce bonne")] private AudioSource m_goodSound;
-    [SerializeField] [Tooltip("Son de sélection de pièce mauvaise")] private AudioSource m_badSound;
-    [SerializeField] [Tooltip("Son de réussite de SubPuzzle")] private AudioSource m_winSound;
+    // [Header("Audio")] 
+    // [SerializeField] [Tooltip("Son de sélection de pièce bonne")] private AudioSource m_goodSound;
+    // [SerializeField] [Tooltip("Son de sélection de pièce mauvaise")] private AudioSource m_badSound;
+    // [SerializeField] [Tooltip("Son de réussite de SubPuzzle")] private AudioSource m_winSound;
     
     // OnEnable is called before the first frame update
     void OnEnable() {
