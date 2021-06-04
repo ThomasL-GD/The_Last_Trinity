@@ -524,7 +524,7 @@ public class PlayerController : MonoBehaviour
     public void Death() {
         if (!m_isPlayingDead) {
             //son de mort du personnage
-            m_deathSound.Play();
+            //m_deathSound.Play();
             DeathAnim(true);
             m_isForbiddenToMove = true;
             StartCoroutine(DeathTimer());
