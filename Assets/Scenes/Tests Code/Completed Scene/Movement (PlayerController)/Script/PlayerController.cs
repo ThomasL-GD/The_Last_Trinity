@@ -577,6 +577,7 @@ public class PlayerController : MonoBehaviour
 
         //We teleport the player to their spawnpoint
         transform.SetPositionAndRotation(m_spawnPoint, transform.rotation);
+        AbilityAnim(false);
         
         //We reset the appropriate camera according to the spawnpoint
         switch (m_chara) {
