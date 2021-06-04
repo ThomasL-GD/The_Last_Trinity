@@ -244,7 +244,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 	/// Cette fonction se fait une fois que chaque pièce a été instancié
 	/// </summary>
 	/// <returns></returns>
-	public int Sweep()
+	private int Sweep()
 	{
 		int value = 0;
 
@@ -271,7 +271,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 	/// <summary>
 	/// activation du canvas de victoire après réussite de puzzle
 	/// </summary>
-	public void Win()
+	private void Win()
 	{
 		m_winSound.Play();	//Son de réussite de subPuzzle
 		
@@ -285,7 +285,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 	/// <summary>
 	/// Fonction qui implique la rotation de pièce et indique le changement de valeurs de la pièce sur chaque face
 	/// </summary>
-	public void SweepPiece(int p_x, int p_y)
+	private void SweepPiece(int p_x, int p_y)
 	{
 		//Debug.Log("test 2");
 		int difference = -QuickSweep(p_x,p_y);   //valeur de position au départ
@@ -307,7 +307,7 @@ public class RobotPuzzleManager : MonoBehaviour {
 	/// <param name="p_width"></param>
 	/// <param name="p_height"></param>
 	/// <returns></returns>
-	public int QuickSweep(int p_width,int p_height)
+	private int QuickSweep(int p_width,int p_height)
 	{
 		int value = 0;
 
