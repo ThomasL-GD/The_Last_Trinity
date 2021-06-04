@@ -58,6 +58,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] [Tooltip("The input used to rotate chara selection clockwise")] private KeyCode m_rightInput = KeyCode.JoystickButton0;
     [SerializeField] [Tooltip("The input used to rotate chara selection counter-clockwise")] private KeyCode m_leftInput = KeyCode.JoystickButton1;
     private static PlayerCharactersArray m_s_charasScripts = new PlayerCharactersArray();
+    [SerializeField] [Tooltip("The input used to make other characters come to you")] private KeyCode m_callKey = KeyCode.None;
+    private bool m_isNmaActive = false;
     
     
     [Header("If Cycle is OFF")]
@@ -68,7 +70,6 @@ public class PlayerController : MonoBehaviour
     [Header("Soul")]
     [SerializeField] [Tooltip("The game object of what represents the soul, it will be driven from a character to another when a switch occurs")] public GameObject m_soul = null;
     [Tooltip("Offset for the instantiate of the Soul")][SerializeField] public Vector3 m_soulOffset = Vector3.zero;
-    [SerializeField] [Tooltip("The input used to make other characters come to you")] private KeyCode m_callKey = KeyCode.None;
     private AutoRotation m_soulScript = null;
     
     
@@ -349,8 +350,14 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if (!m_isActive && Input.GetKeyDown(m_callKey)) {
+        if (!m_isActive && m_cycle && Input.GetKeyDown(m_callKey)) {
             m_nma.SetDestination(m_s_charasScripts.array[m_s_charasScripts.currentIndex].gameObject.transform.position);
+            m_isNmaActive = true;
+        }
+
+        if (m_cycle && m_isNmaActive && m_isActive) {
+            m_nma.isStopped = true;
+            m_isNmaActive = false;
         }
         
         //if(m_chara == Charas.Robot)Debug.Log($"{transform.position}");
