@@ -126,9 +126,6 @@ public class GuardBehavior : MonoBehaviour {
             //The first position where the guard will aim at
             m_nma.SetDestination(m_destinations[m_currentDestination]);
         }
-        
-        Debug.Log(m_audioSource[0].name);
-        Debug.Log(m_audioSource[1].name);
     }
 
     private void OnEnable() {
