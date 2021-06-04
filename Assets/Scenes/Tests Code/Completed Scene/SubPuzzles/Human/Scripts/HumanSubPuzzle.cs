@@ -76,9 +76,8 @@ public class HumanSubPuzzle : MonoBehaviour {
     [SerializeField] [Tooltip("If on, the walls will be displayed for debug")] private bool m_debugMode = false;
 
 
-    [Header("Audio")] 
-    [SerializeField] [Tooltip("Son d'ouverture de subPuzzle")] private AudioSource m_winSound;
-    
+    // [Header("Audio")] 
+    // [SerializeField] [Tooltip("Son d'ouverture de subPuzzle")] private AudioSource m_winSound;
 
     /// <summary>
     /// OnEnable is called once each time the Game Object is enabled
