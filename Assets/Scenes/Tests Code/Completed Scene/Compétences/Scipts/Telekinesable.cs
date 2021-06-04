@@ -23,6 +23,7 @@ public class Telekinesable : MonoBehaviour
     
     [Header("Clamping")]
     [SerializeField] [Tooltip("Un slider d'int")] [Range(0, 4)] private int m_unSliderDint = 2;
+    [SerializeField] [Tooltip("The gameobject that will be active when the robot is close enough")] private GameObject m_teleportFeedback = null;
     //[SerializeField] [Tooltip("The maximum authorized difference between the position to reach and the current position (unit : Unity meters)")] [Range(0f, 1f)] private float m_uncertainty = 0.1f;
    
     private Vector3 m_velocity = Vector3.zero; //Vélocité 0 pour le smoothDamp
@@ -105,6 +106,7 @@ public class Telekinesable : MonoBehaviour
             if (player.m_chara == Charas.Robot)
             {
                 m_cube.Play();
+                if(m_teleportFeedback != null) m_teleportFeedback.SetActive(true);
                 m_telekinesieOpen = true;
                 m_robotScript = player;
             }
@@ -122,6 +124,7 @@ public class Telekinesable : MonoBehaviour
             if (player.m_chara == Charas.Robot)
             {
                 m_cube.Stop();
+                if(m_teleportFeedback != null) m_teleportFeedback.SetActive(false);
                 m_telekinesieOpen = false;
                 m_activeTelekinesie = false;
                 m_robotScript = null;
