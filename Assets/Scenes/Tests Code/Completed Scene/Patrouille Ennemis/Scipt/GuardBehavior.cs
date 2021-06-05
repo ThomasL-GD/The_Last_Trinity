@@ -47,13 +47,15 @@ public class GuardBehavior : MonoBehaviour {
     [SerializeField] [Tooltip("distance d'élimination")] [Range(0f,10f)] private float m_deathPos = 1.0f;
     [SerializeField] [Tooltip("temps d'animation de mort")] [Range(0f,10f)] private float m_deathTime = 3.0f;
 
-    [SerializeField] [Tooltip("The gameobject of the hit FX, must be already placed in a good position and setActive(false)\nMust be a child of this object\nCan be null")] private GameObject m_hitFX = null;
-    [SerializeField] [Tooltip("The gameobject of the stun FX, must be already placed in a good position\nMust be a child of this object\nCan be null")] private GameObject m_stunFX = null;
     private Vector3 m_spawnPoint = Vector3.zero;
     
     [Header("Monster Ability")]
     [SerializeField] [Tooltip("Temps de déploiement de l'intimidation du monstre allié\nUnit : seconds")] [Range(0f,60f)] private float m_intimidationTime = 1.0f;
     [SerializeField] [Tooltip("Temps pendant lequel l'ennemi est stun\nMust be greater than intimidation Time\nUnit : seconds")] [Range(0f,180f)] private float m_stunTime = 1.0f;
+    [SerializeField] [Tooltip("The gameobject of the hit FX, must be already placed in a good position and setActive(false)\nMust be a child of this object\nCan be null")] private GameObject m_hitFX = null;
+    [SerializeField] [Tooltip("The gameobject of the stun FX, must be already placed in a good position\nMust be a child of this object\nCan be null")] private GameObject m_stunFX = null;
+    [SerializeField] [Tooltip("Speed of the blink\nUnit : seconds")] [Range(0f,0.5f)] private float m_blinkTime = 0.1f;
+    private bool m_isAlmostUnstun = false; // Indicates when this monster is soon to be awake from stun and their stun fx will blink
     
     [Header("Rumble")]
     [SerializeField] [Tooltip("valeur de la vibration faible lorsque le character entre dans la zone de l'ennemi")] [Range(0f,1f)] private float m_lowWarningEnemy =0f;
@@ -396,18 +398,43 @@ public class GuardBehavior : MonoBehaviour {
         
         scriptCharaWhoIsDying.m_isForbiddenToMove = false;
         scriptCharaWhoIsDying.AbilityAnim(false);
+        m_stunFX.SetActive(true);
         m_stunFX.GetComponent<ParticleSystem>().Play();
         StartCoroutine(Stun());
         m_intimidationCor = null;
     }
     IEnumerator Stun()
     {
-        yield return new WaitForSeconds(m_stunTime); //durée de stun
+        m_detectionSound.Stop();
+        m_pursuitSound.Stop();
+        
+        yield return new WaitForSeconds(m_stunTime*0.7f); //durée de stun
+        m_isAlmostUnstun = true;
+        StartCoroutine(BlinkingFX());
+        
+        yield return new WaitForSeconds(m_stunTime*0.3f); //durée de stun
+        m_isAlmostUnstun = false;
         if(m_animator != null)m_animator.SetBool(IsStun, false);
+        m_stunFX.SetActive(true);
         m_stunFX.GetComponent<ParticleSystem>().Stop();
+        m_stunFX.SetActive(false);
         m_nma.isStopped = false;
         m_intimidationVibe = false;
     }
+
+    IEnumerator BlinkingFX() {
+        bool isActive = true;
+        ParticleSystem particles = m_stunFX.GetComponent<ParticleSystem>();
+        while (m_isAlmostUnstun) {
+            yield return new WaitForSeconds(m_blinkTime);
+            if(m_isAlmostUnstun){
+                isActive = !isActive;
+                m_stunFX.SetActive(isActive);
+                if(isActive)particles.Play();
+            }
+        }
+    }
+    
     IEnumerator DeathCoroutine()
     {
         m_isKillingSomeone = true;
