@@ -41,6 +41,7 @@ public class EndLevelZone : MonoBehaviour {
 
     private void NextLevel() {
         Debug.Log("Less goooooooooo DaBaby");
+        DeathManager.OnBlackScreen -= NextLevel;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 

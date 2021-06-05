@@ -55,8 +55,8 @@ public class PlayerController : MonoBehaviour
     
     
     [Header("If Cycle is ON")]
-    [SerializeField] [Tooltip("The input used to rotate chara selection clockwise")] private KeyCode m_rightInput = KeyCode.JoystickButton0;
-    [SerializeField] [Tooltip("The input used to rotate chara selection counter-clockwise")] private KeyCode m_leftInput = KeyCode.JoystickButton1;
+    [SerializeField] [Tooltip("The input used to rotate chara selection clockwise")] public KeyCode m_rightInput = KeyCode.JoystickButton4;
+    [SerializeField] [Tooltip("The input used to rotate chara selection counter-clockwise")] public KeyCode m_leftInput = KeyCode.JoystickButton5;
     private static PlayerCharactersArray m_s_charasScripts = new PlayerCharactersArray();
     [SerializeField] [Tooltip("The input used to make other characters come to you")] private KeyCode m_callKey = KeyCode.None;
     private bool m_isNmaActive = false;
@@ -577,19 +577,10 @@ public class PlayerController : MonoBehaviour
 
         //We teleport the player to their spawnpoint
         transform.SetPositionAndRotation(m_spawnPoint, transform.rotation);
+        AbilityAnim(false);
         
         //We reset the appropriate camera according to the spawnpoint
-        switch (m_chara) {
-            case Charas.Human:
-                m_allCameras[0] = m_spawnCamera;
-                break;
-            case Charas.Monster:
-                m_allCameras[1] = m_spawnCamera;
-                break;
-            case Charas.Robot:
-                m_allCameras[2] = m_spawnCamera;
-                break;
-        }
+        SetNewCamera(m_spawnCamera);
         
         //We remove it to let others use it without killing the chara
         if (m_isPlayingDead) {
