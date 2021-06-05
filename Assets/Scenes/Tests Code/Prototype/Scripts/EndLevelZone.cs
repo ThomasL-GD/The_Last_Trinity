@@ -38,7 +38,8 @@ public class EndLevelZone : MonoBehaviour {
             m_levelIsCompleted = false;
             s_isEndingLevel = true;
             Debug.Log("DELEGATOR NEXT LEVEL ADDED !");
-            //We add the function that will laucnh next level to the OnBlackScreen delegator so the next level will be launched once the screen is fully black
+            //We add the function that will launch next level to the OnBlackScreen delegator so the next level will be launched once the screen is fully black
+            DeathManager.OnBlackScreen = null;
             DeathManager.OnBlackScreen += NextLevel;
             DeathManager.Instance.DeathFade(false, m_fadeTime);
         }

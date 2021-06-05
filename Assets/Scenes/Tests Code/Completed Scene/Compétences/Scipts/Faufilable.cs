@@ -61,7 +61,7 @@ public class Faufilable : MonoBehaviour
             if(!m_humanScript.m_cycle) selectorValidation = Input.GetKeyDown(m_selector.inputHuman);
             else if(m_humanScript.m_cycle) selectorValidation = Rumbler.Instance.m_gamepad.buttonSouth.wasPressedThisFrame;
             
-            if(selectorValidation) {
+            if(selectorValidation && m_humanScript.m_isActive) {
                 StartCoroutine(Teleport());
             }
         }
