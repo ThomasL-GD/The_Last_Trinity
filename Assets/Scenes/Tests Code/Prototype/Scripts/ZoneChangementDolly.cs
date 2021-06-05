@@ -60,6 +60,7 @@ public class ZoneChangementDolly : MonoBehaviour {
                     case Charas.Robot :
                         m_previousVCamR = charaScript.GetCurrentCamera();
                         charaScript.SetNewCamera(m_vCamRZ);
+                        //Debug.Log("New Camera set by trigger enter", this);
                         break;
                 }   
             }
@@ -93,6 +94,7 @@ public class ZoneChangementDolly : MonoBehaviour {
                     case Charas.Robot :
                         charaScript.SetNewCamera(m_previousVCamR);
                         m_previousVCamR = m_vCamRZ;
+                        //Debug.Log("New Camera set by trigger EXIT", this);
                         break;
                 }   
             }

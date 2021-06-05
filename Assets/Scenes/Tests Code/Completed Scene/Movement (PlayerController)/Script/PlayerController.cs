@@ -580,17 +580,7 @@ public class PlayerController : MonoBehaviour
         AbilityAnim(false);
         
         //We reset the appropriate camera according to the spawnpoint
-        switch (m_chara) {
-            case Charas.Human:
-                m_allCameras[0] = m_spawnCamera;
-                break;
-            case Charas.Monster:
-                m_allCameras[1] = m_spawnCamera;
-                break;
-            case Charas.Robot:
-                m_allCameras[2] = m_spawnCamera;
-                break;
-        }
+        SetNewCamera(m_spawnCamera);
         
         //We remove it to let others use it without killing the chara
         if (m_isPlayingDead) {
