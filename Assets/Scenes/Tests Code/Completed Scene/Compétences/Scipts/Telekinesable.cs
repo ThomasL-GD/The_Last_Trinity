@@ -71,7 +71,7 @@ public class Telekinesable : MonoBehaviour
         {
             //son de télékinésie stable
             if(!m_telekinesieSound.isPlaying && m_telekinesieSound != null) m_telekinesieSound.PlayOneShot(m_telekinesieSound.clip);
-            
+
             //Debug.Log("Quelconque");
             m_isInBetweenTravel = false;
             m_activeTelekinesie = false;
@@ -96,7 +96,11 @@ public class Telekinesable : MonoBehaviour
                 }
                 else{
                     m_robotScript.AbilityAnim(false); //Animation down play
-                    if(m_downSound != null && !m_downSound.isPlaying) m_downSound.PlayOneShot(m_downSound.clip);  //son de descente
+                    if (m_downSound != null && !m_downSound.isPlaying) {
+                        m_downSound.PlayOneShot(m_downSound.clip); //son de descente
+                        if(m_telekinesieSound.isPlaying && m_telekinesieSound != null) m_telekinesieSound.Stop(); //arrêt son télékinésie
+                    }
+                    
                 }
             }
         }
