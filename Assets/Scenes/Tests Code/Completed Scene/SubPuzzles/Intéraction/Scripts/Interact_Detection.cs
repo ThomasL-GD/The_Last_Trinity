@@ -44,7 +44,7 @@ public class Interact_Detection : MonoBehaviour
     [SerializeField] [Tooltip("Temps que l'écran de fin reste activé quand le subpuzzle est réussit (unit : seconds)")] [Range(0f,5f)] private float m_timer = 1f;
 
     [Header("Audio")] 
-    [SerializeField] [Tooltip("Son de réussite de subPuzzle")] private AudioSource m_puzzleWinSound;
+    [SerializeField] [Tooltip("Son de réussite de subPuzzle")] private AudioSource m_puzzleWinSound = null;
     
     private void Start()
     {
@@ -147,7 +147,7 @@ public class Interact_Detection : MonoBehaviour
     {
         if (m_achieved)
         {
-            m_puzzleWinSound.Play();    //son de réussite de subPuzzle
+            if(m_puzzleWinSound != null) m_puzzleWinSound.Play();    //son de réussite de subPuzzle
             StartCoroutine(EndLook());
         }
         else if (GuardBehavior.m_isKillingSomeone)
