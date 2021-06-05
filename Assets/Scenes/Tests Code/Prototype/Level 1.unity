@@ -2038,7 +2038,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 98253883}
-  m_LocalRotation: {x: -0.28327137, y: 0.710088, z: -0.5096955, w: -0.3946427}
+  m_LocalRotation: {x: -0.28327137, y: 0.7100881, z: -0.5096955, w: -0.39464277}
   m_LocalPosition: {x: 0.9100003, y: 27.68, z: 18.75}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -5427,7 +5427,7 @@ MonoBehaviour:
   - m_Script
   m_LockStageInInspector: 
   m_StreamingVersion: 20170927
-  m_Priority: 0
+  m_Priority: 1
   m_StandbyUpdate: 2
   m_LookAt: {fileID: 1881570409}
   m_Follow: {fileID: 1881570409}
@@ -5958,6 +5958,67 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2668298523893856145, guid: 92ac83da2562aa9468a2a8dc709b57cf, type: 3}
   m_PrefabInstance: {fileID: 2146092437}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &225586228
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 225586229}
+  - component: {fileID: 225586231}
+  - component: {fileID: 225586230}
+  m_Layer: 0
+  m_Name: Change Camera Base
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &225586229
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 225586228}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 20.367712, y: 17.9, z: 15.85}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1901346763}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &225586230
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 225586228}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 54.59613, y: 7.9121017, z: 12.71328}
+  m_Center: {x: 5.6650248, y: -2.7256756, z: 2.6914005}
+--- !u!114 &225586231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 225586228}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe0fad7237fb0fd40b403b30b850916c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_isTheRobotAlone: 0
+  m_vCamHZ: {fileID: 1631136597}
+  m_vCamMZ: {fileID: 780364264}
+  m_vCamRZ: {fileID: 205744752}
 --- !u!1001 &227148185
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14167,7 +14228,7 @@ Transform:
   m_LocalScale: {x: 57.26506, y: 1, z: 4.97142}
   m_Children: []
   m_Father: {fileID: 1901346763}
-  m_RootOrder: 10
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &477632138
 MonoBehaviour:
@@ -14182,7 +14243,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_isTheRobotAlone: 0
-  m_isCancelingOnExit: 0
   m_vCamHZ: {fileID: 1120036908}
   m_vCamMZ: {fileID: 1907106225}
   m_vCamRZ: {fileID: 1443393175}
@@ -16105,7 +16165,7 @@ PrefabInstance:
     - target: {fileID: 7665418445033554696, guid: 6a47782a62854f94d8d04cafacbc56f1, type: 3}
       propertyPath: m_doorSub.Array.data[0].m_door
       value: 
-      objectReference: {fileID: 2125867352}
+      objectReference: {fileID: 1477166027}
     - target: {fileID: 7665418445033554696, guid: 6a47782a62854f94d8d04cafacbc56f1, type: 3}
       propertyPath: m_doorSub.Array.data[0].m_name
       value: Porte Before N1
@@ -16113,34 +16173,34 @@ PrefabInstance:
     - target: {fileID: 7665418445033554696, guid: 6a47782a62854f94d8d04cafacbc56f1, type: 3}
       propertyPath: m_doorSub.Array.data[1].m_door
       value: 
-      objectReference: {fileID: 1477166027}
+      objectReference: {fileID: 2125867352}
     - target: {fileID: 7665418445033554696, guid: 6a47782a62854f94d8d04cafacbc56f1, type: 3}
       propertyPath: m_doorSub.Array.data[1].m_name
       value: Porte Before N1
       objectReference: {fileID: 0}
     - target: {fileID: 7665418445033554696, guid: 6a47782a62854f94d8d04cafacbc56f1, type: 3}
       propertyPath: m_doorSub.Array.data[0].m_positionToGo.x
-      value: 10.829998
-      objectReference: {fileID: 0}
-    - target: {fileID: 7665418445033554696, guid: 6a47782a62854f94d8d04cafacbc56f1, type: 3}
-      propertyPath: m_doorSub.Array.data[0].m_positionToGo.y
-      value: 7.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 7665418445033554696, guid: 6a47782a62854f94d8d04cafacbc56f1, type: 3}
-      propertyPath: m_doorSub.Array.data[0].m_positionToGo.z
-      value: 19.13
-      objectReference: {fileID: 0}
-    - target: {fileID: 7665418445033554696, guid: 6a47782a62854f94d8d04cafacbc56f1, type: 3}
-      propertyPath: m_doorSub.Array.data[1].m_positionToGo.x
       value: 20.772
       objectReference: {fileID: 0}
     - target: {fileID: 7665418445033554696, guid: 6a47782a62854f94d8d04cafacbc56f1, type: 3}
-      propertyPath: m_doorSub.Array.data[1].m_positionToGo.y
+      propertyPath: m_doorSub.Array.data[0].m_positionToGo.y
       value: 5.5
       objectReference: {fileID: 0}
     - target: {fileID: 7665418445033554696, guid: 6a47782a62854f94d8d04cafacbc56f1, type: 3}
-      propertyPath: m_doorSub.Array.data[1].m_positionToGo.z
+      propertyPath: m_doorSub.Array.data[0].m_positionToGo.z
       value: 16.07
+      objectReference: {fileID: 0}
+    - target: {fileID: 7665418445033554696, guid: 6a47782a62854f94d8d04cafacbc56f1, type: 3}
+      propertyPath: m_doorSub.Array.data[1].m_positionToGo.x
+      value: 10.829998
+      objectReference: {fileID: 0}
+    - target: {fileID: 7665418445033554696, guid: 6a47782a62854f94d8d04cafacbc56f1, type: 3}
+      propertyPath: m_doorSub.Array.data[1].m_positionToGo.y
+      value: 7.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7665418445033554696, guid: 6a47782a62854f94d8d04cafacbc56f1, type: 3}
+      propertyPath: m_doorSub.Array.data[1].m_positionToGo.z
+      value: 19.13
       objectReference: {fileID: 0}
     - target: {fileID: 8028357306112050459, guid: 6a47782a62854f94d8d04cafacbc56f1, type: 3}
       propertyPath: m_Name
@@ -20152,7 +20212,7 @@ Transform:
   m_LocalScale: {x: 57.26506, y: 1, z: 4.97142}
   m_Children: []
   m_Father: {fileID: 1901346763}
-  m_RootOrder: 11
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &680768828
 MonoBehaviour:
@@ -20167,7 +20227,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_isTheRobotAlone: 0
-  m_isCancelingOnExit: 0
   m_vCamHZ: {fileID: 636266214}
   m_vCamMZ: {fileID: 1196077187}
   m_vCamRZ: {fileID: 198799262}
@@ -22845,7 +22904,7 @@ MonoBehaviour:
   - m_Script
   m_LockStageInInspector: 
   m_StreamingVersion: 20170927
-  m_Priority: 0
+  m_Priority: 1
   m_StandbyUpdate: 2
   m_LookAt: {fileID: 630369272}
   m_Follow: {fileID: 630369272}
@@ -36259,7 +36318,7 @@ Transform:
   m_LocalScale: {x: 57.26506, y: 1, z: 4.97142}
   m_Children: []
   m_Father: {fileID: 1901346763}
-  m_RootOrder: 9
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1318684408
 MonoBehaviour:
@@ -36274,7 +36333,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_isTheRobotAlone: 0
-  m_isCancelingOnExit: 1
   m_vCamHZ: {fileID: 1998718461}
   m_vCamMZ: {fileID: 98253886}
   m_vCamRZ: {fileID: 1226572863}
@@ -36289,8 +36347,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 3.1052704, y: 27.5847, z: 12.6064825}
-  m_Center: {x: 0.90199876, y: -9.985421, z: 3.8577604}
+  m_Size: {x: 3.1052704, y: 27.5847, z: 1.5872757}
+  m_Center: {x: 0.90199876, y: -9.985421, z: -1.6518415}
 --- !u!33 &1318684410
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -46173,7 +46231,7 @@ MonoBehaviour:
   - m_Script
   m_LockStageInInspector: 
   m_StreamingVersion: 20170927
-  m_Priority: 2
+  m_Priority: 1
   m_StandbyUpdate: 2
   m_LookAt: {fileID: 821941991}
   m_Follow: {fileID: 821941991}
@@ -53463,6 +53521,7 @@ Transform:
   - {fileID: 1569227059}
   - {fileID: 1284505332}
   - {fileID: 1387796781}
+  - {fileID: 225586229}
   - {fileID: 1318684407}
   - {fileID: 477632137}
   - {fileID: 680768827}
