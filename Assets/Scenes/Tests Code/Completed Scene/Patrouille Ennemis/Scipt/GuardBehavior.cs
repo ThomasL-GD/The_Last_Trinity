@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
@@ -10,6 +11,11 @@ using UnityEngine.InputSystem.DualShock;
 [RequireComponent(typeof(SphereCollider))]
 public class GuardBehavior : MonoBehaviour {
 
+    [Serializable] public class Selector {
+        public int i = 0;
+        public float distance = 0f;
+    }
+    
     //Collider présent sur notre ennemi
     private SphereCollider m_sphereCol = null;
     private Animator m_animator = null;
@@ -77,17 +83,16 @@ public class GuardBehavior : MonoBehaviour {
     public static bool m_isKillingSomeone = false;  //tous les script de l'ennemi possèdent la même valeur de la variable au même moment
     [SerializeField] [Tooltip("For Debug Only")] private List<PlayerController> m_charactersInDangerScript = new List<PlayerController>(); //Liste des scripts sur les character qui entrent et sortent de la zone de l'ennemi
 
-
     private static readonly int IsStun = Animator.StringToHash("IsStun");
     private static readonly int IsChasing = Animator.StringToHash("IsChasing");
     private static readonly int IsWalking = Animator.StringToHash("IsWalking");
 
-     [Header("Audio")]
-     [SerializeField] [Tooltip("attaque Monstre")] private AudioSource m_attackSound = null;
-     [SerializeField] [Tooltip("detection Monstre")] private AudioSource m_detectionSound = null;
-     [SerializeField] [Tooltip("poursuite Monstre")] private AudioSource m_pursuitSound = null;
-     [SerializeField] [Tooltip("respiration Monstre")] private AudioSource m_breathSound = null;
-     [SerializeField] [Tooltip("Intimidation")] private AudioSource m_intimidationSound = null;
+    [Header("Audio")]
+    [SerializeField] [Tooltip("attaque Monstre")] private AudioSource m_attackSound = null;
+    [SerializeField] [Tooltip("detection Monstre")] private AudioSource m_detectionSound = null;
+    [SerializeField] [Tooltip("poursuite Monstre")] private AudioSource m_pursuitSound = null;
+    [SerializeField] [Tooltip("respiration Monstre")] private AudioSource m_breathSound = null;
+    [SerializeField] [Tooltip("Intimidation")] private AudioSource m_intimidationSound = null;
 
      // Start is called before the first frame update
     void Start() {
@@ -201,19 +206,42 @@ public class GuardBehavior : MonoBehaviour {
             }
         }
         
-
+        
         if (m_enterZone && !m_isKillingSomeone && !m_intimidationVibe && !(m_charactersInDangerScript[0].m_chara == Charas.Human && m_charactersInDangerScript[0].m_isForbiddenToMove)) {
             m_warningVibe = true;
             m_intimidationVibe = false;
             m_attackVibe = false;
 
-
-            //calcul de la position du premier chara entré dans la zone
+            
+            // Vector3 targetDir = Vector3.zero;
+            // Vector3 raycastPos = new Vector3(transform.position.x, transform.position.y, transform.position.z);
+            // List<float> distance = new List<float>();
+            //
+            // foreach (PlayerController chara in m_charactersInDangerScript) {
+            //     RaycastHit hitChara;
+            //     targetDir = (chara.gameObject.transform.position - transform.position).normalized;
+            //     bool raycastHit = Physics.Raycast(raycastPos, targetDir, out hitChara, m_sphereRadius * 5);
+            //     float lengthVector = new Vector3(chara.transform.position.x - transform.position.x,chara.transform.position.y- transform.position.y,chara.transform.position.z-transform.position.z).magnitude;
+            //     
+            //     if(raycastHit) distance.Add(lengthVector);
+            //     //distance[0] = (m_charactersInDangerScript[0].transform.position - transform.position).magnitude;
+            //     //targetDir = (chara.gameObject.transform.position - transform.position).normalized;
+            // }
+            //
+            // if (distance[0] < distance[1]) {
+            //     Debug.Log("Le premier personnage est plus proche que le deuxième");
+            //     targetDir = m_charactersInDangerScript[0].transform.position - transform.position;
+            // }
+            // else {
+            //     Debug.Log("Le premier personnage est plus loin que le deuxième");
+            //     targetDir = m_charactersInDangerScript[1].transform.position - transform.position;
+            // }
+            
+            
             Vector3 targetDir = (m_charactersInDangerScript[0].gameObject.transform.position - transform.position).normalized;
-            //angle de détection lorsque l'ennemi est à peu près en face du joueur
+            
             float angleForward = Vector3.Angle(transform.forward, targetDir);
             
-
             //création de la variable du  raycast
             RaycastHit hit;
             
@@ -231,7 +259,7 @@ public class GuardBehavior : MonoBehaviour {
 
                 if (m_charactersInDangerScript[0].gameObject.transform.position != hit.transform.position) //le chara se trouve derrière un obstacle et n'est pas visible par l'ennemi
                 {
-                    Debug.Log("Oulala on ne voit pas le character derrière");
+                    //Debug.Log("Oulala on ne voit pas le character derrière");
                     
                     if (m_hasSeenPlayer) {
                         m_nma.speed = m_attackSpeed;
