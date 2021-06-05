@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class DeathManager : MonoBehaviour {
@@ -119,6 +120,15 @@ public class DeathManager : MonoBehaviour {
                 OnBlackScreen?.Invoke(); //We call the delegator if it is not empty
             }
             else m_image.color = new Color(0f,0f,0f, newAlpha);
+        }
+        
+        //To delete when we're gonna remove all the Debug.LogError
+        if (Input.GetKeyDown(KeyCode.F1)) {
+            SceneManager.LoadScene(1);
+        } else if (Input.GetKeyDown(KeyCode.F2)) {
+            SceneManager.LoadScene(2);
+        } else if (Input.GetKeyDown(KeyCode.F3)) {
+            SceneManager.LoadScene(3);
         }
     }
 

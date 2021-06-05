@@ -29,6 +29,11 @@ public class Start_Manager : MonoBehaviour {
     private bool m_frenchMenuIsActive = false;  //indique si le menu français est visible ou non
     private bool m_isLaunchingGame = false;
     private Vector3 m_travelToBack = Vector3.zero; //The vector that represents the travel from original to back position
+
+    [Header("Menu Evolutif")]
+    [SerializeField] [Tooltip("The thing to make appear on the first setup (When you first launch the game)\nMust be an empty unactive gameObject with all the things you need in child")] private GameObject m_fisrtSetup = null;
+    [SerializeField] [Tooltip("The thing to make appear on the second setup (When the player has encountered all the characters)\nMust be an empty unactive gameObject with all the things you need in child")] private GameObject m_secondSetup = null;
+    [SerializeField] [Tooltip("The thing to make appear on the third setup (When the player has finished the game)\nMust be an empty unactive gameObject with all the things you need in child")] private GameObject m_thirdSetup = null;
     
     [Header("Move")]
     [Tooltip("position limite de joystick")] private float m_limitPosition = 0.5f;
@@ -53,8 +58,25 @@ public class Start_Manager : MonoBehaviour {
 
     
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
+
+        switch (PlayerPrefs.GetInt("Level", 0)) {
+            case 0 :
+            case 1 :
+                m_fisrtSetup.SetActive(true);
+                break;
+            
+            case 2 :
+            case 3:
+                m_secondSetup.SetActive(true);
+                break;
+            
+            case 4:
+                m_thirdSetup.SetActive(true);
+                break;
+        }
+        
         if (m_title == null) Debug.LogError("OUPS ! U FORGOT TO PUT THE TITLE IMAGE ON THE START MANAGER OBJECT");
         if (m_pressStartButton == null) Debug.LogError("OUPS ! U FORGOT TO PUT THE START BUTTON ON THE START MANAGER OBJECT");
         if (m_pressStartText == null) Debug.LogError("OUPS ! U FORGOT TO PUT THE TEXT OF THE PRESS START BUTTON ON THE START MANAGER OBJECT");
@@ -152,12 +174,18 @@ public class Start_Manager : MonoBehaviour {
 
                 switch (m_selectorIndex) {
                     case 0: //Continue
-                        Debug.LogWarning("Not implemented yet");
-                        //m_isLaunchingGame = true;
+                        //If the player has not reached the end of the game yet, we launch the level they are currently at, else, we launch the last level once again
+                        int sceneID = PlayerPrefs.GetInt("Level", 1);
+                        if (sceneID < 4) m_sceneIndex = sceneID;
+                        else m_sceneIndex = 3;
+                        m_isLaunchingGame = true;
                         break;
                     case 1: //New Game
                         m_isLaunchingGame = true;
-                        m_sceneIndex = SceneManager.GetActiveScene().buildIndex + 1;
+                        int nextScene = SceneManager.GetActiveScene().buildIndex + 1;
+                        //If the player chooses new game, we reset his save
+                        PlayerPrefs.SetInt("Level", nextScene);
+                        m_sceneIndex = nextScene;
                         break;
                     case 2: //Language
                         if (m_englishMenuIsActive)
@@ -287,6 +315,7 @@ public class Start_Manager : MonoBehaviour {
             if (newAlpha >= 1f) {
                 //If the color will go above one, we set it to one instead and launch the next scene
                 m_image.color = new Color(0f,0f,0f, 1f);
+                PlayerPrefs.Save();
                 SceneManager.LoadScene(m_sceneIndex);
             }
             else m_image.color = new Color(0f,0f,0f, newAlpha);
