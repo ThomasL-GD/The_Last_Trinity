@@ -48,6 +48,7 @@ public class GuardBehavior : MonoBehaviour {
     [SerializeField] [Tooltip("temps d'animation de mort")] [Range(0f,10f)] private float m_deathTime = 3.0f;
 
     [SerializeField] [Tooltip("The gameobject of the hit FX, must be already placed in a good position and setActive(false)\nMust be a child of this object\nCan be null")] private GameObject m_hitFX = null;
+    [SerializeField] [Tooltip("The gameobject of the stun FX, must be already placed in a good position\nMust be a child of this object\nCan be null")] private GameObject m_stunFX = null;
     private Vector3 m_spawnPoint = Vector3.zero;
     
     [Header("Monster Ability")]
@@ -93,11 +94,15 @@ public class GuardBehavior : MonoBehaviour {
         if(m_destinationsTransforms.Count < 1) Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT DESTINATIONS IN THE ENNEMY !", this);
         
         if(m_hitFX == null) Debug.LogWarning("There's no FX for the hit of this ennemy, it's still gonna work thought", this);
+        
+        if(m_stunFX == null) Debug.LogWarning("There's no FX for the stun of this ennemy, pretty sure it's still gonna work", this);
 
         //We adapt the collider to the Serialized value we have
         m_sphereCol = gameObject.GetComponent<SphereCollider>();
         m_sphereCol.radius = m_sphereRadius;
         m_sphereCol.isTrigger = true;
+        
+        m_stunFX.GetComponent<ParticleSystem>().Stop(); //sécurité
 
         m_animator = GetComponent<Animator>();
 
@@ -394,6 +399,7 @@ public class GuardBehavior : MonoBehaviour {
         
         scriptCharaWhoIsDying.m_isForbiddenToMove = false;
         scriptCharaWhoIsDying.AbilityAnim(false);
+        m_stunFX.GetComponent<ParticleSystem>().Play();
         StartCoroutine(Stun());
         m_intimidationCor = null;
     }
@@ -401,6 +407,7 @@ public class GuardBehavior : MonoBehaviour {
     {
         yield return new WaitForSeconds(m_stunTime); //durée de stun
         if(m_animator != null)m_animator.SetBool(IsStun, false);
+        m_stunFX.GetComponent<ParticleSystem>().Stop();
         m_nma.isStopped = false;
         m_intimidationVibe = false;
     }
