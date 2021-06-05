@@ -404,6 +404,9 @@ public class GuardBehavior : MonoBehaviour {
     }
     IEnumerator Stun()
     {
+        m_detectionSound.Stop();
+        m_pursuitSound.Stop();
+        
         yield return new WaitForSeconds(m_stunTime*0.7f); //durée de stun
         m_isAlmostUnstun = true;
         StartCoroutine(BlinkingFX());
