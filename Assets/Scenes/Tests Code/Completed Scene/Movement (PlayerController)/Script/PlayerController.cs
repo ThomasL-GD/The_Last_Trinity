@@ -562,7 +562,7 @@ public class PlayerController : MonoBehaviour
     /// ...Must I really explain this ?
     /// It will just call the deathdelegator there's absolutely no surprise in that...
     /// </summary>
-    public static void DeathDelegatorCall() {
+    private static void DeathDelegatorCall() {
         DeathManager.DeathDelegator?.Invoke();
     }
     
