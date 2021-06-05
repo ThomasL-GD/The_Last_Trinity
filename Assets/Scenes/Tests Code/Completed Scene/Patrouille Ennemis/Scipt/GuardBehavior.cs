@@ -398,6 +398,7 @@ public class GuardBehavior : MonoBehaviour {
         
         scriptCharaWhoIsDying.m_isForbiddenToMove = false;
         scriptCharaWhoIsDying.AbilityAnim(false);
+        m_stunFX.SetActive(true);
         m_stunFX.GetComponent<ParticleSystem>().Play();
         StartCoroutine(Stun());
         m_intimidationCor = null;
