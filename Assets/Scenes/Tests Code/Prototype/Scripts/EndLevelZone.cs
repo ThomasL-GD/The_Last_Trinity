@@ -16,12 +16,17 @@ public class EndLevelZone : MonoBehaviour {
     private float m_counterNextLevel = 0f;
     private bool m_levelIsCompleted = false;
     private static bool s_isEndingLevel = false;
+
+    [Header("Audio")] 
+    [SerializeField] [Tooltip("Son d'ambiance")] private AudioSource m_mainTheme = null;
     
     // Start is called before the first frame update
     void Awake() {
         
         //We make sure the box collider is in trigger
         gameObject.GetComponent<BoxCollider>().isTrigger = true;
+
+        if ( m_mainTheme != null && !m_mainTheme.isPlaying) m_mainTheme.Play();
     }
 
     private void Start() {
