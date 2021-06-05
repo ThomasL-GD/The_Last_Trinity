@@ -79,13 +79,12 @@ public class GuardBehavior : MonoBehaviour {
     private static readonly int IsChasing = Animator.StringToHash("IsChasing");
     private static readonly int IsWalking = Animator.StringToHash("IsWalking");
 
-     [Header("Audio")] 
-     //[SerializeField] [Tooltip("déplacement Monstre")] private AudioSource m_moveSound;
-     [SerializeField] [Tooltip("attaque Monstre")] private AudioSource m_attackSound;
-     [SerializeField] [Tooltip("detection Monstre")] private AudioSource m_detectionSound;
-     [SerializeField] [Tooltip("poursuite Monstre")] private AudioSource m_pursuitSound;
-     [SerializeField] [Tooltip("respiration Monstre")] private AudioSource m_breathSound;
-     [SerializeField] [Tooltip("Intimidation")] private AudioSource m_intimidationSound;
+     [Header("Audio")]
+     [SerializeField] [Tooltip("attaque Monstre")] private AudioSource m_attackSound = null;
+     [SerializeField] [Tooltip("detection Monstre")] private AudioSource m_detectionSound = null;
+     [SerializeField] [Tooltip("poursuite Monstre")] private AudioSource m_pursuitSound = null;
+     [SerializeField] [Tooltip("respiration Monstre")] private AudioSource m_breathSound = null;
+     [SerializeField] [Tooltip("Intimidation")] private AudioSource m_intimidationSound = null;
 
      // Start is called before the first frame update
     void Start() {
@@ -191,7 +190,6 @@ public class GuardBehavior : MonoBehaviour {
                 else{
                     if (m_animator != null) {
                         m_animator.SetBool(IsWalking, true);
-                        //m_moveSound.Play(); //Son de déplacement du personnage
                     }}
             }
         }
@@ -242,7 +240,7 @@ public class GuardBehavior : MonoBehaviour {
                 }
                 else //le chara est visible par l'ennemi
                 {
-                    if(!m_detectionSound.isPlaying) m_detectionSound.PlayOneShot(m_detectionSound.clip); //Son de repérage d'un character
+                    if(!m_detectionSound.isPlaying && m_detectionSound != null) m_detectionSound.PlayOneShot(m_detectionSound.clip); //Son de repérage d'un character
                     
                     //Si le joueur est dans l'angle mort de l'ennemi
                     if (Mathf.Abs(angleForward) > m_angleUncertainty)
@@ -268,7 +266,7 @@ public class GuardBehavior : MonoBehaviour {
                     //si le joueur est visible par l'ennemi
                     else if (angleForward <= m_angleUncertainty) {
                         
-                        if(!m_pursuitSound.isPlaying) m_pursuitSound.PlayOneShot(m_pursuitSound.clip);  //Son de poursuite de character
+                        if(!m_pursuitSound.isPlaying && m_pursuitSound != null) m_pursuitSound.PlayOneShot(m_pursuitSound.clip);  //Son de poursuite de character
 
                         //if(m_isStatic)m_isOnTheirSpot = false;
                         m_warningVibe = false;
@@ -285,8 +283,8 @@ public class GuardBehavior : MonoBehaviour {
                         if (Vector3.Distance(m_charactersInDangerScript[0].transform.position, transform.position) < m_deathPos && !m_isKillingSomeone)
                         {
                             //Debug.Log($"J'AI TROUVE UNE VICTIME      :      {m_isKillingSomeone}");
-                            if(!m_attackSound.isPlaying) m_attackSound.PlayOneShot(m_attackSound.clip);   //Son d'attaque du monstre
-                            if(!m_breathSound.isPlaying) m_breathSound.PlayOneShot(m_breathSound.clip);   //Son de respiration du monstre
+                            if(!m_attackSound.isPlaying && m_attackSound != null) m_attackSound.PlayOneShot(m_attackSound.clip);   //Son d'attaque du monstre
+                            if(!m_breathSound.isPlaying && m_breathSound != null) m_breathSound.PlayOneShot(m_breathSound.clip);   //Son de respiration du monstre
                             StartCoroutine(DeathCoroutine());
                         }
                     }
@@ -375,7 +373,7 @@ public class GuardBehavior : MonoBehaviour {
     IEnumerator Intimidate()
     {
 
-        if(!m_intimidationSound.isPlaying) m_intimidationSound.PlayOneShot(m_intimidationSound.clip); //son d'intimidation du monstre allié
+        if(!m_intimidationSound.isPlaying && m_intimidationSound != null) m_intimidationSound.PlayOneShot(m_intimidationSound.clip); //son d'intimidation du monstre allié
         
         //appel singleton vibe
         Rumbler.Instance.Rumble(m_lowMonsterIntimidation, m_highMonsterIntimidation, m_rumbleDuration);

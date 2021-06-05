@@ -29,12 +29,12 @@ public class Telekinesable : MonoBehaviour
     private Vector3 m_velocity = Vector3.zero; //Vélocité 0 pour le smoothDamp
     private PlayerController m_robotScript = null; //Récupération du script du plauerController pour obtenir le Robot
 
-    private VisualEffect m_cube; //Visual effect en enfant de l'objet Telekinesable
+    private VisualEffect m_cube = null; //Visual effect en enfant de l'objet Telekinesable
     
     [Header("Audio")]
-    [SerializeField] [Tooltip("Son de montée")] private AudioSource m_upSound;
-    [SerializeField] [Tooltip("Son de stabilisation")] private AudioSource m_telekinesieSound;
-    [SerializeField] [Tooltip("Son de descente")] private AudioSource m_downSound;
+    [SerializeField] [Tooltip("Son de montée")] private AudioSource m_upSound = null;
+    [SerializeField] [Tooltip("Son de stabilisation")] private AudioSource m_telekinesieSound = null;
+    [SerializeField] [Tooltip("Son de descente")] private AudioSource m_downSound = null;
     
     void Start() {
         DeathManager.DeathDelegator += Reset;
@@ -54,6 +54,7 @@ public class Telekinesable : MonoBehaviour
         {
             Debug.LogError("Manque l'effet sur le cube telekinesable");
         }
+
     }
     
     private void Update()
@@ -69,7 +70,7 @@ public class Telekinesable : MonoBehaviour
         else if (posClamp == ClampEnjoyer(m_targetPos) && m_activeTelekinesie)
         {
             //son de télékinésie stable
-            if(!m_telekinesieSound.isPlaying) m_telekinesieSound.PlayOneShot(m_telekinesieSound.clip);
+            if(!m_telekinesieSound.isPlaying && m_telekinesieSound != null) m_telekinesieSound.PlayOneShot(m_telekinesieSound.clip);
             
             //Debug.Log("Quelconque");
             m_isInBetweenTravel = false;
@@ -90,12 +91,12 @@ public class Telekinesable : MonoBehaviour
                 if (m_activeTelekinesie)
                 {
                     m_robotScript.m_isForbiddenToMove = true;
-                    m_upSound.PlayOneShot(m_upSound.clip); //son de montée
+                    if(m_upSound != null && !m_upSound.isPlaying) m_upSound.PlayOneShot(m_upSound.clip); //son de montée
                     m_robotScript.AbilityAnim(true); //Animation up play
                 }
                 else{
                     m_robotScript.AbilityAnim(false); //Animation down play
-                    m_downSound.PlayOneShot(m_downSound.clip);  //son de descente
+                    if(m_downSound != null && !m_downSound.isPlaying) m_downSound.PlayOneShot(m_downSound.clip);  //son de descente
                 }
             }
         }

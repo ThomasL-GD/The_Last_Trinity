@@ -28,7 +28,7 @@ public class Faufilable : MonoBehaviour
     private ParticleSystem m_smokeParticle; //Particle system of the smoke object
     
     [Header("Audio")] 
-    [SerializeField] [Tooltip("déplacement conduit")] private AudioSource m_stealthSound;
+    [SerializeField] [Tooltip("déplacement conduit")] private AudioSource m_stealthSound = null;
     
     void Start()
     {
@@ -84,7 +84,7 @@ public class Faufilable : MonoBehaviour
     /// <returns></returns>
     IEnumerator Teleport()
     {
-        m_stealthSound.Play(); //son déplacement conduit
+        if(m_stealthSound != null) m_stealthSound.Play(); //son déplacement conduit
         
         SkinnedMeshRenderer meshRenderer = m_human.gameObject.GetComponentInChildren<SkinnedMeshRenderer>();
         meshRenderer.enabled = false;

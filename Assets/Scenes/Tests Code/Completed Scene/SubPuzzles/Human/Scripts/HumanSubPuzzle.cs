@@ -74,10 +74,9 @@ public class HumanSubPuzzle : MonoBehaviour {
     
     [Header("Debug")]
     [SerializeField] [Tooltip("If on, the walls will be displayed for debug")] private bool m_debugMode = false;
-
-
+    
     [Header("Audio")] 
-    [SerializeField] [Tooltip("Son d'ouverture de subPuzzle")] private AudioSource m_winSound;
+    [SerializeField] [Tooltip("Son d'échec de direction")] private AudioSource m_bonkSound = null;
 
     /// <summary>
     /// OnEnable is called once each time the Game Object is enabled
@@ -570,7 +569,7 @@ public class HumanSubPuzzle : MonoBehaviour {
             if (attemptedMovement == Directions.None || m_maze[m_selector.y, m_selector.x].HasFlag(attemptedMovement)) {
                 Debug.Log("Nah bro, you cannot go this way");
                 Rumbler.Instance.Rumble(m_lowA, m_highA, m_rumbleDuration);
-                //StartCoroutine(Rumble());   //Vibration
+                if(m_bonkSound != null) m_bonkSound.PlayOneShot(m_bonkSound.clip);  //son d'échec de direction
             }
             else {
                 //If the movement is not blocked by a wall, we update the selector coordinates according to the wanted direction
@@ -607,8 +606,6 @@ public class HumanSubPuzzle : MonoBehaviour {
         
         //Win verification
         if (m_selector.x == m_mazeWidth - 1 && m_selector.y == 0) {
-            
-            m_winSound.Play();  //son de réussite de subPuzzle
             Win();
         }
         
