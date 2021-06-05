@@ -8,7 +8,7 @@ public class ZoneChangementDolly : MonoBehaviour {
 
     [Header("")]
     [SerializeField] [Tooltip("If on, you only need to serialize the robot camera")] private bool m_isTheRobotAlone = false;
-    [SerializeField] [Tooltip("If on, the camera will go back to the old camera when the character leaves the zone")] private bool m_isCancelingOnExit = false;
+    //[SerializeField] [Tooltip("If on, the camera will go back to the old camera when the character leaves the zone")] private bool m_isCancelingOnExit = false;
 
     [Header("Cameras")]
     //Cinemachine cameras des trois personnages zoomées sur un rail auxiliaire
@@ -76,34 +76,34 @@ public class ZoneChangementDolly : MonoBehaviour {
     /// Puts back the previous camera to any character going out of the zone
     /// </summary>
     /// <param name="p_other">Collider du joueur entrant dans la zone</param>
-    private void OnTriggerExit(Collider p_other)
-    {
-        if (m_isCancelingOnExit && p_other.gameObject.TryGetComponent(out PlayerController charaScript))
-        {
-            if(!m_isTheRobotAlone){
-                switch (charaScript.m_chara)
-                {
-                    case Charas.Human :
-                        charaScript.SetNewCamera(m_previousVCamH);
-                        m_previousVCamH = m_vCamHZ;
-                        break;
-                    case Charas.Monster :
-                        charaScript.SetNewCamera(m_previousVCamM);
-                        m_previousVCamM = m_vCamMZ;
-                        break;
-                    case Charas.Robot :
-                        charaScript.SetNewCamera(m_previousVCamR);
-                        m_previousVCamR = m_vCamRZ;
-                        //Debug.Log("New Camera set by trigger EXIT", this);
-                        break;
-                }   
-            }
-            else {
-                charaScript.SetNewCamera(m_previousVCamR);
-                m_previousVCamR = m_vCamRZ;
-            }
-            
-        }
-    }
+    // private void OnTriggerExit(Collider p_other)
+    // {
+    //     if (m_isCancelingOnExit && p_other.gameObject.TryGetComponent(out PlayerController charaScript))
+    //     {
+    //         if(!m_isTheRobotAlone){
+    //             switch (charaScript.m_chara)
+    //             {
+    //                 case Charas.Human :
+    //                     charaScript.SetNewCamera(m_previousVCamH);
+    //                     m_previousVCamH = m_vCamHZ;
+    //                     break;
+    //                 case Charas.Monster :
+    //                     charaScript.SetNewCamera(m_previousVCamM);
+    //                     m_previousVCamM = m_vCamMZ;
+    //                     break;
+    //                 case Charas.Robot :
+    //                     charaScript.SetNewCamera(m_previousVCamR);
+    //                     m_previousVCamR = m_vCamRZ;
+    //                     //Debug.Log("New Camera set by trigger EXIT", this);
+    //                     break;
+    //             }   
+    //         }
+    //         else {
+    //             charaScript.SetNewCamera(m_previousVCamR);
+    //             m_previousVCamR = m_vCamRZ;
+    //         }
+    //         
+    //     }
+    // }
     
 }

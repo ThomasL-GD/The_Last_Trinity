@@ -47,7 +47,7 @@ public class PlayerController : MonoBehaviour
     private float m_effectiveGravity = 0f;
     private Vector3 m_charaVelocity = Vector3.zero;
     private Animator m_animator = null;
-    private NavMeshAgent m_nma = null;
+    //private NavMeshAgent m_nma = null;
     
 
     [Header("Switch Chara Input Mode")]
@@ -59,7 +59,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] [Tooltip("The input used to rotate chara selection counter-clockwise")] public KeyCode m_leftInput = KeyCode.JoystickButton5;
     private static PlayerCharactersArray m_s_charasScripts = new PlayerCharactersArray();
     [SerializeField] [Tooltip("The input used to make other characters come to you")] private KeyCode m_callKey = KeyCode.None;
-    private bool m_isNmaActive = false;
+    //private bool m_isNmaActive = false;
     
     
     [Header("If Cycle is OFF")]
@@ -82,7 +82,8 @@ public class PlayerController : MonoBehaviour
     private bool m_isPlayingDead = false; //If the chara is currently playing their death animation
     [HideInInspector] public Vector3 m_spawnPoint = Vector3.zero;
     [HideInInspector] public CinemachineVirtualCamera m_spawnCamera = null;
-    private static CinemachineVirtualCamera s_deathCamera = null; 
+    private static CinemachineVirtualCamera s_deathCamera = null;
+    private int m_priorityBeforeDeath = 0;
 
     
     //Cinemachine cameras des trois personnages en 0 l'humaine, en 1 le monstre et en 2 le robot
@@ -165,10 +166,10 @@ public class PlayerController : MonoBehaviour
         if (TryGetComponent(out Animator animator)) m_animator = animator;
         else Debug.LogWarning("JEEZ ! THE GAME DESIGNER FORGOT TO PUT AN ANIMATOR ON THIS CHARA ! (it's still gonna work tought)");
 
-        if (m_callKey != null) {
-            if (TryGetComponent(out NavMeshAgent nma)) m_nma = nma;
-            else Debug.LogWarning("JEEZ ! THE GAME DESIGNER FORGOT TO PUT A NAVMESH AGENT ! (it's still gonna work tought)");
-        }
+        // if (m_callKey != null) {
+        //     if (TryGetComponent(out NavMeshAgent nma)) m_nma = nma;
+        //     else Debug.LogWarning("JEEZ ! THE GAME DESIGNER FORGOT TO PUT A NAVMESH AGENT ! (it's still gonna work tought)");
+        // }
         
         if (TryGetComponent(out CharacterController charaController)) m_charaController = charaController;
         else Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT A CHARA CONTROLLER ON THIS CHARA !");
@@ -193,7 +194,9 @@ public class PlayerController : MonoBehaviour
                     m_s_charasScripts.currentIndex = 2;
                     break;
             }
+            m_allCameras[m_s_charasScripts.currentIndex].Priority = 3;
         }
+
 
         m_effectiveGravity = m_gravity;
     }
@@ -252,7 +255,7 @@ public class PlayerController : MonoBehaviour
             }
 
             //If we are on the old input system
-            if (!m_cycle) {
+            if (!m_cycle && !m_isPlayingDead) {
                 //We activate this chara if its corresponding input is pressed
                 if (Input.GetKeyDown(m_keyCodes[(int)m_chara])) {
                     if (!m_isActive && !s_inBetweenSwitching) {
@@ -302,7 +305,7 @@ public class PlayerController : MonoBehaviour
                     m_isActive = false;
                 }
             }
-            else if (m_cycle) { // If we are on the new input system
+            else if (m_cycle && !m_isPlayingDead) { // If we are on the new input system
                 //If an input of character change is pressed we switch charas
                 if (m_isActive && (Input.GetKeyDown(m_leftInput) || Input.GetKeyDown(m_rightInput)) && !s_inBetweenSwitching && !m_isInSubPuzzle) {
 
@@ -351,15 +354,15 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if (!m_isActive && m_cycle && Input.GetKeyDown(m_callKey)) {
-            m_nma.SetDestination(m_s_charasScripts.array[m_s_charasScripts.currentIndex].gameObject.transform.position);
-            m_isNmaActive = true;
-        }
-
-        if (m_cycle && m_isNmaActive && m_isActive) {
-            m_nma.isStopped = true;
-            m_isNmaActive = false;
-        }
+        // if (!m_isActive && m_cycle && Input.GetKeyDown(m_callKey)) {
+        //     m_nma.SetDestination(m_s_charasScripts.array[m_s_charasScripts.currentIndex].gameObject.transform.position);
+        //     m_isNmaActive = true;
+        // }
+        //
+        // if (m_cycle && m_isNmaActive && m_isActive) {
+        //     m_nma.isStopped = true;
+        //     m_isNmaActive = false;
+        // }
         
         //if(m_chara == Charas.Robot)Debug.Log($"{transform.position}");
     }
@@ -532,15 +535,19 @@ public class PlayerController : MonoBehaviour
             //We set a new camera to look throught to be sure the players sees the character who is dying
             switch (m_chara) {
                 case Charas.Human:
+                    m_priorityBeforeDeath = m_allCameras[0].Priority;
                     s_deathCamera = m_allCameras[0];
                     break;
                 case Charas.Monster:
+                    m_priorityBeforeDeath = m_allCameras[1].Priority;
                     s_deathCamera = m_allCameras[1];
                     break;
                 case Charas.Robot:
+                    m_priorityBeforeDeath = m_allCameras[2].Priority;
                     s_deathCamera = m_allCameras[2];
                     break;
             }
+
 
             s_deathCamera.Priority = 8;
         }
@@ -574,7 +581,7 @@ public class PlayerController : MonoBehaviour
         m_isDying = false;
         m_deathCounter = 0.0f;
         m_isForbiddenToMove = false;
-        s_deathCamera.Priority = 0;
+        s_deathCamera.Priority = m_priorityBeforeDeath;
 
         //We teleport the player to their spawnpoint
         transform.SetPositionAndRotation(m_spawnPoint, transform.rotation);
