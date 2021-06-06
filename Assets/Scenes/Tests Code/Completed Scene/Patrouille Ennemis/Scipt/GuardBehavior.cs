@@ -336,6 +336,7 @@ public class GuardBehavior : MonoBehaviour {
 
                 //If we're no longer running after someone, we just go back to walking
                 if (!m_isGoingTowardsPlayer) {
+                    m_pursuitSound.Stop();
                     m_nma.speed = m_normalSpeed;
                     m_nma.acceleration = m_normalAcceleration;
                     m_nma.angularSpeed = m_normalRotationSpeed;
@@ -368,7 +369,8 @@ public class GuardBehavior : MonoBehaviour {
         }
         
         if(!m_enterZone) {
-
+            
+            m_pursuitSound.Stop();
             m_hasSeenPlayer = false;
             m_isInBlindSpot = false;
             m_warningVibe = false;

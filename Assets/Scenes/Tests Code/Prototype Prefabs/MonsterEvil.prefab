@@ -992,10 +992,11 @@ MonoBehaviour:
   - {fileID: 0}
   m_deathPos: 2.7
   m_deathTime: 0.61
-  m_hitFX: {fileID: 5567077299451858917}
-  m_stunFX: {fileID: 5931849550804425770}
   m_intimidationTime: 1
   m_stunTime: 20
+  m_hitFX: {fileID: 5567077299451858917}
+  m_stunFX: {fileID: 5931849550804425770}
+  m_blinkTime: 0.1
   m_lowWarningEnemy: 0.204
   m_highWarningEnemy: 0.496
   m_lowAttackEnemy: 1
@@ -1003,11 +1004,6 @@ MonoBehaviour:
   m_lowMonsterIntimidation: 0.5
   m_highMonsterIntimidation: 0.5
   m_rumbleDuration: 0.5
-  m_warningVibe: 0
-  m_intimidationVibe: 0
-  m_attackVibe: 0
-  m_enterZone: 0
-  m_charactersInDangerScript: []
   m_attackSound: {fileID: 7850592407409637167}
   m_detectionSound: {fileID: 4542809694973215784}
   m_pursuitSound: {fileID: 766273359989958636}
@@ -1245,7 +1241,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: b366966340665cd4a8fc62daf3e01162, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 0895b1f2c92b29840972ac6007ee5780, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 0.3
   m_Pitch: 1
