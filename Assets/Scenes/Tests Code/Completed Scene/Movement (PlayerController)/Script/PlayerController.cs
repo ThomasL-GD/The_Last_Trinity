@@ -577,6 +577,12 @@ public class PlayerController : MonoBehaviour
     /// For safety, we reset a few values in case of death & respawn
     /// </summary>
     private void EndDeath() {
+        
+        if (this == null) {
+            DeathManager.OnBlackScreen -= EndDeath;
+            return;
+        }
+        
         //Reset of all death-related values
         m_isDying = false;
         m_deathCounter = 0.0f;

@@ -164,6 +164,11 @@ public class Telekinesable : MonoBehaviour
     }
 
     public void Reset() {
+        if (this == null) {
+            DeathManager.OnBlackScreen -= Reset;
+            return;
+        }
+        
         transform.position = m_originalPos;
         m_cube.Stop();
         m_telekinesieOpen = false;
