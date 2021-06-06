@@ -77,6 +77,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] [Range(0.2f, 20f)] [Tooltip("The time the player is allowed to stay in this death zone (unit : seconds)")] private float m_timeBeforeDying = 0.5f;
     [SerializeField] [Range(0.2f, 5f)] [Tooltip("The time of the death animation (must be longer than the death animation time) (unit : seconds)")] private float m_deathAnimTime = 1.5f;
     [SerializeField] [Range(0.2f, 5f)] [Tooltip("The time of the fade in black after death (unit : seconds)")] private float m_deathFadeTime = 1.5f;
+    [SerializeField] [Tooltip("The particles system that does the hit fx")] private ParticleSystem m_hitFx = null;
     private float m_deathCounter = 0.0f;
     private bool m_isDying = false; //If the chara is in a death zone
     private bool m_isPlayingDead = false; //If the chara is currently playing their death animation
@@ -150,6 +151,9 @@ public class PlayerController : MonoBehaviour
         if(vCamH == null) Debug.LogError("Aucune caméra avec le tag Camera Humain");
         if(vCamM == null) Debug.LogError("Aucune caméra avec le tag Camera Monstre");
         if(vCamR == null) Debug.LogError("Aucune caméra avec le tag Camera Robot");
+        
+        
+        if(m_hitFx == null) Debug.LogWarning("JEEZ !THERE'S NO SERIALIZED HIT FX ? HOW DO YOU EXPECT DO GIVE FEEDBACK ? AND YOU CALL YOURSELF A GAME DESIGNER ?\nHappily for you, this won't make the code crash, it'll just lack feedback as much as you lack IQ", this);
 
         if (m_soul == null) {
             Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT A PREFAB FOR THE SOUL ! WHERE DID HE GOT HIS FAKE DIPLOMA ?!");
@@ -161,6 +165,12 @@ public class PlayerController : MonoBehaviour
     #endif
 
         if (vCamH != null && vCamM != null && vCamR != null) m_allCameras = new CinemachineVirtualCamera[3] {vCamH, vCamM, vCamR};
+
+        if (m_hitFx != null) {
+            m_hitFx.Stop();
+            ParticleSystem.MainModule mainModule = m_hitFx.main;
+            mainModule.duration = m_timeBeforeDying/20;
+        }
 
 
         if (TryGetComponent(out Animator animator)) m_animator = animator;
@@ -346,10 +356,13 @@ public class PlayerController : MonoBehaviour
         //If this character is in a death zone, we increase his death timer, if not, we decrease it
         if (!m_isDying && m_deathCounter > 0f) {
             m_deathCounter -= Time.deltaTime;
+            if(m_hitFx.isPlaying)m_hitFx.Stop();
         }
         else if (m_isDying) {
             m_deathCounter += Time.deltaTime;
+            if(!m_hitFx.isPlaying)m_hitFx.Play();
             if (m_deathCounter > m_timeBeforeDying) {
+                m_hitFx.Stop();
                 if (!m_isPlayingDead)Death();
             }
         }
