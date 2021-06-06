@@ -11,9 +11,14 @@ using UnityEngine.InputSystem.DualShock;
 [RequireComponent(typeof(SphereCollider))]
 public class GuardBehavior : MonoBehaviour {
 
-    [Serializable] public class Selector {
-        public int i = 0;
+    /*[Serializable]*/ public class DistanceToACharacter {
+        public int index = 0;
         public float distance = 0f;
+
+        public DistanceToACharacter(int p_index, float p_distance) {
+            index = p_index;
+            distance = p_distance;
+        }
     }
     
     //Collider présent sur notre ennemi
@@ -79,6 +84,7 @@ public class GuardBehavior : MonoBehaviour {
 
     [SerializeField] [Tooltip("For Debug Only")] private bool m_enterZone = false;
     private bool m_hasSeenPlayer = false;
+    private bool m_isInBlindSpot = false;
     private bool m_isGoingTowardsPlayer = false;
     public static bool m_isKillingSomeone = false;  //tous les script de l'ennemi possèdent la même valeur de la variable au même moment
     [SerializeField] [Tooltip("For Debug Only")] private List<PlayerController> m_charactersInDangerScript = new List<PlayerController>(); //Liste des scripts sur les character qui entrent et sortent de la zone de l'ennemi
@@ -153,6 +159,7 @@ public class GuardBehavior : MonoBehaviour {
     void Update() {
 
         if (!m_isKillingSomeone) {
+            Debug.Log("Is not klling someone", this);
             if(!m_isStatic){
                 if (m_animator != null) {
                     m_animator.SetBool(IsWalking, true);
@@ -179,11 +186,15 @@ public class GuardBehavior : MonoBehaviour {
                 }
             }
             else if (m_isStatic) {
+                Debug.Log("Is static", this);
+                
                 //If the guard is close enough to the point he was trying to reach
                 if (transform.position.x <= m_staticPos.x + m_uncertainty &&
                     transform.position.x >= m_staticPos.x - m_uncertainty &&
                     transform.position.z <= m_staticPos.z + m_uncertainty &&
                     transform.position.z >= m_staticPos.z - m_uncertainty) {
+                    
+                    Debug.Log("Is close enough to their point", this);
 
                     //m_isOnTheirSpot = true;
 
@@ -191,7 +202,7 @@ public class GuardBehavior : MonoBehaviour {
                     
                     //Debug.Log($"enemy rotation {Mathf.Abs(Mathf.Abs(m_staticRotation.eulerAngles.y) - Mathf.Abs(transform.rotation.eulerAngles.y))}   warning : {!m_warningVibe}   attack : {!m_attackVibe}", this);
 
-                    if (Mathf.Abs(Mathf.Abs(m_staticRotation.eulerAngles.y) - Mathf.Abs(transform.rotation.eulerAngles.y)) > 1f && (!m_warningVibe && !m_attackVibe)) {
+                    if (Mathf.Abs(Mathf.Abs(m_staticRotation.eulerAngles.y) - Mathf.Abs(transform.rotation.eulerAngles.y)) > 1f && (!m_isInBlindSpot && !m_attackVibe)) {
                         float angle = Mathf.Abs(m_staticRotation.eulerAngles.y) - Mathf.Abs(transform.rotation.eulerAngles.y);
                         //Debug.Log($"Angle   :  {angle}", this);
                         if (angle > 0) m_nma.transform.Rotate(Vector3.up, m_normalRotationSpeed * Time.deltaTime);
@@ -202,175 +213,188 @@ public class GuardBehavior : MonoBehaviour {
                 else{
                     if (m_animator != null) {
                         m_animator.SetBool(IsWalking, true);
-                    }}
+                    }
+                }
             }
         }
         
         
-        if (m_enterZone && !m_isKillingSomeone && !m_intimidationVibe && !(m_charactersInDangerScript[0].m_chara == Charas.Human && m_charactersInDangerScript[0].m_isForbiddenToMove)) {
+        if (m_enterZone && !m_isKillingSomeone && !m_intimidationVibe) {
             m_warningVibe = true;
             m_intimidationVibe = false;
             m_attackVibe = false;
 
             
-            // Vector3 targetDir = Vector3.zero;
-            // Vector3 raycastPos = new Vector3(transform.position.x, transform.position.y, transform.position.z);
-            // List<float> distance = new List<float>();
-            //
-            // foreach (PlayerController chara in m_charactersInDangerScript) {
-            //     RaycastHit hitChara;
-            //     targetDir = (chara.gameObject.transform.position - transform.position).normalized;
-            //     bool raycastHit = Physics.Raycast(raycastPos, targetDir, out hitChara, m_sphereRadius * 5);
-            //     float lengthVector = new Vector3(chara.transform.position.x - transform.position.x,chara.transform.position.y- transform.position.y,chara.transform.position.z-transform.position.z).magnitude;
-            //     
-            //     if(raycastHit) distance.Add(lengthVector);
-            //     //distance[0] = (m_charactersInDangerScript[0].transform.position - transform.position).magnitude;
-            //     //targetDir = (chara.gameObject.transform.position - transform.position).normalized;
-            // }
-            //
-            // if (distance[0] < distance[1]) {
-            //     Debug.Log("Le premier personnage est plus proche que le deuxième");
-            //     targetDir = m_charactersInDangerScript[0].transform.position - transform.position;
-            // }
-            // else {
-            //     Debug.Log("Le premier personnage est plus loin que le deuxième");
-            //     targetDir = m_charactersInDangerScript[1].transform.position - transform.position;
-            // }
+            Vector3 targetDir = Vector3.zero;
+            Vector3 raycastPos = transform.position;
+            List<DistanceToACharacter> distances = new List<DistanceToACharacter>();
             
+            for (int i = 0; i < m_charactersInDangerScript.Count; i++) {
+                PlayerController chara = m_charactersInDangerScript[i];
+                RaycastHit hitChara;
+                
+                targetDir = (chara.gameObject.transform.position - transform.position).normalized; //The direction of the chara depending on our current position
+                
+                //élévation de la position du raycast
+                Vector3 raycastPosition = new Vector3(transform.position.x, transform.position.y + m_offsetRay, transform.position.z);
+                
+                bool raycastHit = Physics.Raycast(raycastPos, targetDir, out hitChara, m_sphereRadius * 5);
+                Debug.DrawRay(raycastPosition, targetDir * hitChara.distance, Color.magenta, 10f); // For debug
+                
+                float lengthVector = (chara.transform.position - transform.position).magnitude; //The distance between the chara we're aiming at and the current ennemy
+                
+                if(raycastHit && hitChara.transform == chara.transform) distances.Add(new DistanceToACharacter(i, lengthVector));
+                //distance[0] = (m_charactersInDangerScript[0].transform.position - transform.position).magnitude;
+                //targetDir = (chara.gameObject.transform.position - transform.position).normalized;
+            }
             
-            Vector3 targetDir = (m_charactersInDangerScript[0].gameObject.transform.position - transform.position).normalized;
-            
-            float angleForward = Vector3.Angle(transform.forward, targetDir);
-            
-            //création de la variable du  raycast
-            RaycastHit hit;
-            
-            //élévation de la position du raycast
-            Vector3 raycastPosition = new Vector3(transform.position.x, transform.position.y + m_offsetRay, transform.position.z);
-            
-            //création physique du raycast
-            bool raycastHasHit = Physics.Raycast(raycastPosition, targetDir, out hit, m_sphereRadius * 5);
-            
-            
-            //Debug du raycast dans la scène
-            if (raycastHasHit)
-            {
-                Debug.DrawRay(raycastPosition, targetDir * hit.distance, Color.magenta, 10f);
+            if(distances.Count > 0){ //If we currently see any character
 
-                if (m_charactersInDangerScript[0].gameObject.transform.position != hit.transform.position) //le chara se trouve derrière un obstacle et n'est pas visible par l'ennemi
-                {
-                    //Debug.Log("Oulala on ne voit pas le character derrière");
-                    
-                    if (m_hasSeenPlayer) {
-                        m_nma.speed = m_attackSpeed;
-                        m_nma.acceleration = m_attackAcceleration;
-                        m_nma.angularSpeed = m_attackRotationSpeed;
-                    }
-                    else {
-                        m_nma.speed = m_normalSpeed;
-                        m_nma.acceleration = m_normalAcceleration;
-                        m_nma.angularSpeed = m_normalRotationSpeed;
+                PlayerController aimChara = null;
+
+                if (distances.Count == 1) aimChara = m_charactersInDangerScript[distances[0].index]; // if we have only one player in sight, we focus it instantly
+                else { //If we have multiple chars in sight, we want to know who is the nearest in order to focus it
+                    for (int i = 0; i < distances.Count - 1; i++) {
+                        if (distances[i].distance < distances[i + 1].distance) { // if the current index is nearer than the net one, we swap them in order to have the nearest distance in the last index
+                            DistanceToACharacter temp = distances[i];
+                            distances[i] = distances[i + 1];
+                            distances[i + 1] = temp;
+                        }
                     }
                     
+                    // At this point, we are sure that the last index of distances is the closest one
+                    aimChara = m_charactersInDangerScript[distances[distances.Count - 1].index];
                 }
-                else //le chara est visible par l'ennemi
-                {
-                    if(!m_detectionSound.isPlaying && m_detectionSound != null) m_detectionSound.PlayOneShot(m_detectionSound.clip); //Son de repérage d'un character
+            
+                float angleForward = Vector3.Angle(transform.forward, (aimChara.gameObject.transform.position - transform.position).normalized);
+
+                if(!m_detectionSound.isPlaying && m_detectionSound != null) m_detectionSound.PlayOneShot(m_detectionSound.clip); //Son de repérage d'un character
+                
+                //Si le joueur est dans l'angle mort de l'ennemi
+                if (Mathf.Abs(angleForward) > m_angleUncertainty) {
                     
-                    //Si le joueur est dans l'angle mort de l'ennemi
-                    if (Mathf.Abs(angleForward) > m_angleUncertainty)
+                    m_isInBlindSpot = true;
+                    m_warningVibe = true;
+                    m_intimidationVibe = false;
+                    m_attackVibe = false;
+                    
+                    if (m_hasSeenPlayer)
                     {
-                        m_warningVibe = true;
-                        m_intimidationVibe = false;
-                        m_attackVibe = false;
-                        
-                        if (m_hasSeenPlayer)
-                        {
-                            m_nma.speed = m_attackSpeed;
-                            m_nma.acceleration = m_attackAcceleration;
-                            m_nma.angularSpeed = m_attackRotationSpeed;
-                        }
-                        else m_nma.speed = 0f;
-
-                        //sens de rotation en fonction de la position du joueur qui est dans la zone mais pas encore repéré
-                        float angleRight = Vector3.Angle(transform.right, targetDir);
-                        if (Mathf.Abs(angleRight) < 90) m_nma.transform.Rotate(Vector3.up, m_normalRotationSpeed * Time.deltaTime);
-                        else if (Mathf.Abs(angleRight) > 90) m_nma.transform.Rotate(Vector3.up, -m_normalRotationSpeed * Time.deltaTime);
-
-                    }
-                    //si le joueur est visible par l'ennemi
-                    else if (angleForward <= m_angleUncertainty) {
-                        
-                        if(!m_pursuitSound.isPlaying && m_pursuitSound != null) m_pursuitSound.PlayOneShot(m_pursuitSound.clip);  //Son de poursuite de character
-
-                        //if(m_isStatic)m_isOnTheirSpot = false;
-                        m_warningVibe = false;
-                        m_intimidationVibe = false;
-                        m_attackVibe = true;
-
-                        m_hasSeenPlayer = true;
-                        CheckOutSomewhere(m_charactersInDangerScript[0].gameObject.transform.position);
                         m_nma.speed = m_attackSpeed;
                         m_nma.acceleration = m_attackAcceleration;
                         m_nma.angularSpeed = m_attackRotationSpeed;
-
-                        //mort du joueur dès qu'il est assez proche
-                        if (Vector3.Distance(m_charactersInDangerScript[0].transform.position, transform.position) < m_deathPos && !m_isKillingSomeone)
-                        {
-                            //Debug.Log($"J'AI TROUVE UNE VICTIME      :      {m_isKillingSomeone}");
-                            if(!m_attackSound.isPlaying && m_attackSound != null) m_attackSound.PlayOneShot(m_attackSound.clip);   //Son d'attaque du monstre
-                            if(!m_breathSound.isPlaying && m_breathSound != null) m_breathSound.PlayOneShot(m_breathSound.clip);   //Son de respiration du monstre
-                            StartCoroutine(DeathCoroutine());
-                        }
                     }
+                    else m_nma.speed = 0f;
+
+                    //sens de rotation en fonction de la position du joueur qui est dans la zone mais pas encore repéré
+                    float angleRight = Vector3.Angle(transform.right, targetDir);
+                    if (Mathf.Abs(angleRight) < 90) m_nma.transform.Rotate(Vector3.up, m_normalRotationSpeed * Time.deltaTime);
+                    else if (Mathf.Abs(angleRight) > 90) m_nma.transform.Rotate(Vector3.up, -m_normalRotationSpeed * Time.deltaTime);
+
+                }
+                //si le joueur est visible par l'ennemi
+                else if (angleForward <= m_angleUncertainty) {
+                    
+                    if(!m_pursuitSound.isPlaying && m_pursuitSound != null) m_pursuitSound.PlayOneShot(m_pursuitSound.clip);  //Son de poursuite de character
+
+                    //if(m_isStatic)m_isOnTheirSpot = false;
+                    m_isInBlindSpot = false;
+                    m_warningVibe = false;
+                    m_intimidationVibe = false;
+                    m_attackVibe = true;
+
+                    m_hasSeenPlayer = true;
+                    CheckOutSomewhere(aimChara.gameObject.transform.position);
+                    m_nma.speed = m_attackSpeed;
+                    m_nma.acceleration = m_attackAcceleration;
+                    m_nma.angularSpeed = m_attackRotationSpeed;
+
+                    //mort du joueur dès qu'il est assez proche
+                    if (Vector3.Distance(aimChara.transform.position, transform.position) < m_deathPos && !m_isKillingSomeone)
+                    {
+                        //Debug.Log($"J'AI TROUVE UNE VICTIME      :      {m_isKillingSomeone}");
+                        if(!m_attackSound.isPlaying && m_attackSound != null) m_attackSound.PlayOneShot(m_attackSound.clip);   //Son d'attaque du monstre
+                        if(!m_breathSound.isPlaying && m_breathSound != null) m_breathSound.PlayOneShot(m_breathSound.clip);   //Son de respiration du monstre
+                        StartCoroutine(DeathCoroutine());
+                    }
+                    
+                }
+                
+            }
+            else { //If there's someone in the zone but we can't see them
+                
+                m_isInBlindSpot = false;
+
+                if (m_isGoingTowardsPlayer && (transform.position.x <= m_nma.destination.x + m_uncertainty &&
+                                               transform.position.x >= m_nma.destination.x - m_uncertainty &&
+                                               transform.position.z <= m_nma.destination.z + m_uncertainty &&
+                                               transform.position.z >= m_nma.destination.z - m_uncertainty)) {
+                    //If we're close enough to where we were going (the position where we last saw the player we're running after)
+
+                    m_isGoingTowardsPlayer = false;
+                    m_hasSeenPlayer = false;
+                    
+                    if (m_isStatic) {
+                        m_nma.SetDestination(m_staticPos);
+                    }
+                    else if (!m_isStatic) {
+                        m_destinations.Remove(m_destinations[m_currentDestination]);
+                        m_nma.SetDestination(m_destinations[m_currentDestination]);
+                    } 
+                }
+
+                //If we're no longer running after someone, we just go back to walking
+                if (!m_isGoingTowardsPlayer) {
+                    m_nma.speed = m_normalSpeed;
+                    m_nma.acceleration = m_normalAcceleration;
+                    m_nma.angularSpeed = m_normalRotationSpeed;
+                    if(m_animator != null)m_animator.SetBool(IsChasing, false);
                 }
             }
-            else {
-                
-                //if he was off his initial path we simply put him back on
-                if (m_isGoingTowardsPlayer && !m_isStatic) {
-                    m_isGoingTowardsPlayer = false;
-                    m_destinations.Remove(m_destinations[m_currentDestination]);
-                    m_nma.SetDestination(m_destinations[m_currentDestination]);
-                }
-                
-                //Debug.LogWarning("The raycast hit nothing nowhere");
-                
-                //if he was off his initial path we simply put him back on
-                if (m_isGoingTowardsPlayer && m_isStatic) {
-                    m_isGoingTowardsPlayer = false;
-                    m_nma.SetDestination(m_staticPos);
-                }
-            }
-            
                 
             //INTIMIDATION DU MONSTRE
             bool selectorValidation = false;
             if(!m_charactersInDangerScript[0].m_cycle) selectorValidation = Input.GetKeyDown(m_charactersInDangerScript[0].m_selector.inputMonster);
             else if(m_charactersInDangerScript[0].m_cycle) selectorValidation = Rumbler.Instance.m_gamepad.buttonSouth.wasPressedThisFrame;
+
+            bool isMonsterInZone = false; // We just check if the monster is in our zone
+            for (int i = 0; i < m_charactersInDangerScript.Count; i++) {
+                if (m_charactersInDangerScript[i].m_chara == Charas.Monster) {
+                    isMonsterInZone = true;
+                    i = m_charactersInDangerScript.Count;
+                }
+            }
             
-            if (selectorValidation && m_charactersInDangerScript[0].m_chara == Charas.Monster) // TODO monster in any index
+            if (selectorValidation && isMonsterInZone) // If the monster is in our zone and the corresponding input is pressed, we intimidate this monster
             {
                 m_warningVibe = false;
                 m_intimidationVibe = true;
                 m_attackVibe = false;
                 if (m_intimidationCor == null) StartCoroutine(Intimidate());
             }
-
-
+        
+        
         }
         
         if(!m_enterZone) {
+
+            m_hasSeenPlayer = false;
+            m_isInBlindSpot = false;
             m_warningVibe = false;
             m_intimidationVibe = false;
             m_attackVibe = false;
+
+            //We reset our speeds if there's no player near us
+            m_nma.speed = m_normalSpeed;
+            m_nma.acceleration = m_normalAcceleration;
+            m_nma.angularSpeed = m_normalRotationSpeed;
+            
             
             //if he was off his initial path we simply put him back on
             if (m_isGoingTowardsPlayer && m_isStatic) {
                 m_isGoingTowardsPlayer = false;
                 m_nma.SetDestination(m_staticPos);
             }
-            
             
             //if he was off his initial path we simply put him back on
             if (m_isGoingTowardsPlayer && !m_isStatic) {
