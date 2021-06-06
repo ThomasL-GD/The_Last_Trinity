@@ -1,16 +1,6 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
-using UnityEngine.EventSystems;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Cinemachine;
-using UnityEngine.AI;
-using UnityEngine.EventSystems;
 
 /// <summary>
 /// Script du mouvement du player controller

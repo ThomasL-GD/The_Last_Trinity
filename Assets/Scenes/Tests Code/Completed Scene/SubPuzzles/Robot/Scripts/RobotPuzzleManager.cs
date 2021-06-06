@@ -1,12 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
-using TMPro;
 using UnityEngine;
 using Random = UnityEngine.Random;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.DualShock;
 
 public class RobotPuzzleManager : MonoBehaviour {
 

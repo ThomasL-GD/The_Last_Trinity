@@ -1,7 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
 /// <summary>
 /// This enum that can stocks directions, as it is a bitmask enum, it can stock multiples directions at once

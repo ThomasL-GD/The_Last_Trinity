@@ -1,11 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using System.Linq;
-using UnityEngine.InputSystem.Controls;
-using UnityEngine.InputSystem.DualShock;
-using UnityEngine.InputSystem.HID;
 
 [CreateAssetMenu(fileName = "InputMultiChara", menuName = "Inputs/InputMultiChara", order = 1)]
 public class SOInputMultiChara : ScriptableObject {

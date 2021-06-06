@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.DualShock;
 
 [RequireComponent(typeof(SphereCollider))]
 public class GuardBehavior : MonoBehaviour {
@@ -77,17 +72,17 @@ public class GuardBehavior : MonoBehaviour {
     [SerializeField] [Tooltip("valeur de la vibration forte lorsque le character monstre utilise sa compétence")] [Range(0f,1f)] private float m_highMonsterIntimidation =0.5f;
     [SerializeField] [Tooltip("valeur de la vibration forte lorsque le character monstre utilise sa compétence")] [Range(0f,10f)] private float m_rumbleDuration =0.5f;
     
-    [SerializeField] [Tooltip("For Debug Only")] bool m_warningVibe = false; //présence d'un character dans la zone de l'ennemi
-    [SerializeField] [Tooltip("For Debug Only")] bool m_intimidationVibe = false;   //utilisation de la compétence du monstre dans la zone de l'ennemi
-    [SerializeField] [Tooltip("For Debug Only")] bool m_attackVibe = false;   //attack de l'ennemi sur un character
+    /*[SerializeField] [Tooltip("For Debug Only")]*/ bool m_warningVibe = false; //présence d'un character dans la zone de l'ennemi
+    /*[SerializeField] [Tooltip("For Debug Only")]*/ bool m_intimidationVibe = false;   //utilisation de la compétence du monstre dans la zone de l'ennemi
+    /*[SerializeField] [Tooltip("For Debug Only")]*/ bool m_attackVibe = false;   //attack de l'ennemi sur un character
 
 
-    [SerializeField] [Tooltip("For Debug Only")] private bool m_enterZone = false;
+    /*[SerializeField] [Tooltip("For Debug Only")]*/ private bool m_enterZone = false;
     private bool m_hasSeenPlayer = false;
     private bool m_isInBlindSpot = false;
     private bool m_isGoingTowardsPlayer = false;
     public static bool m_isKillingSomeone = false;  //tous les script de l'ennemi possèdent la même valeur de la variable au même moment
-    [SerializeField] [Tooltip("For Debug Only")] private List<PlayerController> m_charactersInDangerScript = new List<PlayerController>(); //Liste des scripts sur les character qui entrent et sortent de la zone de l'ennemi
+    /*[SerializeField] [Tooltip("For Debug Only")]*/ private List<PlayerController> m_charactersInDangerScript = new List<PlayerController>(); //Liste des scripts sur les character qui entrent et sortent de la zone de l'ennemi
 
     private static readonly int IsStun = Animator.StringToHash("IsStun");
     private static readonly int IsChasing = Animator.StringToHash("IsChasing");
@@ -311,7 +306,7 @@ public class GuardBehavior : MonoBehaviour {
                         //Debug.Log($"J'AI TROUVE UNE VICTIME      :      {m_isKillingSomeone}");
                         if(!m_attackSound.isPlaying && m_attackSound != null) m_attackSound.PlayOneShot(m_attackSound.clip);   //Son d'attaque du monstre
                         if(!m_breathSound.isPlaying && m_breathSound != null) m_breathSound.PlayOneShot(m_breathSound.clip);   //Son de respiration du monstre
-                        StartCoroutine(DeathCoroutine());
+                        StartCoroutine(DeathCoroutine(aimChara));
                     }
                     
                 }
@@ -483,13 +478,12 @@ public class GuardBehavior : MonoBehaviour {
         }
     }
     
-    IEnumerator DeathCoroutine()
+    IEnumerator DeathCoroutine(PlayerController p_target)
     {
         m_isKillingSomeone = true;
         m_animator.SetTrigger(Attack);
-        PlayerController scriptCharaWhoIsDying = m_charactersInDangerScript[0];
         m_nma.isStopped = true;
-        scriptCharaWhoIsDying.m_isForbiddenToMove = true;
+        p_target.m_isForbiddenToMove = true;
         yield return new WaitForSeconds(m_deathTime); //temps d'animation de mort du monstre
         
         m_hitFX.GetComponent<ParticleSystem>().Play();
@@ -497,7 +491,7 @@ public class GuardBehavior : MonoBehaviour {
         if(m_animator != null)m_animator.SetBool(IsChasing, false);
         if(m_animator != null)m_animator.SetBool(IsWalking, false);
 
-        scriptCharaWhoIsDying.Death();  //mort   // We will reset m_isForbiddenToMove and m_isKillingSomeone in there
+        p_target.Death();  //mort   // We will reset m_isForbiddenToMove and m_isKillingSomeone in there
     }
     
     

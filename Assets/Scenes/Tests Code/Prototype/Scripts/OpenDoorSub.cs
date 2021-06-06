@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace Scenes.Tests_Code.Prototype.Scripts

@@ -1,14 +1,6 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel.Design.Serialization;
-using System.Net.NetworkInformation;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
-using UnityEngine.InputSystem;
-using System.Linq;
-using UnityEngine.InputSystem.DualShock;
 using UnityEngine.UI;
 
 public class MonsterPuzzle : MonoBehaviour
@@ -41,10 +33,7 @@ public class MonsterPuzzle : MonoBehaviour
     [SerializeField] [Tooltip("Offset des bords de la pierre\nUnit : percentage (between 0 and 1)")] [Range(0f, 0.5f)] private float m_offsetBorders = 0.1f;
     [SerializeField] [Tooltip("The gameObject in which things will be created\nMost likely a empty child")] private GameObject m_parent = null;
 
-    //La position de la première case
-    private Vector3 m_initialPos = Vector3.zero;
-    //transform du sélecteur
-    private Transform m_selectorTransform = null;
+    
     //Coordonnées du sélecteur
     private int m_selectorX = 0;
     private int m_selectorY = 0;
@@ -151,9 +140,6 @@ public class MonsterPuzzle : MonoBehaviour
                 //enlèvement du prefab instancié des prefab du stock pour ne pas avoir de pièces en double
                 m_potentialPieces.Add(m_prefabStock[x,y]);
                 m_stockPieces.RemoveAt(random);
-
-                //récupération de la position de la première prefab instanciée
-                if (x == 0 && y == 0) m_initialPos = transform.position;
             }
             
         }

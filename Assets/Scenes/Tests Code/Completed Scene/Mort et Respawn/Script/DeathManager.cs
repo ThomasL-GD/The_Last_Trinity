@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -9,9 +6,7 @@ public class DeathManager : MonoBehaviour {
 
     [SerializeField] [Tooltip("The canvas of the scene, if null, will use a find instead\n(and that's bad coz not opti)")] private GameObject m_canvas = null;
     private Image m_image = null;
-    private bool m_isFading = false;
     private float m_targetOpacity = 1f;
-    private float m_oldOpacity = 0f;
     private float m_fadeTime = 4f;
     
     public delegate void Death();

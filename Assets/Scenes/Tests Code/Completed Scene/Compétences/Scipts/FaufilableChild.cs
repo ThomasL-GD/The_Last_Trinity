@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class FaufilableChild : MonoBehaviour {
@@ -11,11 +8,6 @@ public class FaufilableChild : MonoBehaviour {
     void Start() {
         m_parentScript = GetComponentInParent<Faufilable>();
         if(m_parentScript == null) Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT THIS SCRIPT IN A GAMEOBJECT CHILD OF A FAUFILABLE OBJECT !");
-    }
-
-    // Update is called once per frame
-    void Update() {
-        
     }
 
     /// <summary>
