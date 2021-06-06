@@ -301,7 +301,7 @@ public class GuardBehavior : MonoBehaviour {
                     m_nma.angularSpeed = m_attackRotationSpeed;
 
                     //mort du joueur dès qu'il est assez proche
-                    if (Vector3.Distance(aimChara.transform.position, transform.position) < m_deathPos && !m_isKillingSomeone)
+                    if (Vector3.Distance(aimChara.transform.position, transform.position) < m_deathPos && !m_isKillingSomeone && !m_intimidationVibe)
                     {
                         //Debug.Log($"J'AI TROUVE UNE VICTIME      :      {m_isKillingSomeone}");
                         if(!m_attackSound.isPlaying && m_attackSound != null) m_attackSound.PlayOneShot(m_attackSound.clip);   //Son d'attaque du monstre
