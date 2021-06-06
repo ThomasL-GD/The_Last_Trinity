@@ -280,7 +280,7 @@ public class MonsterPuzzle : MonoBehaviour
                     //PIECE PAS ENCORE TROUVEE ET CORRECTE
                     if (!isAlreadyFound)    
                     {
-                        if(!m_goodSound.isPlaying && m_goodSound != null) m_goodSound.PlayOneShot(m_goodSound.clip);
+                        if(/*!m_goodSound.isPlaying && */m_goodSound != null) m_goodSound.PlayOneShot(m_goodSound.clip);
                         
                         m_foundPieces.Add(m_correctPieces[i]); //ajout d'une pièce correcte à pièce trouvé
                         m_findPiece++; //incrémentation des bonnes pièces trouvées
