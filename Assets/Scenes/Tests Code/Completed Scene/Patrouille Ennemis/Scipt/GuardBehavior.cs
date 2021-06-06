@@ -159,7 +159,6 @@ public class GuardBehavior : MonoBehaviour {
     void Update() {
 
         if (!m_isKillingSomeone) {
-            Debug.Log("Is not klling someone", this);
             if(!m_isStatic){
                 if (m_animator != null) {
                     m_animator.SetBool(IsWalking, true);
@@ -186,15 +185,12 @@ public class GuardBehavior : MonoBehaviour {
                 }
             }
             else if (m_isStatic) {
-                Debug.Log("Is static", this);
                 
                 //If the guard is close enough to the point he was trying to reach
                 if (transform.position.x <= m_staticPos.x + m_uncertainty &&
                     transform.position.x >= m_staticPos.x - m_uncertainty &&
                     transform.position.z <= m_staticPos.z + m_uncertainty &&
                     transform.position.z >= m_staticPos.z - m_uncertainty) {
-                    
-                    Debug.Log("Is close enough to their point", this);
 
                     //m_isOnTheirSpot = true;
 
@@ -542,7 +538,6 @@ public class GuardBehavior : MonoBehaviour {
             if(!isAlreadyInList) m_charactersInDangerScript.Add(charaScript);
             
             m_enterZone = true;
-            Debug.Log("OnTriggerExit", this);
         }
     }
     
