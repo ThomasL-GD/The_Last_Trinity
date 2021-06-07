@@ -14,17 +14,19 @@ public class Start_Manager : MonoBehaviour {
         public Transform nouvellePartie = null;
         public Transform options = null;
         public Transform quitter = null;
+        public Transform etpaFrancais = null;
         public Transform continueGame = null;
         public Transform newGame = null;
         public Transform settings = null;
         public Transform quit = null;
+        public Transform etpaEnglish = null;
 
         [HideInInspector] public Transform[] frenchMenu = null;
         [HideInInspector] public Transform[] englishMenu = null;
         [HideInInspector] public Transform[] allMenus = null;
 
         public void BuildArrays() {
-            allMenus = new Transform[8] {continuer, nouvellePartie, options, quitter, continueGame, newGame, settings, quit};
+            allMenus = new Transform[10] {continuer, nouvellePartie, options, quitter, etpaFrancais, continueGame, newGame, settings, quit, etpaEnglish};
         }
     }
     
@@ -126,11 +128,12 @@ public class Start_Manager : MonoBehaviour {
         
         m_mainMenu.SetActive(false);
         m_languagesMenu.BuildArrays();
-        foreach (Transform trans in m_languagesMenu.allMenus) {
-            trans.gameObject.SetActive(false);
-            trans.gameObject.GetComponent<Image>().color = new Color(0, 0, 0, 0);
+        for (int i = 0; i < m_languagesMenu.allMenus.Length; i++) {
+            m_languagesMenu.allMenus[i].gameObject.SetActive(false);
+            if(i == 4 || i == m_languagesMenu.allMenus.Length-1)m_languagesMenu.allMenus[i].gameObject.GetComponent<Image>().color = new Color(0.4f, 0.4f, 0.4f, 1f); //The etpa logo shall be visible
+            else m_languagesMenu.allMenus[i].gameObject.GetComponent<Image>().color = new Color(0, 0, 0, 0);
         }
-        m_languagesMenu.allMenus[4].gameObject.GetComponent<Image>().color = Color.white;
+        m_languagesMenu.allMenus[5].gameObject.GetComponent<Image>().color = Color.white;
 
         ////////// BOUTON D'ACCES AU MENU PRINCIPAL ////////////
         m_pressStartText = m_pressStartButton.GetComponentInChildren<TextMeshProUGUI>();  //Récupération de la couleur du text du bouton de lancement
@@ -207,9 +210,12 @@ public class Start_Manager : MonoBehaviour {
         if (m_englishMenuIsActive || m_frenchMenuIsActive) {
             if (left || right || up || down) {
                 int shift = 0;
-                if (m_englishMenuIsActive) shift = 4;
+                if (m_englishMenuIsActive) shift = 5;
                 
-                m_languagesMenu.allMenus[m_selectorIndex + shift].GetComponent<Image>().color = new Color(0, 0, 0, 0);
+                if(m_selectorIndex == 4)m_languagesMenu.allMenus[m_selectorIndex + shift].GetComponent<Image>().color = new Color(0.4f, 0.4f, 0.4f, 1f); //If we're on the etpa Logo
+                else {
+                    m_languagesMenu.allMenus[m_selectorIndex + shift].GetComponent<Image>().color = new Color(0, 0, 0, 0);
+                }
                 
                 //déplacement du sélecteur avec le joystick gauche
                 if (up && m_selectorIndex > 0) //Déplacement sur le bouton au-dessus de celui actuellement
@@ -217,7 +223,7 @@ public class Start_Manager : MonoBehaviour {
                     m_selectorIndex--;
                     m_hasMoved = true;
                 }
-                else if (down && m_selectorIndex < 3) //Déplacement sur le bouton en-dessous de celui actuellement
+                else if (down && m_selectorIndex < 4) //Déplacement sur le bouton en-dessous de celui actuellement
                 {
                     m_selectorIndex++;
                     m_hasMoved = true;
@@ -257,7 +263,7 @@ public class Start_Manager : MonoBehaviour {
                             m_frenchMenuIsActive = true;
                             for (int i = 0; i < m_languagesMenu.allMenus.Length; i++) {
 
-                                if (i < 4) {
+                                if (i < 5) {
                                     m_languagesMenu.allMenus[i].gameObject.SetActive(true);
                                     if(i == m_selectorIndex)m_languagesMenu.allMenus[i].gameObject.GetComponent<Image>().color = Color.white;
                                 }
@@ -273,9 +279,9 @@ public class Start_Manager : MonoBehaviour {
                             m_englishMenuIsActive = true;
                             for (int i = 0; i < m_languagesMenu.allMenus.Length; i++) {
 
-                                if (i > 3) {
+                                if (i > 4) {
                                     m_languagesMenu.allMenus[i].gameObject.SetActive(true);
-                                    if(i == m_selectorIndex)m_languagesMenu.allMenus[i+4].gameObject.GetComponent<Image>().color = Color.white;
+                                    if(i == m_selectorIndex)m_languagesMenu.allMenus[i+5].gameObject.GetComponent<Image>().color = Color.white;
                                 }
                                 else {
                                     m_languagesMenu.allMenus[i].gameObject.SetActive(false);
@@ -286,6 +292,9 @@ public class Start_Manager : MonoBehaviour {
                         break;
                     case 3:
                         Application.Quit();
+                        break;
+                    case 4:
+                        Application.OpenURL("https://www.etpa.com/");
                         break;
                     default: 
                         Debug.LogError("AAAAAAAAAAAAAAHHHHHHHHH   (contact niels if this error occurs)"); 
@@ -329,8 +338,8 @@ public class Start_Manager : MonoBehaviour {
                 
                 m_mainMenu.SetActive(true);
                 m_englishMenuIsActive = true;
-                for (int i = 4; i < m_languagesMenu.allMenus.Length; i++) {
-                    //We active the indexes from 4 to 7
+                for (int i = 5; i < m_languagesMenu.allMenus.Length; i++) {
+                    //We active the indexes from 5 to 9
                     m_languagesMenu.allMenus[i].gameObject.SetActive(true);
                 }
                 m_pressStartButton.gameObject.SetActive(false);
