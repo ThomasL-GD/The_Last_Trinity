@@ -7,7 +7,7 @@ public class EndLevelZone : MonoBehaviour {
     [SerializeField] [Tooltip("If on, at the end of the level, the game will reboot to the main menu\nUSE IT WITH FREAKING PRECAUTIONS")] private bool m_isLastLevel = false;
     [SerializeField] [Tooltip("The chara who ill trigger the end of the level\nMost likely to be the human for every non-special level")] private Charas m_charaNeeded = Charas.Human;
     [SerializeField] [Tooltip("The time taken by the fade in black to occur\nUnit : seconds")] [Range(0.5f, 10f)] private float m_fadeTime = 4f;
-    private bool m_levelIsCompleted = false;
+    private static bool m_levelIsCompleted = false;
     private static bool s_isEndingLevel = false;
 
     [Header("Audio")] 
