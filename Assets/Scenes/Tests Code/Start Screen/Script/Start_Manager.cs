@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -5,16 +6,34 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class Start_Manager : MonoBehaviour {
+
+    [Serializable] public class Menu {
+        public Transform continuer = null;
+        public Transform nouvellePartie = null;
+        public Transform options = null;
+        public Transform quitter = null;
+        public Transform continueGame = null;
+        public Transform newGame = null;
+        public Transform settings = null;
+        public Transform quit = null;
+
+        [HideInInspector] public Transform[] frenchMenu = null;
+        [HideInInspector] public Transform[] englishMenu = null;
+        [HideInInspector] public Transform[] allMenus = null;
+
+        public void BuildArrays() {
+            allMenus = new Transform[8] {continuer, nouvellePartie, options, quitter, continueGame, newGame, settings, quit};
+        }
+    }
+    
     
     [Header("Canvas")] 
     [Tooltip("image de Titre")] public Image m_title;
     [SerializeField] [Tooltip("Bouton de démarrage")] private Button m_pressStartButton =null;
     [SerializeField] [Tooltip("texte de démarrage")] private TextMeshProUGUI m_pressStartText=null;
     [SerializeField] [Tooltip("Menu Principal")] private GameObject m_mainMenu=null;
-    [SerializeField] [Tooltip("Liste des positions sur lesquelles on va se déplacer ")] private List<Transform> m_test = new List<Transform>();
+    [SerializeField] [Tooltip("Liste des positions sur lesquelles on va se déplacer ")] private Menu m_languagesMenu = new Menu();
     
-    [Header("Menu Selector")] 
-    [SerializeField] [Tooltip("Selecteur du menu")] private GameObject m_menuSelector;
     private int m_sceneIndex = 0;
     
     [Header("Animations")]
@@ -64,14 +83,20 @@ public class Start_Manager : MonoBehaviour {
             case 0 :
             case 1 :
                 m_fisrtSetup.SetActive(true);
+                m_secondSetup.SetActive(false);
+                m_thirdSetup.SetActive(false);
                 break;
             
             case 2 :
             case 3:
+                m_fisrtSetup.SetActive(false);
                 m_secondSetup.SetActive(true);
+                m_thirdSetup.SetActive(false);
                 break;
             
             case 4:
+                m_fisrtSetup.SetActive(false);
+                m_secondSetup.SetActive(false);
                 m_thirdSetup.SetActive(true);
                 break;
         }
@@ -80,9 +105,14 @@ public class Start_Manager : MonoBehaviour {
         if (m_pressStartButton == null) Debug.LogError("OUPS ! U FORGOT TO PUT THE START BUTTON ON THE START MANAGER OBJECT");
         if (m_pressStartText == null) Debug.LogError("OUPS ! U FORGOT TO PUT THE TEXT OF THE PRESS START BUTTON ON THE START MANAGER OBJECT");
         if (m_mainMenu == null) Debug.LogError("OUPS ! U FORGOT TO PUT THE MAIN MENU ON THE START MANAGER OBJECT");
-        if (m_menuSelector == null) Debug.LogError("OUPS ! U FORGOT TO PUT THE SELECTOR MENU ON THE START MANAGER OBJECT");
         
         m_mainMenu.SetActive(false);
+        m_languagesMenu.BuildArrays();
+        foreach (Transform trans in m_languagesMenu.allMenus) {
+            trans.gameObject.SetActive(false);
+            trans.gameObject.GetComponent<Image>().color = new Color(0, 0, 0, 0);
+        }
+        m_languagesMenu.allMenus[4].gameObject.GetComponent<Image>().color = Color.white;
 
         ////////// BOUTON D'ACCES AU MENU PRINCIPAL ////////////
         m_pressStartText = m_pressStartButton.GetComponentInChildren<TextMeshProUGUI>();  //Récupération de la couleur du text du bouton de lancement
@@ -146,21 +176,26 @@ public class Start_Manager : MonoBehaviour {
         
         //DEPLACEMENT DU CURSEUR si le menu adequat est actif
         if (m_englishMenuIsActive || m_frenchMenuIsActive) {
-            if (left || right || up || down)
-            {
+            if (left || right || up || down) {
+                int shift = 0;
+                if (m_englishMenuIsActive) shift = 4;
+                
+                m_languagesMenu.allMenus[m_selectorIndex + shift].GetComponent<Image>().color = new Color(0, 0, 0, 0);
+                
                 //déplacement du sélecteur avec le joystick gauche
                 if (up && m_selectorIndex > 0) //Déplacement sur le bouton au-dessus de celui actuellement
                 {
                     m_selectorIndex--;
-                    m_menuSelector.transform.position = m_test[m_selectorIndex].transform.position;
                     m_hasMoved = true;
                 }
                 else if (down && m_selectorIndex < 3) //Déplacement sur le bouton en-dessous de celui actuellement
                 {
                     m_selectorIndex++;
-                    m_menuSelector.transform.position = m_test[m_selectorIndex].transform.position;
                     m_hasMoved = true;
                 }
+
+                m_languagesMenu.allMenus[m_selectorIndex + shift].GetComponent<Image>().color = Color.white;
+                
             }
 
             //RESET POUR DEPLACEMENT PAR A COUPS
@@ -187,26 +222,36 @@ public class Start_Manager : MonoBehaviour {
                         m_sceneIndex = nextScene;
                         break;
                     case 2: //Language
-                        if (m_englishMenuIsActive)
-                        {
+                        if (m_englishMenuIsActive) {
                             Debug.Log("Vers le francais");
                             m_englishMenuIsActive = false;
                             m_frenchMenuIsActive = true;
-                            for (int i = 4; i < m_test.Count; i++)
-                            {
-                                if(i>3) m_test[i].gameObject.SetActive(true);
-                                else m_test[i].gameObject.SetActive(false);
+                            for (int i = 0; i < m_languagesMenu.allMenus.Length; i++) {
+
+                                if (i < 4) {
+                                    m_languagesMenu.allMenus[i].gameObject.SetActive(true);
+                                    if(i == m_selectorIndex)m_languagesMenu.allMenus[i].gameObject.GetComponent<Image>().color = Color.white;
+                                }
+                                else {
+                                    m_languagesMenu.allMenus[i].gameObject.SetActive(false);
+                                    if(i == m_selectorIndex)m_languagesMenu.allMenus[i].gameObject.GetComponent<Image>().color = new Color(0,0,0,0);
+                                }
                             }
                         }
-                        else if (m_frenchMenuIsActive)
-                        {
+                        else if (m_frenchMenuIsActive) {
                             Debug.Log("Vers l'anglais");
                             m_frenchMenuIsActive = false;
                             m_englishMenuIsActive = true;
-                            for (int i = 4; i < m_test.Count; i++)
-                            {
-                                if(i<4) m_test[i].gameObject.SetActive(true);
-                                else m_test[i].gameObject.SetActive(false);
+                            for (int i = 0; i < m_languagesMenu.allMenus.Length; i++) {
+
+                                if (i > 3) {
+                                    m_languagesMenu.allMenus[i].gameObject.SetActive(true);
+                                    if(i == m_selectorIndex)m_languagesMenu.allMenus[i+4].gameObject.GetComponent<Image>().color = Color.white;
+                                }
+                                else {
+                                    m_languagesMenu.allMenus[i].gameObject.SetActive(false);
+                                    if(i == m_selectorIndex)m_languagesMenu.allMenus[i].gameObject.GetComponent<Image>().color = new Color(0,0,0,0);
+                                }
                             }
                         }
                         break;
@@ -253,12 +298,11 @@ public class Start_Manager : MonoBehaviour {
             if ((Input.GetKeyDown(KeyCode.JoystickButton9) || Input.GetKeyDown(KeyCode.JoystickButton1)) && m_timer >= m_opacityDuration)
             {
                 
-                //m_englishMainMenu.SetActive(true);
                 m_mainMenu.SetActive(true);
                 m_englishMenuIsActive = true;
-                for (int i = 4; i < m_test.Count; i++)
-                {
-                    m_test[i].gameObject.SetActive(false);
+                for (int i = 4; i < m_languagesMenu.allMenus.Length; i++) {
+                    //We active the indexes from 4 to 7
+                    m_languagesMenu.allMenus[i].gameObject.SetActive(true);
                 }
                 m_pressStartButton.gameObject.SetActive(false);
                 
