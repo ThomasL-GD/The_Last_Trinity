@@ -41,14 +41,16 @@ public class EndLevelZone : MonoBehaviour {
         Debug.Log("Less goooooooooo DaBaby");
         DeathManager.OnBlackScreen -= NextLevel;
         int sceneID = 0;
-        if(!m_isLastLevel)sceneID = SceneManager.GetActiveScene().buildIndex + 1;
+        if (!m_isLastLevel) {
+            sceneID = SceneManager.GetActiveScene().buildIndex + 1;
+            PlayerPrefs.SetInt("Level", sceneID);
+        }
         else {
             PlayerPrefs.SetInt("Level", SceneManager.GetActiveScene().buildIndex + 1);
             sceneID = 0;
         }
         
         //We save the current progress of the player
-        if(!m_isLastLevel)PlayerPrefs.SetInt("Level", sceneID);
         PlayerPrefs.Save();
         
         SceneManager.LoadScene(sceneID);
