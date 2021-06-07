@@ -20,6 +20,7 @@ public class CreditsPage : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.JoystickButton1) || Input.GetKeyDown(KeyCode.JoystickButton9)) {
 
+            DeathManager.Instance.DeathFade(false, 1f);
             DeathManager.OnBlackScreen = null;
             DeathManager.OnBlackScreen += LaunchMainMenu;
             DeathManager.Instance.DeathFade(false, 1f);
