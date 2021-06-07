@@ -97,9 +97,9 @@ public class DeathManager : MonoBehaviour {
             //We increase or decrease the alpha according to the wanted color
             float newAlpha = m_image.color.a;
             if (m_targetOpacity == 0f) {
-                newAlpha -= Time.deltaTime / m_fadeTime;
+                newAlpha -= Time.unscaledDeltaTime / m_fadeTime;
             }else if (m_targetOpacity == 1f) {
-                newAlpha += Time.deltaTime / m_fadeTime;
+                newAlpha += Time.unscaledDeltaTime / m_fadeTime;
             }else{
                 Debug.LogError("The precision of the float has been fucked up, call Blue immediately if this error occurs", this);
             }

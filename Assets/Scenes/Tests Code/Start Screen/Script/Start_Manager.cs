@@ -80,23 +80,8 @@ public class Start_Manager : MonoBehaviour {
 
     [SerializeField] [Tooltip("not supposed to exist")] [Range(0.0f,1.0f)] private float m_multiplier = 2f;
 
-    
-    // Start is called before the first frame update
-    void Awake() {
-        Initialization();
 
-        if (Rumbler.Instance.m_gamepad == null) {
-            m_isGamepadPlugged = false;
-            m_missingGamepadScreen.SetActive(true);
-        }else {
-            m_isGamepadPlugged = true;
-            m_missingGamepadScreen.SetActive(false);
-        }
-
-    }
-
-
-    void Initialization()
+    private void Start()
     {
 
         switch (PlayerPrefs.GetInt("Level", 0)) {
@@ -109,12 +94,13 @@ public class Start_Manager : MonoBehaviour {
             
             case 2 :
             case 3:
+            case 4:
                 m_fisrtSetup.SetActive(false);
                 m_secondSetup.SetActive(true);
                 m_thirdSetup.SetActive(false);
                 break;
             
-            case 4:
+            case 5:
                 m_fisrtSetup.SetActive(false);
                 m_secondSetup.SetActive(false);
                 m_thirdSetup.SetActive(true);
@@ -176,6 +162,17 @@ public class Start_Manager : MonoBehaviour {
         //We make the panel fully transparent... for now...
         image.color = new Color(0f,0f,0f, 0f);
         m_image = image;
+        
+        
+        
+
+        if (Rumbler.Instance.m_gamepad == null) {
+            m_isGamepadPlugged = false;
+            m_missingGamepadScreen.SetActive(true);
+        }else {
+            m_isGamepadPlugged = true;
+            m_missingGamepadScreen.SetActive(false);
+        }
         
     }
 

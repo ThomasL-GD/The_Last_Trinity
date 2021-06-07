@@ -98,7 +98,7 @@ public class GuardBehavior : MonoBehaviour {
      // Start is called before the first frame update
     void Start() {
 
-        if(m_destinationsTransforms.Count < 1) Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT DESTINATIONS IN THE ENNEMY !", this);
+        if(m_destinationsTransforms.Count < 1 && !m_isStatic) Debug.LogError("JEEZ ! THE GAME DESIGNER FORGOT TO PUT DESTINATIONS IN THE ENNEMY !", this);
         
         if(m_hitFX == null) Debug.LogWarning("There's no FX for the hit of this ennemy, it's still gonna work thought", this);
         
