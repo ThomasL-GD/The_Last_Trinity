@@ -90,6 +90,10 @@ public class Rumbler : MonoBehaviour
     // Private helpers
     public Gamepad GetGamepad()
     {
+        if (m_gamepad == null) {
+            m_gamepad = Gamepad.current;
+            m_dpad = Gamepad.current.dpad;
+        }
         //return Gamepad.all.FirstOrDefault(g => m_playerInput.devices.Any(d => d.deviceId == g.deviceId));
         return Gamepad.current;
         

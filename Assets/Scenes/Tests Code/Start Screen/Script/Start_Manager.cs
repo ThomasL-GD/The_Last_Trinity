@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
@@ -33,6 +35,7 @@ public class Start_Manager : MonoBehaviour {
     [SerializeField] [Tooltip("texte de démarrage")] private TextMeshProUGUI m_pressStartText=null;
     [SerializeField] [Tooltip("Menu Principal")] private GameObject m_mainMenu=null;
     [SerializeField] [Tooltip("Liste des positions sur lesquelles on va se déplacer ")] private Menu m_languagesMenu = new Menu();
+    [SerializeField] [Tooltip("UImage that shows the user he has no gamepad plugged in")] private GameObject m_missingGamepadScreen = null;
     
     private int m_sceneIndex = 0;
     
@@ -46,6 +49,7 @@ public class Start_Manager : MonoBehaviour {
     private bool m_englishMenuIsActive = false;  //indique si le menu anglais est visible ou non
     private bool m_frenchMenuIsActive = false;  //indique si le menu français est visible ou non
     private bool m_isLaunchingGame = false;
+    private bool m_isGamepadPlugged = false;
     private Vector3 m_travelToBack = Vector3.zero; //The vector that represents the travel from original to back position
 
     [Header("Menu Evolutif")]
@@ -76,7 +80,21 @@ public class Start_Manager : MonoBehaviour {
 
     
     // Start is called before the first frame update
-    void Awake()
+    void Awake() {
+        Initialization();
+
+        if (Rumbler.Instance.m_gamepad == null) {
+            m_isGamepadPlugged = false;
+            m_missingGamepadScreen.SetActive(true);
+        }else {
+            m_isGamepadPlugged = true;
+            m_missingGamepadScreen.SetActive(false);
+        }
+
+    }
+
+
+    void Initialization()
     {
 
         switch (PlayerPrefs.GetInt("Level", 0)) {
@@ -155,11 +173,22 @@ public class Start_Manager : MonoBehaviour {
         //We make the panel fully transparent... for now...
         image.color = new Color(0f,0f,0f, 0f);
         m_image = image;
-
+        
     }
 
     // Update is called once per frame
-    void Update(){
+    void Update()
+    {
+
+        if (!m_isGamepadPlugged) {
+            Gamepad gamepad = Rumbler.Instance.GetGamepad();
+            if (gamepad == null) return;
+            else {
+                m_isGamepadPlugged = true;
+                m_missingGamepadScreen.SetActive(false);
+                return;
+            }
+        }
 
         float horizontalAxis = Input.GetAxis("Horizontal");
         float verticalAxis = Input.GetAxis("Vertical");
@@ -329,7 +358,7 @@ public class Start_Manager : MonoBehaviour {
             else { //Once we've reached the back point, we just hang in there
                 m_cosine += Time.deltaTime * m_multiplier;
                 m_camera.transform.position += m_travelToBack * ((Time.deltaTime/m_backTimeCamera) * Mathf.Cos(m_cosine));
-                Debug.Log(Mathf.Cos(m_cosine));
+                //Debug.Log(Mathf.Cos(m_cosine));
             }
             
             
